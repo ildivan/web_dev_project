@@ -205,3 +205,49 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+.DS_Store
+dist
+dist-ssr
+coverage
+*.local
+
+/cypress/videos/
+/cypress/screenshots/
+
+# Editor directories and files
+frontend/.vscode
+
+# --- Custom ignores for project structure ---
+# Backend (Django)
+backend/src/db.sqlite3
+backend/src/db.sqlite3-journal
+backend/src/__pycache__/
+backend/src/*.pyc
+backend/src/*.pyo
+backend/src/*.log
+backend/src/local_settings.py
+backend/src/env/
+backend/src/venv/
+backend/src/.env
+backend/src/.venv
+
+# Frontend (Vue.js)
+frontend/src/node_modules/
+frontend/src/dist/
+frontend/src/.env
+frontend/src/.DS_Store
+frontend/src/npm-debug.log*
+frontend/src/yarn-debug.log*
+frontend/src/yarn-error.log*
