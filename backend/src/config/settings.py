@@ -21,7 +21,7 @@ INSTALLED_APPS = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:8080",  # Vue frontend
+    "http://localhost",  # Vue frontend
 ]
 
 MIDDLEWARE = [
