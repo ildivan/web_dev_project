@@ -6,9 +6,8 @@ Web developement project for the Bachelor 's Degree in Computer Engineering cour
 2) Write a .env file where you find .env_example files and follow them
 3) Run docker compose up
 4) Enter the backend container's shell and run these commands for the first startup:
-    1) python src/manage.py migrate #creates the tables needed for django to function
-    2) python src/manage.py createsuperuser  # Lets you create an admin user for the application
-    
+    1) python src/manage.py createsuperuser  # Lets you create an admin user for the application
+    2) python src/manage.py migrate #creates the tables needed for django to function
 
 5) Go to http://localhost and you should be forwarded to the login page
 
