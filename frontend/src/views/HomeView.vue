@@ -1,4 +1,3 @@
-
 <script setup>
 import Title from '../components/Title.vue'
 import { useAuth } from '../composables/useAuth'
