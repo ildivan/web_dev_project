@@ -20,6 +20,7 @@ const handleLogin = () => {
       <input v-model="password" type="password" placeholder="Password" />
       <button type="submit">Login</button>
       <p v-if="authError">{{ authError }}</p>
+      <p>Don't have an account? <router-link to="/register">Register here</router-link></p>
     </form>
   </div>
 </template>

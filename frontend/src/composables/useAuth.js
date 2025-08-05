@@ -36,10 +36,26 @@ export function useAuth() {
     }
   }
 
+  const register = async (email, username, password) => {
+    try {
+      await axiosInstance.post('api/auth/users/', {
+        email,
+        username,
+        password,
+      })
+      //automatic login after registration
+      await login(username, password)
+    } catch (err) {
+      authError.value = err.response?.data || 'Registration failed'
+      console.error(err)
+    }
+  }
+
   return {
     authToken,
     authError,
     login,
     logout,
+    register
   }
 }
