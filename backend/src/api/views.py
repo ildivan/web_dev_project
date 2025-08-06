@@ -1,7 +1,7 @@
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import viewsets, generics, permissions
+from rest_framework import viewsets, permissions
 from .models import ResearchArea, ResearchGroupComponent, ResearchProject, Publication, Course
 from rest_framework import serializers
 
