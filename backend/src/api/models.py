@@ -9,8 +9,7 @@ class ResearchArea(models.Model):
         return self.name
 
 class ResearchGroupComponent(models.Model):
-    username = models.OneToOneField('auth.User', on_delete=models.CASCADE, related_name='research_group_component', primary_key=True)
-    role = models.ForeignKey('auth.Group', on_delete=models.SET_NULL, related_name='components', null=True)
+    user = models.OneToOneField('auth.User', on_delete=models.CASCADE, related_name='research_group_component', primary_key=True)
     description = models.TextField(blank=True)
     
     def __str__(self):
