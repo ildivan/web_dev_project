@@ -3,6 +3,7 @@ import { useRouter } from 'vue-router'
 import axiosInstance from '../axios'
 
 const authToken = ref(localStorage.getItem('authToken') || null)
+const permissions = ref(localStorage.getItem('userPermissions') || null)
 const authError = ref(null)
 
 export function useAuth() {
@@ -21,6 +22,14 @@ export function useAuth() {
       router.push('/')
     } catch (err) {
       authError.value = 'Invalid credentials'
+    } finally {
+      try {
+        const permissionsRes = await axiosInstance.get('api/auth/permissions/')
+        permissions.value = permissionsRes.data.permissions
+        localStorage.setItem('userPermissions', JSON.stringify(permissions.value))
+      } catch (err) {
+        console.error('Failed to fetch permissions:', err)
+      }
     }
   }
 
@@ -31,6 +40,8 @@ export function useAuth() {
       console.warn('Logout error:', err)
     } finally {
       localStorage.removeItem('authToken')
+      localStorage.removeItem('userPermissions')
+      permissions.value = null
       authToken.value = null
       router.push('/login')
     }

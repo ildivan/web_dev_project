@@ -3,6 +3,7 @@ import Title from '../components/Title.vue'
 import axiosInstance from '../axios'
 import { useAuth } from '../composables/useAuth'
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 
 
 const title = ref('Welcome to the Research Hub')
@@ -10,6 +11,7 @@ const { logout } = useAuth()
 const message = ref('')
 const user = ref(null)
 const error = ref('')
+const router = useRouter()
 
 
 const fetchUser = async () => {
@@ -38,6 +40,9 @@ const sendName = async () => {
 }
 
 
+const goToLoginPage = () => {
+  router.push("/login")
+}
 
 
 onMounted(() => {
@@ -49,8 +54,10 @@ onMounted(() => {
 <template>
   <div>
     <Title :title="title" />
-    <h2>{{ message }}</h2>
-    <button @click="logout">Logout</button>
+    <h2 v-if="user && user.username">{{ message }}</h2>
+    <p v-else>{{ error }}</p>
+    <button v-if="user && user.username" @click="logout">Logout</button>
+    <button v-else @click="goToLoginPage">Login</button>
   </div>
 </template>
 

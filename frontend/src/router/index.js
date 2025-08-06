@@ -8,9 +8,6 @@ const routes = [
     path: '/',
     name: 'Home',
     component: HomeView,
-    meta: {
-      authenticationRequired: true,
-    },
   },
   {
     path: '/login',
@@ -34,6 +31,14 @@ router.beforeEach((to, from, next) => {
   if (to.meta.authenticationRequired && !isAuthenticated) {
     next('/login');
   } else {
+    if(to.meta.permissionRequired) {
+      const userPermissions = JSON.parse(localStorage.getItem('userPermissions') || '[]');
+      for (const permission of to.meta.permissionsRequired || []) {
+        if (!userPermissions.includes(permission)) {
+          return next({ name: 'Home' });
+        }
+      }
+    }
     next();
   }
 });
