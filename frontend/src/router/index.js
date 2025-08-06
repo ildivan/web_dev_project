@@ -35,7 +35,7 @@ router.beforeEach((to, from, next) => {
       const userPermissions = JSON.parse(localStorage.getItem('userPermissions') || '[]');
       for (const permission of to.meta.permissionsRequired || []) {
         if (!userPermissions.includes(permission)) {
-          return next({ name: 'Home' });
+          next({ name: from.name || 'Home' });
         }
       }
     }
