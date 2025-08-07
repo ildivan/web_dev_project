@@ -1,9 +1,10 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import viewsets, permissions
+from rest_framework import viewsets
 from .models import ResearchArea, ResearchGroupComponent, ResearchProject, Publication, Course
 from rest_framework import serializers
 from rest_framework.permissions import IsAuthenticated, DjangoModelPermissions
+from django.contrib.auth.models import User
 
 # Serializers
 class ResearchAreaSerializer(serializers.ModelSerializer):
@@ -11,7 +12,14 @@ class ResearchAreaSerializer(serializers.ModelSerializer):
         model = ResearchArea
         fields = '__all__'
 
+class UserPublicSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'first_name', 'last_name', 'email']
+
 class ResearchGroupComponentSerializer(serializers.ModelSerializer):
+    user = UserPublicSerializer(read_only=True)
+
     class Meta:
         model = ResearchGroupComponent
         fields = '__all__'
