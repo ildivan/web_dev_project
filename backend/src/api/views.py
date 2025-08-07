@@ -13,9 +13,15 @@ class ResearchAreaSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class UserPublicSerializer(serializers.ModelSerializer):
+    groups = serializers.SlugRelatedField(
+        many=True,
+        read_only=True,
+        slug_field='name'
+    )
+
     class Meta:
         model = User
-        fields = ['id', 'first_name', 'last_name', 'email']
+        fields = ['id', 'first_name', 'last_name', 'email', 'groups']
 
 class ResearchGroupComponentSerializer(serializers.ModelSerializer):
     user = UserPublicSerializer(read_only=True)
