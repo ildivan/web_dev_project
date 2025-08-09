@@ -1,4 +1,3 @@
-
 <script setup>
 import { defineProps } from 'vue'
 
@@ -11,11 +10,7 @@ const props = defineProps({
 </script>
 
 <template>
-  <h1>{{ title }}</h1>
+  <h1 class="text-center text-3xl font-extrabold text-indigo-900 mb-6">
+    {{ title }}
+  </h1>
 </template>
-
-<style scoped>
-h1 {
-  color: #42b883;
-}
-</style>
