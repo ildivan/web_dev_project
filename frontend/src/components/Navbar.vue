@@ -5,9 +5,10 @@ const mobileMenuOpen = ref(false);
 
 const menuItems = [
   { name: 'Home', to: '/' },
-  { name: 'About', to: '/about' },
-  { name: 'Sign Up', to: '/register' },
-  { name: 'Login', to: '/login' }
+  { name: 'Membri', to: '/members' },
+  { name: 'Progetti', to: '/projects' },
+  { name: 'Pubblicazioni', to: '/pubblications' },
+  { name: 'Profilo', to: '/profile' }
 ];
 
 const toggleMobileMenu = () => {

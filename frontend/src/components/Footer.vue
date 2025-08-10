@@ -8,6 +8,23 @@ const currentYear = ref(new Date().getFullYear());
 
 <template>
   <footer class="bg-gray-50 text-slate-700 py-6 text-center rounded-b-xl font-sans select-none shadow-inner">
+    
+    <p class="text-sm mb-5 inline-block">
+      <router-link 
+        to="/contacts" 
+        class="text-slate-700 hover:underline duration-300 "
+        style="cursor: pointer;"
+      >
+        Contattaci
+      </router-link>
+    </p>
+
+    <div 
+      class="mx-auto mb-4"
+      style="width: 360px; height: 0; border-bottom: 1px; border-bottom-style: solid; border-bottom-color: rgb(51, 65, 85);"
+    ></div>
+
+
     <p class="text-sm">&copy; {{ currentYear }} by {{ authorName }}</p>
     <p class="text-sm">Version {{ appVersion }}</p>
   </footer>

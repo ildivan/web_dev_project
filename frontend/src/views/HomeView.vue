@@ -15,7 +15,7 @@ const projectViewTitle = ref('Progetti di Ricerca')
 const projects = ref([])
 
 const goToAllProjects = () => {
-  router.push('/progetti')
+  router.push('/projects')
 }
 
 onMounted(() => {
