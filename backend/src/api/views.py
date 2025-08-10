@@ -59,7 +59,13 @@ class ResearchGroupComponentViewSet(viewsets.ModelViewSet):
 class ResearchProjectViewSet(viewsets.ModelViewSet):
     queryset = ResearchProject.objects.all()
     serializer_class = ResearchProjectSerializer
-    permission_classes = [IsAuthenticated, DjangoModelPermissions]
+
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            permission_classes = []
+        else:
+            permission_classes = [IsAuthenticated, DjangoModelPermissions]
+        return [permission() for permission in permission_classes]
 
 class PublicationViewSet(viewsets.ModelViewSet):
     queryset = Publication.objects.all()

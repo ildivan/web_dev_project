@@ -243,6 +243,7 @@ backend/src/env/
 backend/src/venv/
 backend/src/.env
 backend/src/.venv
+backend/src/config/populate.py
 
 # Frontend (Vue.js)
 frontend/src/node_modules/
