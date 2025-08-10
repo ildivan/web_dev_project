@@ -5,48 +5,25 @@ import Footer from '../components/Footer.vue'
 import Navbar from '../components/Navbar.vue'
 import ProjectCard from '../components/ProjectCard.vue'
 import axiosInstance from '../axios' 
+import { getProjects } from '../apicalls/apiCalls.js'
 
 const router = useRouter()
 const welcomeMessage = ref('Benvenuti nel nostro gruppo di ricerca!')
 const description = ref('Siamo un team dedicato allo sviluppo di soluzioni innovative nelle aree di Intelligenza Artificiale, Sicurezza Informatica e Data Science. Esplora i nostri progetti e le nostre ricerche per scoprire come stiamo contribuendo al progresso tecnologico e scientifico.')
 const projectViewTitle = ref('Progetti di Ricerca')
-// tutti i progetti
-// const projects = ref([
-//   { id: 1, name: 'Intelligenza Artificiale per la Medicina', description: 'Sviluppo di algoritmi di AI per la diagnosi precoce.', status: 'Attivo' },
-//   { id: 2, name: 'Energia Rinnovabile e Storage', description: 'Tecnologie innovative per accumulo di energia solare.', status: 'Concluso' },
-//   { id: 3, name: 'Robotica per Ambienti Pericolosi', description: 'Progettazione di robot autonomi per missioni di salvataggio.', status: 'Attivo' },
-//   { id: 4, name: 'Sicurezza Informatica Avanzata', description: 'Sistemi di difesa e rilevamento minacce informatiche.', status: 'In sviluppo' },
-//   { id: 5, name: 'Analisi di Big Data per la Climatologia', description: 'Studio di modelli climatici usando dataset di grandi dimensioni.', status: 'Attivo' },
-//   { id: 6, name: 'Biotecnologie per l’Agricoltura', description: 'Tecniche innovative per aumentare la resa agricola sostenibile.', status: 'Concluso' },
-//   { id: 7, name: 'Machine Learning per la Prevenzione Sismica', description: 'Modelli predittivi per identificare segnali precursori di terremoti.', status: 'In sviluppo' },
-//   { id: 8, name: 'Nanotecnologie per la Medicina Rigenerativa', description: 'Utilizzo di nanoparticelle per la rigenerazione di tessuti danneggiati.', status: 'Attivo' },
-//   { id: 9, name: 'Blockchain per la Tracciabilità Alimentare', description: 'Sistemi decentralizzati per garantire la sicurezza della filiera alimentare.', status: 'Attivo' },
-//   { id: 10, name: 'Sistemi di Visione Artificiale per la Qualità Industriale', description: 'Telecamere intelligenti per rilevare difetti in produzione.', status: 'Concluso' }
-// ])
 
-const projects = ref([])  // array vuoto inizialmente
-const authError = ref(null)  // per gestire errori
 
-const fetchProjects = async () => {
-  try {
-    const response = await axiosInstance.get('api/projects')
-    projects.value = response.data  // assegna i dati ricevuti
-  } catch (err) {
-    authError.value = err.response?.data || 'Failed to fetch projects'
-    console.error(err)
-  }
-}
-
-// quanti progetti mostrare in home
-const visibleCount = ref(6) // mostra solo 6, cambia in base al layout
-const visibleProjects = computed(() => projects.value.slice(0, visibleCount.value))
+const projects = ref([])
 
 const goToAllProjects = () => {
-  router.push('/progetti') // pagina dedicata con lista completa
+  router.push('/progetti')
 }
 
 onMounted(() => {
-  fetchProjects()
+  getProjects().then(data => {
+    projects.value = data.results
+  })
+  
 })
 </script>
 
@@ -67,7 +44,7 @@ onMounted(() => {
           <h2 class="text-2xl font-bold mb-12">{{ projectViewTitle }}</h2>
           <div class="grid md:grid-cols-1 gap-6">
             <ProjectCard
-              v-for="project in visibleProjects"
+              v-for="project in projects"
               :key="project.id"
               :project="project"
             />
