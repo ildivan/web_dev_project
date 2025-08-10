@@ -3,5 +3,5 @@
 </script>
 
 <template>
-    <h1>CONTACTSVIEW</h1>
+    contactsview
 </template>

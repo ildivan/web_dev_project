@@ -1,8 +1,7 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted, onBeforeUnmount } from 'vue';
 
 const mobileMenuOpen = ref(false);
-
 const menuItems = [
   { name: 'Home', to: '/' },
   { name: 'Membri', to: '/members' },
@@ -14,14 +13,40 @@ const menuItems = [
 const toggleMobileMenu = () => {
   mobileMenuOpen.value = !mobileMenuOpen.value;
 };
+
+// --- Nuovo: mostra/nascondi navbar allo scroll ---
+const lastScrollY = ref(window.scrollY);
+const showNavbar = ref(true);
+
+const handleScroll = () => {
+  if (window.scrollY > lastScrollY.value && window.scrollY > 80) {
+    // scendendo -> nascondi
+    showNavbar.value = false;
+  } else {
+    // salendo -> mostra
+    showNavbar.value = true;
+  }
+  lastScrollY.value = window.scrollY;
+};
+
+onMounted(() => {
+  window.addEventListener('scroll', handleScroll);
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener('scroll', handleScroll);
+});
 </script>
 
 <template>
-  <nav class="bg-white shadow-md fixed w-full z-30 top-0 left-0">
+  <nav
+    class="bg-white shadow-md fixed w-full z-30 top-0 left-0 transform transition-transform duration-300"
+    :class="{ '-translate-y-full': !showNavbar, 'translate-y-0': showNavbar }"
+  >
     <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between h-16 items-center">
         <!-- Logo -->
-        <router-link to="/" class="text-indigo-900 font-bold text-xl select-none">
+        <router-link to="/" class="text-indigo-900 font-bold text-xl select-none hover:text-indigo-700 transition-colors duration-300">
           Research Hub
         </router-link>
 
@@ -36,7 +61,6 @@ const toggleMobileMenu = () => {
             {{ item.name }}
           </router-link>
         </div>
-
 
         <!-- Mobile menu button -->
         <button
@@ -75,7 +99,7 @@ const toggleMobileMenu = () => {
       </div>
     </div>
 
-    <!-- Mobile menu con animazione -->
+    <!-- Mobile menu -->
     <transition
       enter-active-class="transition ease-out duration-300"
       enter-from-class="opacity-0 transform -translate-y-4"

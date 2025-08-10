@@ -53,7 +53,7 @@ onMounted(() => {
           <div class="mt-8 text-center">
             <button 
               @click="goToAllProjects"
-              class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors duration-300"
+              class="px-6 py-2 bg-indigo-300 text-grey-600 rounded-lg hover:bg-indigo-700 hover:text-white transition-colors duration-300"
             >
               Mostra tutti i progetti
             </button>
