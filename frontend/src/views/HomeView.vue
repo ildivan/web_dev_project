@@ -4,7 +4,6 @@ import { useRouter } from 'vue-router'
 import Footer from '../components/Footer.vue'
 import Navbar from '../components/Navbar.vue'
 import ProjectCard from '../components/ProjectCard.vue'
-import axiosInstance from '../axios' 
 import { getProjects } from '../apicalls/apiCalls.js'
 
 const router = useRouter()
