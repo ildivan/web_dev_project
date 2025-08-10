@@ -1,24 +1,21 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import Footer from '../components/Footer.vue'
 import Navbar from '../components/Navbar.vue'
+import ProjectListItem from '../components/ProjectListItem.vue'
+import { getProjects } from '../apiCalls/apiCalls.js'
 
 const router = useRouter()
 
 // tutti i progetti
-const projects = ref([
-  { id: 1, name: 'Intelligenza Artificiale per la Medicina', description: 'Sviluppo di algoritmi di AI per la diagnosi precoce.', status: 'Attivo' },
-  { id: 2, name: 'Energia Rinnovabile e Storage', description: 'Tecnologie innovative per accumulo di energia solare.', status: 'Concluso' },
-  { id: 3, name: 'Robotica per Ambienti Pericolosi', description: 'Progettazione di robot autonomi per missioni di salvataggio.', status: 'Attivo' },
-  { id: 4, name: 'Sicurezza Informatica Avanzata', description: 'Sistemi di difesa e rilevamento minacce informatiche.', status: 'In sviluppo' },
-  { id: 5, name: 'Analisi di Big Data per la Climatologia', description: 'Studio di modelli climatici usando dataset di grandi dimensioni.', status: 'Attivo' },
-  { id: 6, name: 'Biotecnologie per l’Agricoltura', description: 'Tecniche innovative per aumentare la resa agricola sostenibile.', status: 'Concluso' },
-  { id: 7, name: 'Machine Learning per la Prevenzione Sismica', description: 'Modelli predittivi per identificare segnali precursori di terremoti.', status: 'In sviluppo' },
-  { id: 8, name: 'Nanotecnologie per la Medicina Rigenerativa', description: 'Utilizzo di nanoparticelle per la rigenerazione di tessuti danneggiati.', status: 'Attivo' },
-  { id: 9, name: 'Blockchain per la Tracciabilità Alimentare', description: 'Sistemi decentralizzati per garantire la sicurezza della filiera alimentare.', status: 'Attivo' },
-  { id: 10, name: 'Sistemi di Visione Artificiale per la Qualità Industriale', description: 'Telecamere intelligenti per rilevare difetti in produzione.', status: 'Concluso' }
-])
+const projects = ref([])
+
+onMounted(() => {
+  getProjects().then(data => {
+    projects.value.results = data
+  })
+})
 
 // quanti progetti mostrare in home
 const visibleCount = ref(6) // mostra solo 6, cambia in base al layout
@@ -46,21 +43,13 @@ const goToAllProjects = () => {
         <div class="container mx-auto">
           <h2 class="text-2xl font-bold mb-12">Progetti di Ricerca</h2>
           <div class="grid md:grid-cols-1 gap-6">
-            <div 
-              v-for="project in visibleProjects" 
-              :key="project.id" 
-              class="p-4 bg-gray-100 rounded shadow hover:shadow-lg transition-shadow duration-300"
-            >
-              <h3 class="font-semibold">{{ project.name }}</h3>
-              <p class="text-sm text-gray-600">{{ project.description }}</p>
-              <p class="mt-2 text-xs font-medium text-gray-500">
-                Stato: <span :class="{
-                  'text-green-600': project.status === 'Attivo',
-                  'text-red-600': project.status === 'Concluso',
-                  'text-yellow-600': project.status === 'In sviluppo'
-                }">{{ project.status }}</span>
-              </p>
-            </div>
+            <ProjectListItem
+              v-for="project in visibleProjects"
+              :key="project.id"
+              :name="project.name"
+              :description="project.description"
+              :status="project.status"
+            />
           </div>
 
           <div class="mt-8 text-center">
