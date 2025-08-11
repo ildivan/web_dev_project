@@ -5,6 +5,7 @@ import Footer from '../components/Footer.vue'
 import Navbar from '../components/Navbar.vue'
 import ProjectCard from '../components/ProjectCard.vue'
 import { getProjects } from '../apicalls/apiCalls.js'
+import Button from '../components/Button.vue'
 
 const router = useRouter()
 const welcomeMessage = ref('Benvenuti nel nostro gruppo di ricerca!')
@@ -51,12 +52,10 @@ onMounted(() => {
 
 
           <div class="mt-8 text-center">
-            <button 
-              @click="goToAllProjects"
-              class="px-6 py-2 bg-indigo-300 text-grey-600 rounded-lg hover:bg-indigo-700 hover:text-white transition-colors duration-300"
-            >
-              Mostra tutti i progetti
-            </button>
+            <Button
+              message="Mostra tutti i progetti"
+              @click="goToAllProjects">
+            </Button>
           </div>
         </div>
       </section>
