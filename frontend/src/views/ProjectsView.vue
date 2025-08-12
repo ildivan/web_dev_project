@@ -7,7 +7,6 @@ import ProjectCard from '../components/cards/ProjectCard.vue'
 import { getProjects } from '../apiCalls/apiCalls.js'
 import Button from '../components/Button.vue'
 
-const router = useRouter()
 const welcomeMessage = ref('I nostri progetti')
 
 const projects = ref([])
