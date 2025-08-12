@@ -3,6 +3,7 @@ import { ref, computed } from 'vue';
 import { useAuth } from '../composables/useAuth';
 import Footer from '../components/Footer.vue';
 import Title from '../components/Title.vue';
+import ShowHideButton from '../components/ShowHIdeButton.vue';
 
 const username = ref('');
 const password = ref('');
@@ -30,19 +31,19 @@ const isFormValid = computed(() => {
   <div class="flex flex-col min-h-screen bg-gray-50">
     <div class="flex-grow flex justify-center items-center p-6">
       <div class="w-full max-w-lg">
-        <Title title="Welcome to the Research Hub" class="mb-6" />
+        <Title title="Area privata Research Hub" class="mb-6" />
         <div class="bg-white rounded-2xl shadow-lg p-8">
-          <h2 class="text-center text-2xl font-bold mb-4 text-grey-600">Log in</h2>
+          <h2 class="text-center text-2xl font-bold mb-4 text-grey-600">Accedi</h2>
           <p class="text-center text-grey-600 mb-6">
-            Don't have an account?
+            Non hai un account?
             <router-link to="/register" class="text-indigo-600 font-semibold hover:text-indigo-800 underline">
-              Sign up here
+              Registrati
             </router-link>
           </p>
 
           <form @submit.prevent="handleLogin" class="space-y-6">
             <div>
-              <label for="username" class="block text-grey-600 font-semibold mb-1">Your username</label>
+              <label for="username" class="block text-grey-600 font-semibold mb-1">Username</label>
               <input
                 id="username"
                 v-model="username"
@@ -54,7 +55,7 @@ const isFormValid = computed(() => {
             </div>
 
             <div class="relative">
-              <label for="password" class="block text-grey-600 font-semibold mb-1">Your password</label>
+              <label for="password" class="block text-grey-600 font-semibold mb-1">Password</label>
               <input
                 :type="passwordFieldType"
                 id="password"
@@ -63,13 +64,11 @@ const isFormValid = computed(() => {
                 required
                 class="w-full px-4 py-2 rounded-lg border border-indigo-300 bg-indigo-100 text-grey-600 focus:outline-none focus:ring-2 focus:ring-indigo-400"
               />
-              <button
-                type="button"
-                @click="togglePasswordVisibility"
-                class="absolute right-3 top-2/4 -translate-y-2/4 text-grey-600 hover:text-indigo-600 font-semibold show-button-position"
-              >
-                {{ showPassword ? 'Hide' : 'Show' }}
-              </button>
+              <ShowHideButton 
+                class="show-button"
+                :showPassword="showPassword"
+                @toggle="togglePasswordVisibility"
+              />
             </div>
 
             <button
@@ -78,7 +77,7 @@ const isFormValid = computed(() => {
               :class="isFormValid ? 'bg-indigo-900 hover:bg-indigo-700 text-white' : 'bg-indigo-300 text-grey-600 cursor-not-allowed'"
               class="w-full py-3 rounded-lg font-bold transition-colors"
             >
-              Log in
+              Accedi
             </button>
 
             <p v-if="authError" class="text-red-600 mt-3 text-center">{{ authError }}</p>
@@ -102,8 +101,14 @@ const isFormValid = computed(() => {
 
 <style scoped>
 
-.show-button-position {
-  top: 70%;
-  margin-right: 30px;
+.relative {
+  position: relative;
 }
+
+.show-button {
+  position: absolute;
+  right: 45px;
+  top: 70%
+}
+
 </style>

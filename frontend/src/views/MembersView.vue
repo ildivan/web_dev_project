@@ -1,41 +1,50 @@
 <script setup>
-import Footer from '../components/Footer.vue';
-import Navbar from '../components/Navbar.vue';
-import Title from '../components/Title.vue';
+import { ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import Footer from '../components/Footer.vue'
+import Navbar from '../components/Navbar.vue'
+import { getGroupComponents } from '../apiCalls/apiCalls.js'
+import Button from '../components/Button.vue'
+import Title from '../components/Title.vue'
 
-// Lista contatti del gruppo di ricerca
-const contacts = [
-  {
-    name: 'Dr. Maria Rossi',
-    role: 'Coordinatrice del Gruppo',
-    email: 'maria.rossi@university.edu',
-    phone: '+39 333 123 4567'
-  },
-  {
-    name: 'Luca Bianchi',
-    role: 'Ricercatore Senior',
-    email: 'luca.bianchi@university.edu',
-    phone: '+39 333 987 6543'
-  },
-  {
-    name: 'Elena Verdi',
-    role: 'Dottoranda',
-    email: 'elena.verdi@university.edu',
-    phone: '+39 320 111 2233'
+const router = useRouter()
+const welcomeMessage = ref('Componenti del Gruppo di Ricerca')
+
+const components = ref([])
+
+const currentPage = ref(1)
+const pageSize = 4
+const hasMore = ref(true)
+
+
+async function loadComponents() {
+  const data = await getGroupComponents(currentPage.value, pageSize)
+  projects.value = [...components.value, ...data.results]
+
+  if (!data.next) {
+    hasMore.value = false
   }
-];
+}
+
+function loadMore() {
+  currentPage.value++
+  loadProjects()
+}
+
+onMounted(() => {
+  loadComponents()
+  console.log('Components loaded:', components.value)
+})
+
 </script>
 
 <template>
-
-
-    
         <div class="flex flex-col min-h-screen bg-gray-50">
             <Navbar/>
             <main class="flex-grow pt-18">
             <section class="flex-grow flex justify-center items-center p-6">
                 <div class="w-full max-w-3xl">
-                    <Title title="Research Group Contacts" class="mb-6" />
+                    <Title title={{welcomeMessage}} class="mb-6" />
 
                     <div class="bg-white rounded-2xl shadow-lg p-8">
                         <h2 class="text-center text-2xl font-bold mb-6 text-gray-600">Our Team</h2>
