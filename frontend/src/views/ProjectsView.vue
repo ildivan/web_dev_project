@@ -3,7 +3,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import Footer from '../components/Footer.vue'
 import Navbar from '../components/Navbar.vue'
-import ProjectCard from '../components/ProjectCard.vue'
+import ProjectCard from '../components/cards/ProjectCard.vue'
 import { getProjects } from '../apiCalls/apiCalls.js'
 import Button from '../components/Button.vue'
 
@@ -17,6 +17,8 @@ const filterPanelOpen = ref(false)
 const currentPage = ref(1)
 const pageSize = 4
 const hasMore = ref(true)
+
+const searchQuery = ref('')
 
 
 async function loadProjects() {
@@ -44,12 +46,24 @@ const getStatus = (project) => {
 
 
 const filteredProjects = computed(() => {
-  if (selectedFilters.value.length === 0) {
-    return projects.value
+  let filtered = projects.value
+  //state filters
+  if (selectedFilters.value.length > 0) {
+    filtered = filtered.filter(project =>
+      selectedFilters.value.includes(getStatus(project))
+    )
   }
-  return projects.value.filter(project =>
-    selectedFilters.value.includes(getStatus(project))
-  )
+  //search query filter
+  if (searchQuery.value.trim() !== '') {
+    const query = searchQuery.value.toLowerCase()
+    filtered = filtered.filter(project =>
+      project.title?.toLowerCase().includes(query)
+      //  ||
+      // project.description?.toLowerCase().includes(query)
+    )
+  }
+
+  return filtered
 })
 
 const toggleFilterPanel = () => {
@@ -68,18 +82,21 @@ const toggleFilterPanel = () => {
             <h2 class="text-3xl font-bold mb-4">{{ welcomeMessage }}</h2>
         </section>
 
-        <section>
-            <Button
-                message="Filtra"
-                @click="toggleFilterPanel"
-                class="mb-4"
-            />
-        </section>
-
-        <section id="progetti" class="bg-white py-12 px-4 rounded-lg shadow relative">
+        <section id="progetti" class="bg-white py-6 px-4 rounded-lg shadow relative">
             <div class="container mx-auto">
-
-    
+            <div class="flex items-center justify-between mb-4">
+               <Button
+                  message="Filtra"
+                  @click="toggleFilterPanel"
+                  class="mr-4"
+                />
+                <input
+                  v-model="searchQuery"
+                  type="text"
+                  placeholder="Cerca progetti..."
+                  class="border border-gray-300 rounded-lg px-4 py-2 flex-1 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+            </div>  
 
                 <!-- flex div for projects and filters -->
                 <div class="flex transition-all duration-300">

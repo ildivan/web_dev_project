@@ -3,7 +3,7 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import Footer from '../components/Footer.vue'
 import Navbar from '../components/Navbar.vue'
-import ProjectCard from '../components/ProjectCard.vue'
+import ProjectCard from '../components/cards/ProjectCard.vue'
 import { getProjects } from '../apiCalls/apiCalls.js'
 import Button from '../components/Button.vue'
 
