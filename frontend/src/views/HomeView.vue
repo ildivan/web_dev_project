@@ -20,7 +20,7 @@ const goToAllProjects = () => {
 }
 
 onMounted(() => {
-  getProjects().then(data => {
+  getProjects(1,4).then(data => {
     projects.value = data.results
   })
   

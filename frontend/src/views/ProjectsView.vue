@@ -14,14 +14,28 @@ const projects = ref([])
 const selectedFilters = ref([]) // selected active filters
 const filterPanelOpen = ref(false)
 
-const goToAllProjects = () => {
-  router.push('/projects')
+const currentPage = ref(1)
+const pageSize = 4
+const hasMore = ref(true)
+
+
+async function loadProjects() {
+  const data = await getProjects(currentPage.value, pageSize)
+  projects.value = [...projects.value, ...data.results]
+
+  if (!data.next) {
+    hasMore.value = false
+  }
+}
+
+
+function loadMore() {
+  currentPage.value++
+  loadProjects()
 }
 
 onMounted(() => {
-  getProjects().then(data => {
-    projects.value = data.results
-  })
+  loadProjects()
 })
 
 const getStatus = (project) => {
@@ -129,8 +143,9 @@ const toggleFilterPanel = () => {
 
                 <div class="mt-8 text-center">
                     <Button
-                        message="Mostra tutti i progetti"
-                        @click="goToAllProjects"
+                        v-if="hasMore"
+                        message="Carica altri progetti"
+                        @click="loadMore"
                     />
                 </div>
             </div>
@@ -159,11 +174,11 @@ const toggleFilterPanel = () => {
 
 .slide-side-enter-to,
 .slide-side-leave-from {
-  width: 16rem; /* corrisponde a w-64 */
+  width: 16rem; 
   opacity: 1;
-  padding-left: 1rem;  /* corrisponde a p-4 */
+  padding-left: 1rem;  
   padding-right: 1rem;
-  margin-right: 1rem; /* corrisponde a mr-4 */
+  margin-right: 1rem; 
 }
 
 </style>
