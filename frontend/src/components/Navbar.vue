@@ -1,14 +1,28 @@
 <script setup>
+import { useRouter } from 'vue-router'
 import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { useAuth } from '../composables/useAuth'
 
-const mobileMenuOpen = ref(false);
-const menuItems = [
-  { name: 'Home', to: '/' },
-  { name: 'Membri', to: '/members' },
-  { name: 'Progetti', to: '/projects' },
-  { name: 'Pubblicazioni', to: '/pubblications' },
-  { name: 'Profilo', to: '/profile' }
-];
+const props = defineProps({
+  menuItems: {
+    type: Array,
+    required: true
+  }
+})
+
+const mobileMenuOpen = ref(false)
+
+const router = useRouter()
+const { logout } = useAuth()
+
+const handleItemClick = (item) => {
+  if (item.action === 'logout') {
+    logout()
+    router.push('/')
+  } else if (item.to) {
+    router.push(item.to)
+  }
+}
 
 const toggleMobileMenu = () => {
   mobileMenuOpen.value = !mobileMenuOpen.value;
@@ -52,14 +66,14 @@ onBeforeUnmount(() => {
 
         <!-- Desktop menu -->
         <div class="hidden md:!flex space-x-8 font-semibold text-gray-700">
-          <router-link
-            v-for="item in menuItems"
+          <button
+            v-for="item in props.menuItems"
             :key="item.name"
-            :to="item.to"
+            @click="handleItemClick(item)"
             class="px-3 py-2 rounded-md hover:bg-indigo-100 hover:text-indigo-700 transition-colors duration-300"
           >
             {{ item.name }}
-          </router-link>
+          </button>
         </div>
 
         <!-- Mobile menu button -->
@@ -114,15 +128,14 @@ onBeforeUnmount(() => {
         id="mobile-menu"
       >
         <div class="px-2 pt-2 pb-3 space-y-1 font-semibold text-gray-700">
-          <router-link
-            v-for="item in menuItems"
+          <button
+            v-for="item in props.menuItems"
             :key="item.name"
-            :to="item.to"
             class="block px-3 py-2 rounded-md hover:bg-indigo-100 hover:text-indigo-700 transition-colors duration-300"
-            @click="mobileMenuOpen = false"
+            @click="() => { handleItemClick(item); mobileMenuOpen = false }"
           >
             {{ item.name }}
-          </router-link>
+          </button>
         </div>
       </div>
     </transition>
