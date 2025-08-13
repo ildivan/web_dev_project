@@ -1,1 +1,6 @@
 docker compose -f docker-compose-no-front.yaml up
+
+Cosa ho creato relativamente hai gruppi
+
+1- per ora un solo gruppo, Componente (admin django)
+2- assegno il gruppo all'utente che vuoi (admin django) -> per ora fatto da qua poi creiamo la pagina apposta

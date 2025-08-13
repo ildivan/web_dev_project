@@ -96,6 +96,27 @@ export function deleteCourse(id) {
     return apiRequest(`/api/courses/${id}/`, 'DELETE');
 }
 
+// Users
+export function getUsers(page = 1, pageSize = 10) {
+    return apiRequest('/api/users/', 'GET', null, { page, page_size: pageSize });
+}
+export function getUser(id) {
+    return apiRequest(`/api/users/${id}/`, 'GET');
+}
+export function createUser(data) {
+    return apiRequest('/api/users/', 'POST', data);
+}
+export function updateUser(id, data) {
+    return apiRequest(`/api/users/${id}/`, 'PUT', data);
+}
+export function deleteUser(id) {
+    return apiRequest(`/api/users/${id}/`, 'DELETE');
+}
+export function isComponent() {
+    return apiRequest('/api/is-component/', 'GET');
+}
+
+
 // Permissions endpoint
 export function getPermissions() {
     return apiRequest('/api/auth/permissions/', 'GET');

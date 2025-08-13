@@ -1,13 +1,14 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import viewsets
-from .models import ResearchArea, ResearchGroupComponent, ResearchProject, Publication, Course
-from rest_framework import serializers
+from rest_framework import viewsets, serializers
 from rest_framework.permissions import IsAuthenticated, DjangoModelPermissions
-from django.contrib.auth.models import User
 from rest_framework.pagination import PageNumberPagination
+from django.contrib.auth.models import User
 
-# Serializers
+from .models import ResearchArea, ResearchGroupComponent, ResearchProject, Publication, Course
+
+# ----------------- SERIALIZER -----------------
+
 class ResearchAreaSerializer(serializers.ModelSerializer):
     class Meta:
         model = ResearchArea
@@ -37,39 +38,36 @@ class ResearchProjectSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class PublicationSerializer(serializers.ModelSerializer):
-    #whe method is GET returns the complete detail of the components otherwise only id required
     components_detail = ResearchGroupComponentSerializer(source='components', many=True, read_only=True)
-    
-    
     components = serializers.PrimaryKeyRelatedField(
         many=True,
         queryset=ResearchGroupComponent.objects.all(),
         write_only=True
     )
-
     research_project_detail = ResearchProjectSerializer(source='research_project', read_only=True)
-
     research_project = serializers.PrimaryKeyRelatedField(
         queryset=ResearchProject.objects.all(),
         write_only=True
     )
+
     class Meta:
         model = Publication
-        fields = '__all__' 
-
+        fields = '__all__'
 
 class CourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Course
         fields = '__all__'
 
-# Optional: Custom pagination class (if you want to customize page size)
+# ----------------- PAGINATION -----------------
+
 class DefaultPagination(PageNumberPagination):
-    page_size = 10  # Set your default page size here
+    page_size = 10
     page_size_query_param = 'page_size'
     max_page_size = 100
 
-# ViewSets
+# ----------------- VIEWSETS -----------------
+
 class ResearchAreaViewSet(viewsets.ModelViewSet):
     queryset = ResearchArea.objects.all()
     serializer_class = ResearchAreaSerializer
@@ -83,10 +81,14 @@ class ResearchGroupComponentViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         if self.request.method == 'GET':
-            permission_classes = []
-        else:
-            permission_classes = [IsAuthenticated, DjangoModelPermissions]
-        return [permission() for permission in permission_classes]
+            return []
+        return [IsAuthenticated(), DjangoModelPermissions()]
+
+class AllUsersViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserPublicSerializer
+    permission_classes = [IsAuthenticated]
+    pagination_class = DefaultPagination
 
 class ResearchProjectViewSet(viewsets.ModelViewSet):
     queryset = ResearchProject.objects.all()
@@ -95,10 +97,8 @@ class ResearchProjectViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         if self.request.method == 'GET':
-            permission_classes = []
-        else:
-            permission_classes = [IsAuthenticated, DjangoModelPermissions]
-        return [permission() for permission in permission_classes]
+            return []
+        return [IsAuthenticated(), DjangoModelPermissions()]
 
 class PublicationViewSet(viewsets.ModelViewSet):
     queryset = Publication.objects.select_related('research_project').prefetch_related('components')
@@ -107,16 +107,16 @@ class PublicationViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         if self.request.method == 'GET':
-            permission_classes = []
-        else:
-            permission_classes = [IsAuthenticated, DjangoModelPermissions]
-        return [permission() for permission in permission_classes]
+            return []
+        return [IsAuthenticated(), DjangoModelPermissions()]
 
 class CourseViewSet(viewsets.ModelViewSet):
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
     permission_classes = [IsAuthenticated, DjangoModelPermissions]
     pagination_class = DefaultPagination
+
+# ----------------- SIMPLE API VIEWS -----------------
 
 class HelloView(APIView):
     def post(self, request):
@@ -128,8 +128,13 @@ class PermissionsView(APIView):
         user = request.user
         if not user.is_authenticated:
             return Response({'detail': 'Authentication failed.'}, status=401)
-
-        # Get all permissions (user and group)
         permissions = user.get_all_permissions()
         return Response({'permissions': list(permissions)})
+    
+class IsComponentView(APIView):
+    permission_classes = [IsAuthenticated]
 
+    def get(self, request):
+        user = request.user
+        is_component = user.groups.filter(name='Componente').exists()
+        return Response({'is_component': is_component})

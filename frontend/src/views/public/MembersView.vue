@@ -21,7 +21,7 @@ const hasMore = ref(true)
 async function loadComponents() {
   const data = await getGroupComponents(currentPage.value, pageSize)
   components.value = [...components.value, ...data.results]
-
+console.log('Loaded components:', components.value)
   if (!data.next) {
     hasMore.value = false
   }

@@ -12,7 +12,7 @@ const groupsString = computed(() => {
 
 <template>
   <div class="border border-indigo-300 rounded-xl p-4 bg-indigo-50">
-    <h3 class="text-lg font-bold text-indigo-900">
+    <h3 class="text-lg font-bold text-indigo-900 capitalize">
       {{ props.component.user.first_name }} {{ props.component.user.last_name }}
     </h3>
 
