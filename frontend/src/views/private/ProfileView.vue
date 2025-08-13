@@ -6,7 +6,7 @@ import Navbar from '../../components/Navbar.vue'
 import Button from '../../components/Button.vue'
 import { useAuth } from '../../composables/useAuth';
 import { MENUS } from '../../composables/menus.js';
-import { isComponent } from '../../apicalls/apiCalls.js';
+import { isComponent } from '../../apiCalls/apiCalls.js';
 
 const router = useRouter()
 const welcomeMessage = ref('Benvenuto nel tuo hub!')

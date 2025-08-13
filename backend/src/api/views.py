@@ -71,7 +71,7 @@ class DefaultPagination(PageNumberPagination):
 class ResearchAreaViewSet(viewsets.ModelViewSet):
     queryset = ResearchArea.objects.all()
     serializer_class = ResearchAreaSerializer
-    permission_classes = [IsAuthenticated, DjangoModelPermissions]
+    permission_classes = [DjangoModelPermissions]
     pagination_class = DefaultPagination
 
 class ResearchGroupComponentViewSet(viewsets.ModelViewSet):
@@ -82,7 +82,7 @@ class ResearchGroupComponentViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.request.method == 'GET':
             return []
-        return [IsAuthenticated(), DjangoModelPermissions()]
+        return [DjangoModelPermissions]
 
 class AllUsersViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = User.objects.all()
@@ -98,7 +98,7 @@ class ResearchProjectViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.request.method == 'GET':
             return []
-        return [IsAuthenticated(), DjangoModelPermissions()]
+        return [DjangoModelPermissions]
 
 class PublicationViewSet(viewsets.ModelViewSet):
     queryset = Publication.objects.select_related('research_project').prefetch_related('components')
@@ -108,12 +108,12 @@ class PublicationViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.request.method == 'GET':
             return []
-        return [IsAuthenticated(), DjangoModelPermissions()]
+        return [DjangoModelPermissions]
 
 class CourseViewSet(viewsets.ModelViewSet):
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
-    permission_classes = [IsAuthenticated, DjangoModelPermissions]
+    permission_classes = [DjangoModelPermissions]
     pagination_class = DefaultPagination
 
 # ----------------- SIMPLE API VIEWS -----------------
