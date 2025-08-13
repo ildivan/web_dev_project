@@ -11,14 +11,14 @@ const groupsString = computed(() => {
 </script>
 
 <template>
-  <div class="border border-indigo-300 rounded-xl p-4 bg-indigo-50 hover:bg-indigo-100 transition">
+  <div class="border border-indigo-300 rounded-xl p-4 bg-indigo-50">
     <h3 class="text-lg font-bold text-indigo-900">
       {{ props.component.user.first_name }} {{ props.component.user.last_name }}
     </h3>
 
     <p class="text-gray-700 font-medium">
-      <span class="font-semibold">Email:</span>
-      <a :href="`mailto:${props.component.user.email}`" class="text-indigo-600 hover:underline">
+      <span class="font-semibold">Email: </span>
+      <a :href="`mailto:${props.component.user.email}`" class="text-gray-700 hover:underline">
         {{ props.component.user.email }}
       </a>
     </p>

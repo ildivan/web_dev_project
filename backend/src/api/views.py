@@ -37,9 +37,26 @@ class ResearchProjectSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class PublicationSerializer(serializers.ModelSerializer):
+    #whe method is GET returns the complete detail of the components otherwise only id required
+    components_detail = ResearchGroupComponentSerializer(source='components', many=True, read_only=True)
+    
+    
+    components = serializers.PrimaryKeyRelatedField(
+        many=True,
+        queryset=ResearchGroupComponent.objects.all(),
+        write_only=True
+    )
+
+    research_project_detail = ResearchProjectSerializer(source='research_project', read_only=True)
+
+    research_project = serializers.PrimaryKeyRelatedField(
+        queryset=ResearchProject.objects.all(),
+        write_only=True
+    )
     class Meta:
         model = Publication
-        fields = '__all__'
+        fields = '__all__' 
+
 
 class CourseSerializer(serializers.ModelSerializer):
     class Meta:
@@ -84,10 +101,16 @@ class ResearchProjectViewSet(viewsets.ModelViewSet):
         return [permission() for permission in permission_classes]
 
 class PublicationViewSet(viewsets.ModelViewSet):
-    queryset = Publication.objects.all()
+    queryset = Publication.objects.select_related('research_project').prefetch_related('components')
     serializer_class = PublicationSerializer
-    permission_classes = [IsAuthenticated, DjangoModelPermissions]
     pagination_class = DefaultPagination
+
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            permission_classes = []
+        else:
+            permission_classes = [IsAuthenticated, DjangoModelPermissions]
+        return [permission() for permission in permission_classes]
 
 class CourseViewSet(viewsets.ModelViewSet):
     queryset = Course.objects.all()
