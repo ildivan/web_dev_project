@@ -20,6 +20,9 @@ FROM nginx:alpine AS production-stage
 # Copio la build prod da node build-stage
 COPY --from=build-stage /app/dist /usr/share/nginx/html
 
+# Copia la configurazione personalizzata di nginx
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
 # Esponi la porta 80
 EXPOSE 80
 
