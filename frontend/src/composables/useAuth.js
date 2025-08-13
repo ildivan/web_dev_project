@@ -19,7 +19,7 @@ export function useAuth() {
       localStorage.setItem('authToken', token)
       authToken.value = token
       authError.value = null
-      router.push('/')
+      router.push('/profile')
     } catch (err) {
       authError.value = 'Invalid credentials'
     } finally {

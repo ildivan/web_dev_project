@@ -1,17 +1,15 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
-import Footer from '../components/Footer.vue'
-import Navbar from '../components/Navbar.vue'
-import ProjectCard from '../components/cards/ProjectCard.vue'
-import { getPublications } from '../apiCalls/apiCalls.js'
-import Button from '../components/Button.vue'
-import PublicationCard from '../components/cards/PublicationCard.vue'
+import Footer from '../../components/Footer.vue'
+import Navbar from '../../components/Navbar.vue'
+import ProjectCard from '../../components/cards/ProjectCard.vue'
+import { getProjects } from '../../apiCalls/apiCalls.js'
+import Button from '../../components/Button.vue'
 
-const welcomeMessage = ref('Pubblicazioni')
+const welcomeMessage = ref('I nostri progetti')
 
-const publications = ref([])
-const selectedFilters = ref([])
+const projects = ref([])
+const selectedFilters = ref([]) // selected active filters
 const filterPanelOpen = ref(false)
 
 const currentPage = ref(1)
@@ -21,9 +19,10 @@ const hasMore = ref(true)
 const searchQuery = ref('')
 
 
-async function loadPublications() {
-  const data = await getPublications(currentPage.value, pageSize)
-  publications.value = [...publications.value, ...data.results]
+async function loadProjects() {
+  const data = await getProjects(currentPage.value, pageSize)
+  projects.value = [...projects.value, ...data.results]
+
   if (!data.next) {
     hasMore.value = false
   }
@@ -32,27 +31,31 @@ async function loadPublications() {
 
 function loadMore() {
   currentPage.value++
-  loadPublications()
+  loadProjects()
 }
 
 onMounted(() => {
-  loadPublications()
+  loadProjects()
 })
 
+const getStatus = (project) => {
+  return project.end_date ? 'finished' : 'active'
+}
 
-const filteredPublications = computed(() => {
-  let filtered = publications.value
+
+const filteredProjects = computed(() => {
+  let filtered = projects.value
   //state filters
   if (selectedFilters.value.length > 0) {
-    filtered = filtered.filter(publication =>
-      selectedFilters.value.includes(getStatus(publication))
+    filtered = filtered.filter(project =>
+      selectedFilters.value.includes(getStatus(project))
     )
   }
   //search query filter
   if (searchQuery.value.trim() !== '') {
     const query = searchQuery.value.toLowerCase()
-    filtered = filtered.filter(publication =>
-      publication.title?.toLowerCase().includes(query)
+    filtered = filtered.filter(project =>
+      project.title?.toLowerCase().includes(query)
       //  ||
       // project.description?.toLowerCase().includes(query)
     )
@@ -61,9 +64,9 @@ const filteredPublications = computed(() => {
   return filtered
 })
 
-// const toggleFilterPanel = () => {
-//   filterPanelOpen.value = !filterPanelOpen.value
-// }
+const toggleFilterPanel = () => {
+  filterPanelOpen.value = !filterPanelOpen.value
+}
 </script>
 
 
@@ -77,18 +80,18 @@ const filteredPublications = computed(() => {
             <h2 class="text-3xl font-bold mb-4">{{ welcomeMessage }}</h2>
         </section>
 
-        <section id="pubblicazioni" class="bg-white py-6 px-4 rounded-lg shadow relative">
+        <section id="progetti" class="bg-white py-6 px-4 rounded-lg shadow relative">
             <div class="container mx-auto">
             <div class="flex items-center justify-between mb-4">
-               <!-- <Button
+               <Button
                   message="Filtra"
                   @click="toggleFilterPanel"
                   class="mr-4"
-                /> -->
+                />
                 <input
                   v-model="searchQuery"
                   type="text"
-                  placeholder="Cerca pubblicazioni..."
+                  placeholder="Cerca progetti..."
                   class="border border-gray-300 rounded-lg px-4 py-2 flex-1 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
             </div>  
@@ -96,7 +99,7 @@ const filteredPublications = computed(() => {
                 <!-- flex div for projects and filters -->
                 <div class="flex transition-all duration-300">
 
-                    <!-- filter panel
+                    <!-- filter panel -->
                     <transition name="slide-side">
                         <div 
                         v-if="filterPanelOpen" 
@@ -142,13 +145,13 @@ const filteredPublications = computed(() => {
                                 </label>
                             </div>
                         </div>
-                    </transition> -->
+                    </transition>
 
                     <div class="grid md:grid-cols-1 gap-6">
-                        <PublicationCard
-                        v-for="publication in filteredPublications"
-                        :key="publication.id"
-                        :project="publication"
+                        <ProjectCard
+                        v-for="project in filteredProjects"
+                        :key="project.id"
+                        :project="project"
                         />
                     </div>
                 </div>
@@ -156,7 +159,7 @@ const filteredPublications = computed(() => {
                 <div class="mt-8 text-center">
                     <Button
                         v-if="hasMore"
-                        message="Carica altre pubblicazioni"
+                        message="Carica altri progetti"
                         @click="loadMore"
                     />
                 </div>

@@ -1,12 +1,12 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import HomeView from '../views/HomeView.vue';
+import HomeView from '../views/public/HomeView.vue';
 import LoginView from '../views/LoginView.vue';
 import RegisterView from '../views/RegisterView.vue';
-import ProjectsView from '../views/ProjectsView.vue';
-import PubblicationsView from '../views/PubblicationsView.vue';
-import ContactsView from '../views/ContactsView.vue';
-import ProfileView from '../views/ProfileView.vue';
-import MembersView from '../views/MembersView.vue';
+import ProjectsView from '../views/public/ProjectsView.vue';
+import PubblicationsView from '../views/public/PubblicationsView.vue';
+import ContactsView from '../views/public/ContactsView.vue';
+import ProfileView from '../views/private/ProfileView.vue';
+import MembersView from '../views/public/MembersView.vue';
 
 const routes = [
   {

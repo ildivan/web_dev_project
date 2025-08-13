@@ -1,11 +1,11 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import Footer from '../components/Footer.vue'
-import Navbar from '../components/Navbar.vue'
-import { getGroupComponents } from '../apiCalls/apiCalls.js'
-import Button from '../components/Button.vue'
-import Title from '../components/Title.vue'
-import ComponentCard from '../components/cards/ComponentCard.vue'
+import Footer from '../../components/Footer.vue'
+import Navbar from '../../components/Navbar.vue'
+import { getGroupComponents } from '../../apiCalls/apiCalls.js'
+import Button from '../../components/Button.vue'
+import Title from '../../components/Title.vue'
+import ComponentCard from '../../components/cards/ComponentCard.vue'
 
 const welcomeMessage = ref('Componenti del Gruppo di Ricerca')
 
