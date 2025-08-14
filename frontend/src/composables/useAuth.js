@@ -1,8 +1,9 @@
-import { ref } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
-import axiosInstance from '../axios'
+import axiosInstance, { axiosEventBus } from '../axios'
 
 const authToken = ref(localStorage.getItem('authToken') || null)
+const refreshToken = ref(localStorage.getItem('refreshToken') || null)
 const permissions = ref(localStorage.getItem('userPermissions') || null)
 const authError = ref(null)
 
@@ -11,13 +12,16 @@ export function useAuth() {
 
   const login = async (username, password) => {
     try {
-      const res = await axiosInstance.post('api/auth/token/login/', {
+      const res = await axiosInstance.post('api/auth/jwt/create/', {
         username,
         password,
       })
-      const token = res.data.auth_token
-      localStorage.setItem('authToken', token)
-      authToken.value = token
+      const access = res.data.access
+      const refresh = res.data.refresh
+      localStorage.setItem('authToken', access)
+      localStorage.setItem('refreshToken', refresh)
+      authToken.value = access
+      refreshToken.value = refresh
       authError.value = null
       router.push('/profile')
     } catch (err) {
@@ -34,18 +38,27 @@ export function useAuth() {
   }
 
   const logout = async () => {
-    try {
-      await axiosInstance.post('api/auth/token/logout/')
-    } catch (err) {
-      console.warn('Logout error:', err)
-    } finally {
       localStorage.removeItem('authToken')
+      localStorage.removeItem('refreshToken')
       localStorage.removeItem('userPermissions')
       permissions.value = null
       authToken.value = null
+      refreshToken.value = null
       router.push('/login')
-    }
   }
+
+  // Listen for logout event from axios
+  const handleLogoutEvent = () => {
+    logout()
+  }
+
+  onMounted(() => {
+    axiosEventBus.addEventListener('auth:logout', handleLogoutEvent)
+  })
+
+  onUnmounted(() => {
+    axiosEventBus.removeEventListener('auth:logout', handleLogoutEvent)
+  })
 
   const register = async (email, username, password) => {
     try {
@@ -54,7 +67,6 @@ export function useAuth() {
         username,
         password,
       })
-      //automatic login after registration
       await login(username, password)
     } catch (err) {
       authError.value = err.response?.data || 'Registration failed'
@@ -64,6 +76,7 @@ export function useAuth() {
 
   return {
     authToken,
+    permissions,
     authError,
     login,
     logout,

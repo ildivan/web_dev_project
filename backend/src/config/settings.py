@@ -1,4 +1,5 @@
 import os
+from datetime import timedelta
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -14,7 +15,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'rest_framework.authtoken',
+    'rest_framework_simplejwt',
     'djoser',
     'corsheaders',
     'api',
@@ -92,15 +93,21 @@ STATIC_URL = '/static/'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
     ),
 }
 
 DJOSER = {
-    'LOGIN_FIELD': 'username', # or 'email' depending on what is used for login
+    'LOGIN_FIELD': 'username', 
     'SERIALIZERS': {},
+    'TOKEN_MODEL': None,
+}
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),      # Access token valid for 5 minutes
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),        # Refresh token valid for 7 days
 }
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
