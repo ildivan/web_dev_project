@@ -1,17 +1,26 @@
 <script setup>
 import { computed } from 'vue'
+import { useRouter } from 'vue-router'
 
 const props = defineProps({
   component: Object
 })
 
+
 const groupsString = computed(() => {
   return props.component.user.groups?.join(', ') || 'Nessun gruppo'
 })
+
+
+const router = useRouter()
+
 </script>
 
 <template>
-  <div class="border border-indigo-300 rounded-xl p-4 bg-indigo-50">
+  <div
+    @click="() => { router.push(`/members/${props.component.user.id}`) }"
+    class="border border-indigo-300 rounded-xl p-4 bg-indigo-50 cursor-pointer transition hover:shadow-lg hover:bg-indigo-100 hover:border-indigo-500"
+  >
     <h3 class="text-lg font-bold text-indigo-900 capitalize">
       {{ props.component.user.first_name }} {{ props.component.user.last_name }}
     </h3>

@@ -149,7 +149,7 @@ const filteredPublications = computed(() => {
                         <PublicationCard
                         v-for="publication in filteredPublications"
                         :key="publication.id"
-                        :project="publication"
+                        :publication="publication"
                         />
                     </div>
                 </div>

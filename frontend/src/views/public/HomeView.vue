@@ -7,6 +7,7 @@ import ProjectCard from '../../components/cards/ProjectCard.vue'
 import { getProjects } from '../../apiCalls/apiCalls.js'
 import Button from '../../components/Button.vue'
 import { MENUS } from '../../composables/menus.js';
+import HeroSection from '../../components/HeroSection.vue'
 
 const router = useRouter()
 const welcomeMessage = ref('Benvenuti nel nostro gruppo di ricerca!')
@@ -34,6 +35,8 @@ onMounted(() => {
         :menuItems = MENUS.home
     />
 
+    <HeroSection />
+
     <main class="flex-grow container max-w-8xl mx-auto p-6 mt-10">
       <section id="overview" class="container mx-auto py-12 px-4 text-center">
         <h2 class="text-3xl font-bold mb-4">{{welcomeMessage}}</h2>
@@ -41,6 +44,8 @@ onMounted(() => {
           {{description}}
         </p>
       </section>
+
+
 
       <section id="progetti" class="bg-white py-12 px-4 rounded-lg shadow">
         <div class="container mx-auto">

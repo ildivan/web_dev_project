@@ -14,6 +14,7 @@ class ResearchAreaSerializer(serializers.ModelSerializer):
         model = ResearchArea
         fields = '__all__'
 
+
 class UserPublicSerializer(serializers.ModelSerializer):
     groups = serializers.SlugRelatedField(
         many=True,
@@ -23,38 +24,64 @@ class UserPublicSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'first_name', 'last_name', 'email', 'groups']
+        fields = ['id', 'username', 'first_name', 'last_name', 'email', 'groups']
+
 
 class ResearchGroupComponentSerializer(serializers.ModelSerializer):
     user = UserPublicSerializer(read_only=True)
+    projects = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    owned_projects = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    teached_courses = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    publications = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
 
     class Meta:
         model = ResearchGroupComponent
         fields = '__all__'
 
+
+class ResearchGroupComponentShortSerializer(serializers.ModelSerializer):
+    user = UserPublicSerializer(read_only=True)
+
+    class Meta:
+        model = ResearchGroupComponent
+        fields = ['user']
+
+class PublicationShortSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Publication
+        fields = ['id', 'title', 'description', 'publication_date']
+
 class ResearchProjectSerializer(serializers.ModelSerializer):
+    research_area_detail = ResearchAreaSerializer(source='research_area', read_only=True)
+    project_owner_detail = ResearchGroupComponentShortSerializer(source='project_owner', read_only=True)
+    components_detail = ResearchGroupComponentShortSerializer(source='components', many=True, read_only=True)
+    publications = PublicationShortSerializer(many=True, read_only=True)
+
     class Meta:
         model = ResearchProject
         fields = '__all__'
 
+
+class ResearchProjectShortSerializer(serializers.ModelSerializer):
+    research_area_detail = ResearchAreaSerializer(source='research_area', read_only=True)
+
+    class Meta:
+        model = ResearchProject
+        fields = ['id', 'title', 'description', 'research_area_detail']
+
+
 class PublicationSerializer(serializers.ModelSerializer):
-    components_detail = ResearchGroupComponentSerializer(source='components', many=True, read_only=True)
-    components = serializers.PrimaryKeyRelatedField(
-        many=True,
-        queryset=ResearchGroupComponent.objects.all(),
-        write_only=True
-    )
-    research_project_detail = ResearchProjectSerializer(source='research_project', read_only=True)
-    research_project = serializers.PrimaryKeyRelatedField(
-        queryset=ResearchProject.objects.all(),
-        write_only=True
-    )
+    components_detail = ResearchGroupComponentShortSerializer(source='components', many=True, read_only=True)
+    research_project_detail = ResearchProjectShortSerializer(source='research_project', read_only=True)
 
     class Meta:
         model = Publication
         fields = '__all__'
 
+
 class CourseSerializer(serializers.ModelSerializer):
+    teacher_detail = ResearchGroupComponentShortSerializer(source='teacher', read_only=True)
+
     class Meta:
         model = Course
         fields = '__all__'
@@ -69,13 +96,15 @@ class DefaultPagination(PageNumberPagination):
 # ----------------- VIEWSETS -----------------
 
 class ResearchAreaViewSet(viewsets.ModelViewSet):
-    queryset = ResearchArea.objects.all()
+    queryset = ResearchArea.objects.prefetch_related('projects')
     serializer_class = ResearchAreaSerializer
     permission_classes = [DjangoModelPermissions]
     pagination_class = DefaultPagination
 
 class ResearchGroupComponentViewSet(viewsets.ModelViewSet):
-    queryset = ResearchGroupComponent.objects.all()
+    queryset = ResearchGroupComponent.objects.prefetch_related(
+        'projects', 'owned_projects', 'teached_courses', 'publications', 'user__groups'
+    ).select_related('user')
     serializer_class = ResearchGroupComponentSerializer
     pagination_class = DefaultPagination
 
@@ -85,13 +114,15 @@ class ResearchGroupComponentViewSet(viewsets.ModelViewSet):
         return [DjangoModelPermissions]
 
 class AllUsersViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = User.objects.all()
+    queryset = User.objects.prefetch_related('groups')
     serializer_class = UserPublicSerializer
     permission_classes = [IsAuthenticated]
     pagination_class = DefaultPagination
 
 class ResearchProjectViewSet(viewsets.ModelViewSet):
-    queryset = ResearchProject.objects.all()
+    queryset = ResearchProject.objects.select_related(
+        'research_area', 'project_owner'
+    ).prefetch_related('components', 'publications')
     serializer_class = ResearchProjectSerializer
     pagination_class = DefaultPagination
 
@@ -101,7 +132,9 @@ class ResearchProjectViewSet(viewsets.ModelViewSet):
         return [DjangoModelPermissions]
 
 class PublicationViewSet(viewsets.ModelViewSet):
-    queryset = Publication.objects.select_related('research_project').prefetch_related('components')
+    queryset = Publication.objects.select_related(
+        'research_project'
+    ).prefetch_related('components')
     serializer_class = PublicationSerializer
     pagination_class = DefaultPagination
 
@@ -111,7 +144,7 @@ class PublicationViewSet(viewsets.ModelViewSet):
         return [DjangoModelPermissions]
 
 class CourseViewSet(viewsets.ModelViewSet):
-    queryset = Course.objects.all()
+    queryset = Course.objects.select_related('teacher')
     serializer_class = CourseSerializer
     permission_classes = [DjangoModelPermissions]
     pagination_class = DefaultPagination

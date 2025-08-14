@@ -7,6 +7,7 @@ import PubblicationsView from '../views/public/PubblicationsView.vue';
 import ContactsView from '../views/public/ContactsView.vue';
 import ProfileView from '../views/private/ProfileView.vue';
 import MembersView from '../views/public/MembersView.vue';
+import ComponentDetailsView from '../views/public/ComponentDetailsView.vue';
 
 const routes = [
   {
@@ -51,6 +52,11 @@ const routes = [
     path: '/members',
     name: 'Members',
     component: MembersView,
+  },
+  {
+    path: '/members/:id',
+    name: 'MemberDetail',
+    component: ComponentDetailsView,
   }
 ];
 
