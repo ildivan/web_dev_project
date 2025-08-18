@@ -1,21 +1,21 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
-import { useRouter } from 'vue-router'
 import Footer from '../../components/Footer.vue'
 import Navbar from '../../components/Navbar.vue'
-import { useAuth } from '../../composables/useAuth'
+import { useLoggedUser } from '../../composables/useLoggedUser.js'
 import { MENUS } from '../../composables/menus.js'
 import { isComponent } from '../../apiCalls/apiCalls.js'
+import ProfileContent from '../../components/ProfileContent.vue'
 
-const router = useRouter()
-const welcomeMessage = ref('Benvenuto nel tuo hub!')
 const tempMessage = ref('')
-const { logoutUser } = useAuth()
-
-const logout = () => {
-  logoutUser()
-  router.push('/')
-}
+const { loading,
+        error,
+        userId,
+        component,
+        projects,
+        ownedProjects,
+        teachedCourses,
+        publications} = useLoggedUser()
 
 const checkIfComponent = async () => {
   try {
@@ -35,11 +35,11 @@ onMounted(() => {
 })
 
 const menuOptions = [
-  { key: 'overview', label: 'Panoramica' },
+  { key: 'info', label: 'Panoramica' },
   { key: 'settings', label: 'Impostazioni' },
   { key: 'security', label: 'Sicurezza' },
 ]
-const selectedMenu = ref('overview')
+const selectedMenu = ref('info')
 const mobileMenuOpen = ref(false)
 
 const selectOption = (option) => {
@@ -54,7 +54,7 @@ const toggleMobileMenu = () => {
   mobileMenuOpen.value = !mobileMenuOpen.value
 }
 
-// helpers used in template to avoid ref/arrow quirks
+
 const selectedLabel = computed(() => {
   const found = menuOptions.find(opt => opt.key === selectedMenu.value)
   return found ? found.label : 'Menu'
@@ -64,16 +64,13 @@ const isSelected = (key) => selectedMenu.value === key
 
 <template>
   <div class="min-h-screen flex flex-col bg-gray-50 text-gray-800 pt-16">
-    <!-- Navbar con pulsanti Home e Logout -->
     <Navbar
         :menuItems = MENUS.profile
     />
 
     <main class="flex-grow container max-w-6xl mx-auto p-2 sm:p-4 md:p-6 mt-4">
       <div class="flex flex-col md:flex-row gap-4 md:gap-8">
-        <!-- Sidebar Menu (single dropdown for all sizes) -->
         <aside class="w-full md:w-64 mb-2 md:mb-0">
-          <!-- Always-visible dropdown button -->
           <button
             class="w-full bg-white border border-violet-200 rounded-lg px-4 py-3 mb-2 flex justify-between items-center"
             @click="toggleMobileMenu"
@@ -86,7 +83,6 @@ const isSelected = (key) => selectedMenu.value === key
             </svg>
           </button>
 
-          <!-- Unified dropdown used on all viewports -->
           <div id="profile-menu" v-show="mobileMenuOpen" class="bg-white border border-violet-200 rounded-lg shadow mb-2 z-20">
             <button
               v-for="option in menuOptions"
@@ -102,11 +98,23 @@ const isSelected = (key) => selectedMenu.value === key
           </div>
         </aside>
 
-        <!-- Main Content -->
         <section class="flex-1 bg-white rounded-xl shadow p-6 min-h-[300px]">
-          <template v-if="selectedMenu === 'overview'">
-            <h2 class="text-3xl font-bold mb-4">{{ welcomeMessage }}</h2>
-            <p class="text-lg mb-6">{{ tempMessage }}</p>
+          <template v-if="selectedMenu === 'info'">
+            <ProfileContent
+              v-if="!loading && !error"
+              :component="component"
+              :projects="projects"
+              :owned-projects="ownedProjects"
+              :teached-courses="teachedCourses"
+              :publications="publications"
+            />
+            <div v-else-if="loading">
+              <h2 class="text-2xl font-bold mb-4">Loading profile...</h2>
+            </div>
+            <div v-else>
+              <h2 class="text-2xl font-bold mb-4">Benvenuto</h2>
+              <p>Questa pagina è vuota in quanto non sei un componente del gruppo.</p>
+            </div>
           </template>
           <template v-else-if="selectedMenu === 'settings'">
             <h2 class="text-2xl font-bold mb-4">Impostazioni</h2>

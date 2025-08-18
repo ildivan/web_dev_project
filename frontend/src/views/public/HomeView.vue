@@ -10,9 +10,9 @@ import { MENUS } from '../../composables/menus.js';
 import HeroSection from '../../components/HeroSection.vue'
 
 const router = useRouter()
-const welcomeMessage = ref('Benvenuti nel nostro gruppo di ricerca!')
-const description = ref('Siamo un team dedicato allo sviluppo di soluzioni innovative nelle aree di Intelligenza Artificiale, Sicurezza Informatica e Data Science. Esplora i nostri progetti e le nostre ricerche per scoprire come stiamo contribuendo al progresso tecnologico e scientifico.')
-const projectViewTitle = ref('Progetti di Ricerca')
+const welcomeMessage = 'Benvenuti nel nostro gruppo di ricerca!'
+const description = 'Siamo un team dedicato allo sviluppo di soluzioni innovative nelle aree di Intelligenza Artificiale, Sicurezza Informatica e Data Science. Esplora i nostri progetti e le nostre ricerche per scoprire come stiamo contribuendo al progresso tecnologico e scientifico.'
+const projectViewTitle = 'Progetti di Ricerca'
 
 
 const projects = ref([])

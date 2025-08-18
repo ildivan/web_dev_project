@@ -8,7 +8,7 @@ import Title from '../../components/Title.vue'
 import ComponentCard from '../../components/cards/ComponentCard.vue'
 import { MENUS } from '../../composables/menus.js';
 
-const welcomeMessage = ref('Componenti del Gruppo di Ricerca')
+const title = 'Componenti del Gruppo di Ricerca'
 
 const components = ref([])
 
@@ -21,7 +21,6 @@ const hasMore = ref(true)
 async function loadComponents() {
   const data = await getGroupComponents(currentPage.value, pageSize)
   components.value = [...components.value, ...data.results]
-console.log('Loaded components:', components.value)
   if (!data.next) {
     hasMore.value = false
   }
@@ -47,7 +46,7 @@ onMounted(() => {
             <main class="flex-grow pt-18">
             <section class="flex-grow flex justify-center items-center p-6">
                 <div class="w-full max-w-3xl">
-                    <Title :title="welcomeMessage"  class="mb-6" />
+                    <Title :title="title"  class="mb-6" />
 
                     <div class="bg-white rounded-2xl shadow-lg p-8">
                         <h2 class="text-center text-2xl font-bold mb-6 text-gray-600">Our Team</h2>

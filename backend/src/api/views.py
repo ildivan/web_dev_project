@@ -113,6 +113,13 @@ class ResearchGroupComponentViewSet(viewsets.ModelViewSet):
             return []
         return [DjangoModelPermissions]
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        username = self.request.query_params.get('username')
+        if username:
+            queryset = queryset.filter(user__username=username)
+        return queryset
+
 class AllUsersViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = User.objects.prefetch_related('groups')
     serializer_class = UserPublicSerializer
