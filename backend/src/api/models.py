@@ -31,6 +31,7 @@ class Publication(models.Model):
     title = models.CharField(max_length=200)
     publication_date = models.DateField()
     description = models.TextField(blank=True)
+    link = models.URLField(blank=True)
     research_project = models.ForeignKey(ResearchProject, on_delete=models.CASCADE, related_name='publications')
     components = models.ManyToManyField(ResearchGroupComponent, related_name='publications', blank=True)
 
