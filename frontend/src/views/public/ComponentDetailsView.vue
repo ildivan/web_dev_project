@@ -7,7 +7,7 @@
 
     <div v-if="loading" class="text-center my-8 text-lg text-gray-500">Loading...</div>
     <div v-else-if="error" class="text-center my-8 text-red-500">{{ error }}</div>
-    <main v-else-if="component" class="flex-grow container max-w-8xl mx-auto p-6 mt-10">
+    <main v-else-if="component" class="flex-grow container max-w-8xl mx-auto p-6 mt-10 pt-16">
       <section class="bg-violet-50 rounded-xl p-8 mb-8 shadow-md">
         <h2 class="text-3xl font-semibold text-violet-700 mb-2">
           {{ component.user.first_name }} {{ component.user.last_name }}
