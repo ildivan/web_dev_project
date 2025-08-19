@@ -43,7 +43,7 @@ class Course(models.Model):
     description = models.TextField(blank=True)
     start_date = models.DateField()
     end_date = models.DateField(null=True, blank=True)
-    teacher = models.ForeignKey(ResearchGroupComponent, on_delete=models.CASCADE, related_name='teached_courses')
+    teachers = models.ManyToManyField(ResearchGroupComponent, related_name='teached_courses', blank=True)
 
     def __str__(self):
         return self.name
