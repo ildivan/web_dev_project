@@ -111,7 +111,7 @@ class ResearchGroupComponentViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.request.method == 'GET':
             return []
-        return [DjangoModelPermissions]
+        return [DjangoModelPermissions()]
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -136,7 +136,7 @@ class ResearchProjectViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.request.method == 'GET':
             return []
-        return [DjangoModelPermissions]
+        return [DjangoModelPermissions()]
 
 class PublicationViewSet(viewsets.ModelViewSet):
     queryset = Publication.objects.select_related(
@@ -148,12 +148,12 @@ class PublicationViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.request.method == 'GET':
             return []
-        return [DjangoModelPermissions]
+        return [DjangoModelPermissions()]
 
 class CourseViewSet(viewsets.ModelViewSet):
     queryset = Course.objects.select_related('teacher')
     serializer_class = CourseSerializer
-    permission_classes = [DjangoModelPermissions]
+    permission_classes = [DjangoModelPermissions()]
     pagination_class = DefaultPagination
 
 # ----------------- SIMPLE API VIEWS -----------------
