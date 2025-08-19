@@ -5,8 +5,9 @@ import Navbar from '../../components/Navbar.vue'
 import { getPublications } from '../../apiCalls/apiCalls.js'
 import Button from '../../components/Button.vue'
 import PublicationCard from '../../components/cards/PublicationCard.vue'
-import { MENUS } from '../../composables/menus.js';
+import { useMenu } from '../../composables/useMenu.js'
 
+const { menu } = useMenu()
 const welcomeMessage = ref('Pubblicazioni')
 
 const publications = ref([])
@@ -70,7 +71,7 @@ const filteredPublications = computed(() => {
 <template>
   <div class="min-h-screen flex flex-col bg-gray-50 text-gray-800">
     <Navbar
-        :menuItems = MENUS.home
+        :menuItems="menu"
     />
 
     <main class="flex-grow container max-w-8xl mx-auto p-6 mt-10">

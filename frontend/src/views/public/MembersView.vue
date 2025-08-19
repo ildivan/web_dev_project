@@ -6,8 +6,9 @@ import { getGroupComponents } from '../../apiCalls/apiCalls.js'
 import Button from '../../components/Button.vue'
 import Title from '../../components/Title.vue'
 import ComponentCard from '../../components/cards/ComponentCard.vue'
-import { MENUS } from '../../composables/menus.js';
+import { useMenu } from '../../composables/useMenu.js'
 
+const { menu } = useMenu()
 const title = 'Componenti del Gruppo di Ricerca'
 
 const components = ref([])
@@ -41,7 +42,7 @@ onMounted(() => {
 <template>
         <div class="flex flex-col min-h-screen bg-gray-50">
             <Navbar
-                :menuItems = MENUS.home
+                :menuItems="menu"
             />
             <main class="flex-grow pt-18">
             <section class="flex-grow flex justify-center items-center p-6">

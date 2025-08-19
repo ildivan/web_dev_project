@@ -2,10 +2,11 @@
 import { watch } from 'vue'
 import { useRoute } from 'vue-router'
 import Navbar from '../../components/Navbar.vue'
-import { MENUS } from '../../composables/menus.js'
 import ProfileContent from '../../components/ProfileContent.vue'
 import { useUser } from '../../composables/useUser'
+import { useMenu } from '../../composables/useMenu.js'
 
+const { menu } = useMenu()
 const route = useRoute()
 const id = route.params.id
 const {
@@ -30,7 +31,7 @@ watch(
 
 <template>
   <div class="min-h-screen flex flex-col bg-gray-50 text-gray-800">
-    <Navbar :menuItems="MENUS.home" />
+    <Navbar :menuItems="menu" />
 
     <div v-if="loading" class="text-center my-8 text-lg text-gray-500">Loading...</div>
     <div v-else-if="error" class="text-center my-8 text-red-500">{{ error }}</div>

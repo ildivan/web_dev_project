@@ -6,9 +6,10 @@ import Navbar from '../../components/Navbar.vue'
 import ProjectCard from '../../components/cards/ProjectCard.vue'
 import { getProjects } from '../../apiCalls/apiCalls.js'
 import Button from '../../components/Button.vue'
-import { MENUS } from '../../composables/menus.js';
 import HeroSection from '../../components/HeroSection.vue'
+import { useMenu } from '../../composables/useMenu.js'
 
+const { menu } = useMenu()
 const router = useRouter()
 const welcomeMessage = 'Benvenuti nel nostro gruppo di ricerca!'
 const description = 'Siamo un team dedicato allo sviluppo di soluzioni innovative nelle aree di Intelligenza Artificiale, Sicurezza Informatica e Data Science. Esplora i nostri progetti e le nostre ricerche per scoprire come stiamo contribuendo al progresso tecnologico e scientifico.'
@@ -32,7 +33,7 @@ onMounted(() => {
 <template>
   <div class="min-h-screen flex flex-col bg-gray-50 text-gray-800">
     <Navbar
-        :menuItems = MENUS.home
+        :menuItems="menu"
     />
 
     <HeroSection />

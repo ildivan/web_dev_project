@@ -5,8 +5,9 @@ import Navbar from '../../components/Navbar.vue'
 import ProjectCard from '../../components/cards/ProjectCard.vue'
 import { getProjects } from '../../apiCalls/apiCalls.js'
 import Button from '../../components/Button.vue'
-import { MENUS } from '../../composables/menus.js';
+import { useMenu } from '../../composables/useMenu.js'
 
+const { menu } = useMenu()
 const welcomeMessage = ref('I nostri progetti')
 
 const projects = ref([])
@@ -75,7 +76,7 @@ const toggleFilterPanel = () => {
 <template>
   <div class="min-h-screen flex flex-col bg-gray-50 text-gray-800">
     <Navbar
-        :menuItems = MENUS.home
+        :menuItems="menu"
     />
 
     <main class="flex-grow container max-w-8xl mx-auto p-6 mt-10">

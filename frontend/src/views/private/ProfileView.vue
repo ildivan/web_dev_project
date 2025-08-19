@@ -3,9 +3,11 @@ import { ref, onMounted, computed } from 'vue'
 import Footer from '../../components/Footer.vue'
 import Navbar from '../../components/Navbar.vue'
 import { useLoggedUser } from '../../composables/useLoggedUser.js'
-import { MENUS } from '../../composables/menus.js'
 import { isComponent } from '../../apiCalls/apiCalls.js'
 import ProfileContent from '../../components/ProfileContent.vue'
+import { useMenu } from '../../composables/useMenu.js'
+
+const { menu } = useMenu()
 
 const tempMessage = ref('')
 const { loading,
@@ -65,7 +67,7 @@ const isSelected = (key) => selectedMenu.value === key
 <template>
   <div class="min-h-screen flex flex-col bg-gray-50 text-gray-800 pt-16">
     <Navbar
-        :menuItems = MENUS.profile
+        :menuItems="menu"
     />
 
     <main class="flex-grow container max-w-6xl mx-auto p-2 sm:p-4 md:p-6 mt-4">
