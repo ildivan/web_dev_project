@@ -1,40 +1,33 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, computed } from 'vue'
 import Footer from '../../components/Footer.vue'
 import Navbar from '../../components/Navbar.vue'
-import { useLoggedUser } from '../../composables/useLoggedUser.js'
-import { isComponent } from '../../apiCalls/apiCalls.js'
+import { useUser } from '../../composables/useUser.js'
 import ProfileContent from '../../components/ProfileContent.vue'
+import ComponentForm from '../../components/forms/ComponentForm.vue'
 import { useMenu } from '../../composables/useMenu.js'
+import axios from '../../axios'
+
+async function fetchLoggedUserId() {
+    try {
+      const res = await axios.get('/api/auth/users/me/')
+      return res.data.id
+    } catch (err) {
+      console.error('Error fetching logged user ID:', err)
+      throw err
+    }
+  }
 
 const { menu } = useMenu()
 
-const tempMessage = ref('')
-const { loading,
+const { updateUser,
+        loading,
         error,
-        userId,
         component,
         projects,
         ownedProjects,
         teachedCourses,
-        publications} = useLoggedUser()
-
-const checkIfComponent = async () => {
-  try {
-    const response = await isComponent()
-    if (response.is_component) {
-      tempMessage.value = 'Benvenuto nel tuo hub, Componente!'
-    } else {
-      tempMessage.value = 'Benvenuto nel tuo hub!'
-    }
-  } catch (error) {
-    console.error('Errore durante il recupero dello stato del componente:', error)
-  }
-}
-
-onMounted(() => {
-  checkIfComponent()
-})
+        publications } = useUser(fetchLoggedUserId)
 
 const menuOptions = [
   { key: 'info', label: 'Panoramica' },
@@ -62,6 +55,15 @@ const selectedLabel = computed(() => {
   return found ? found.label : 'Menu'
 })
 const isSelected = (key) => selectedMenu.value === key
+
+
+const save = (toSave) => {
+  try {
+    updateUser(toSave)
+  } catch (error) {
+    console.error('Error saving user data:', error)
+  }
+}
 </script>
 
 <template>
@@ -109,6 +111,19 @@ const isSelected = (key) => selectedMenu.value === key
               :owned-projects="ownedProjects"
               :teached-courses="teachedCourses"
               :publications="publications"
+            />
+            <ComponentForm 
+              v-if="!loading && !error"
+              :user="component"
+              :projects="projects"
+              :ownedProjects="ownedProjects"
+              :teachedCourses="teachedCourses"
+              :publications="publications"
+              :saving="loading"
+              :projectOptions="projects"
+              :courseOptions="teachedCourses"
+              :publicationOptions="publications"
+              @save="save"
             />
             <div v-else-if="loading">
               <h2 class="text-2xl font-bold mb-4">Loading profile...</h2>

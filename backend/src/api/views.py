@@ -29,10 +29,18 @@ class UserPublicSerializer(serializers.ModelSerializer):
 
 class ResearchGroupComponentSerializer(serializers.ModelSerializer):
     user = UserPublicSerializer(read_only=True)
-    projects = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
-    owned_projects = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
-    teached_courses = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
-    publications = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    projects = serializers.PrimaryKeyRelatedField(
+        many=True, queryset=ResearchProject.objects.all()
+    )
+    owned_projects = serializers.PrimaryKeyRelatedField(
+        many=True, queryset=ResearchProject.objects.all()
+    )
+    teached_courses = serializers.PrimaryKeyRelatedField(
+        many=True, queryset=Course.objects.all()
+    )
+    publications = serializers.PrimaryKeyRelatedField(
+        many=True, queryset=Publication.objects.all()
+    )
 
     class Meta:
         model = ResearchGroupComponent

@@ -1,7 +1,7 @@
 import { ref } from 'vue'
 import axios from '../axios'
 
-export function useUser(id) {
+export function useUser(getId) {
   const loading = ref(true)
   const error = ref(null)
   const component = ref(null)
@@ -10,16 +10,19 @@ export function useUser(id) {
   const teachedCourses = ref([])
   const publications = ref([])
 
+  const id = ref(null)
+
   const fetchUserData = async () => {
     loading.value = true
     error.value = null
+    component.value = null
     projects.value = []
     ownedProjects.value = []
     teachedCourses.value = []
     publications.value = []
     try {
-      
-      const res = await axios.get(`/api/group-components/${id}/`)
+      id.value = await getId()
+      const res = await axios.get(`/api/group-components/${id.value}/`)
       component.value = res.data
 
       if (!component.value) {
@@ -49,6 +52,33 @@ export function useUser(id) {
     }
   }
 
+  function isEqual(a, b) {
+    // Compare arrays by value
+    if (Array.isArray(a) && Array.isArray(b)) {
+      return JSON.stringify(a) === JSON.stringify(b)
+    }
+    // Compare objects by value
+    if (typeof a === 'object' && typeof b === 'object' && a && b) {
+      return JSON.stringify(a) === JSON.stringify(b)
+    }
+    // Fallback to primitive comparison
+    return a === b
+  }
+
+  const updateUser = async (data) => {
+    loading.value = true
+    error.value = null
+    try {
+      const res = await axios.patch(`/api/group-components/${id.value}/`, data)
+      component.value = res.data
+      await fetchUserData() // Refresh data after update
+    } catch (err) {
+      error.value = err.message || 'Could not update user data.'
+    } finally {
+      loading.value = false
+    }
+  }
+
   fetchUserData()
 
   return {
@@ -60,5 +90,6 @@ export function useUser(id) {
     teachedCourses,
     publications,
     fetchUserData,
+    updateUser
   }
 }
