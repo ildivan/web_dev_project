@@ -11,7 +11,6 @@ router.register('courses', views.CourseViewSet)
 router.register('users', views.AllUsersViewSet, basename='all-users')  # tutti gli utenti
 
 urlpatterns = [
-    path('hello/', views.HelloView.as_view(), name='hello'),
     path('auth/', include('djoser.urls')),
     path('auth/', include('djoser.urls.jwt')),
     path('auth/permissions/', views.PermissionsView.as_view(), name='permissions'),

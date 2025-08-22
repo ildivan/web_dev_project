@@ -1,5 +1,5 @@
 import { ref } from 'vue'
-import axios from '../axios'
+import { getGroupComponent , getProject, getPublication, getCourse, updateGroupComponent} from '../apiCalls/apiCalls'
 
 export function useUser(getId) {
   const loading = ref(true)
@@ -22,29 +22,23 @@ export function useUser(getId) {
     publications.value = []
     try {
       id.value = await getId()
-      const res = await axios.get(`/api/group-components/${id.value}/`)
-      component.value = res.data
+      if (id.value) {
+        component.value = await getGroupComponent(id.value)
 
-      if (!component.value) {
-        throw new Error('Component not found')
-      }
+        if (!component.value) {
+          throw new Error('Component not found')
+        }
 
-      for (const projectId of component.value.projects || []) {
-        const projectRes = await axios.get(`/api/projects/${projectId}/`)
-        projects.value.push(projectRes.data)
-      }
-      for (const projectId of component.value.owned_projects || []) {
-        const projectRes = await axios.get(`/api/projects/${projectId}/`)
-        ownedProjects.value.push(projectRes.data)
-      }
-      for (const courseId of component.value.teached_courses || []) {
-        const courseRes = await axios.get(`/api/courses/${courseId}/`)
-        teachedCourses.value.push(courseRes.data)
-      }
-      for (const pubId of component.value.publications || []) {
-        const pubRes = await axios.get(`/api/publications/${pubId}/`)
-        publications.value.push(pubRes.data)
-      }
+        for (const projectId of component.value.projects || []) {
+          projects.value.push(await getProject(projectId))
+        }
+        for (const courseId of component.value.teached_courses || []) {
+          teachedCourses.value.push(await getCourse(courseId))
+        }
+        for (const pubId of component.value.publications || []) {
+          publications.value.push(await getPublication(pubId))
+        }
+    }
     } catch (err) {
       error.value = err.message || 'Could not load user data.'
     } finally {
@@ -52,25 +46,11 @@ export function useUser(getId) {
     }
   }
 
-  function isEqual(a, b) {
-    // Compare arrays by value
-    if (Array.isArray(a) && Array.isArray(b)) {
-      return JSON.stringify(a) === JSON.stringify(b)
-    }
-    // Compare objects by value
-    if (typeof a === 'object' && typeof b === 'object' && a && b) {
-      return JSON.stringify(a) === JSON.stringify(b)
-    }
-    // Fallback to primitive comparison
-    return a === b
-  }
-
   const updateUser = async (data) => {
     loading.value = true
     error.value = null
     try {
-      const res = await axios.patch(`/api/group-components/${id.value}/`, data)
-      component.value = res.data
+      component.value = await updateGroupComponent(id.value, data)
       await fetchUserData() // Refresh data after update
     } catch (err) {
       error.value = err.message || 'Could not update user data.'

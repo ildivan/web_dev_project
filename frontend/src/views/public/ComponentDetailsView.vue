@@ -18,7 +18,7 @@ const {
   teachedCourses,
   publications,
   fetchUserData
-} = useUser(id)
+} = useUser(() => id)
 
 // Refetch if route param changes
 watch(

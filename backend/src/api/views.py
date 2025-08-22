@@ -88,11 +88,17 @@ class PublicationSerializer(serializers.ModelSerializer):
 
 
 class CourseSerializer(serializers.ModelSerializer):
-    teacher_detail = ResearchGroupComponentShortSerializer(source='teacher', read_only=True)
+    teacher_detail = ResearchGroupComponentShortSerializer(source='teacher', many=True, read_only=True)
 
     class Meta:
         model = Course
         fields = '__all__'
+
+class CourseShortSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Course
+        fields = ['id', 'name']
 
 # ----------------- PAGINATION -----------------
 
@@ -100,6 +106,13 @@ class DefaultPagination(PageNumberPagination):
     page_size = 10
     page_size_query_param = 'page_size'
     max_page_size = 100
+
+    def paginate_queryset(self, queryset, request, view=None):
+        # allow client to disable pagination per-request with ?page_size=0 or ?page_size=all
+        param = request.query_params.get(self.page_size_query_param)
+        if param in ('0', 'all'):
+            return None
+        return super().paginate_queryset(queryset, request, view)
 
 # ----------------- VIEWSETS -----------------
 
@@ -113,7 +126,6 @@ class ResearchGroupComponentViewSet(viewsets.ModelViewSet):
     queryset = ResearchGroupComponent.objects.prefetch_related(
         'projects', 'owned_projects', 'teached_courses', 'publications', 'user__groups'
     ).select_related('user')
-    serializer_class = ResearchGroupComponentSerializer
     pagination_class = DefaultPagination
 
     def get_permissions(self):
@@ -128,6 +140,24 @@ class ResearchGroupComponentViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(user__username=username)
         return queryset
 
+    def get_serializer_class(self):
+        """
+        Use a short serializer for paginated list responses and the full serializer
+        for non-paginated requests or detail endpoints.
+        """
+        # if this is not a list action, use the full serializer
+        if getattr(self, 'action', None) not in ('list', None) and self.request.method != 'GET':
+            return ResearchGroupComponentSerializer
+
+        params = self.request.query_params
+        page_size_param = params.get(self.pagination_class.page_size_query_param)
+
+        # Client explicitly disabled pagination with ?page_size=0 or ?page_size=all
+        if page_size_param in ('0', 'all'):
+            return ResearchGroupComponentShortSerializer
+
+        return ResearchGroupComponentSerializer
+
 class AllUsersViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = User.objects.prefetch_related('groups')
     serializer_class = UserPublicSerializer
@@ -138,38 +168,84 @@ class ResearchProjectViewSet(viewsets.ModelViewSet):
     queryset = ResearchProject.objects.select_related(
         'research_area', 'project_owner'
     ).prefetch_related('components', 'publications')
-    serializer_class = ResearchProjectSerializer
     pagination_class = DefaultPagination
 
     def get_permissions(self):
         if self.request.method == 'GET':
             return []
         return [DjangoModelPermissions()]
+    
+    def get_serializer_class(self):
+        """
+        Use a short serializer for paginated list responses and the full serializer
+        for non-paginated requests or detail endpoints.
+        """
+        # if this is not a list action, use the full serializer
+        if getattr(self, 'action', None) not in ('list', None) and self.request.method != 'GET':
+            return ResearchProjectSerializer
+
+        params = self.request.query_params
+        page_size_param = params.get(self.pagination_class.page_size_query_param)
+
+        # Client explicitly disabled pagination with ?page_size=0 or ?page_size=all
+        if page_size_param in ('0', 'all'):
+            return ResearchProjectShortSerializer
+
+        return ResearchProjectSerializer
 
 class PublicationViewSet(viewsets.ModelViewSet):
     queryset = Publication.objects.select_related(
         'research_project'
     ).prefetch_related('components')
-    serializer_class = PublicationSerializer
     pagination_class = DefaultPagination
 
     def get_permissions(self):
         if self.request.method == 'GET':
             return []
         return [DjangoModelPermissions()]
+    
+    def get_serializer_class(self):
+        """
+        Use a short serializer for paginated list responses and the full serializer
+        for non-paginated requests or detail endpoints.
+        """
+        # if this is not a list action, use the full serializer
+        if getattr(self, 'action', None) not in ('list', None) and self.request.method != 'GET':
+            return PublicationSerializer
+
+        params = self.request.query_params
+        page_size_param = params.get(self.pagination_class.page_size_query_param)
+
+        # Client explicitly disabled pagination with ?page_size=0 or ?page_size=all
+        if page_size_param in ('0', 'all'):
+            return PublicationShortSerializer
+
+        return PublicationSerializer
 
 class CourseViewSet(viewsets.ModelViewSet):
     queryset = Course.objects.select_related('teacher')
-    serializer_class = CourseSerializer
     permission_classes = [DjangoModelPermissions()]
     pagination_class = DefaultPagination
 
-# ----------------- SIMPLE API VIEWS -----------------
+    def get_serializer_class(self):
+        """
+        Use a short serializer for paginated list responses and the full serializer
+        for non-paginated requests or detail endpoints.
+        """
+        # if this is not a list action, use the full serializer
+        if getattr(self, 'action', None) not in ('list', None) and self.request.method != 'GET':
+            return CourseSerializer
 
-class HelloView(APIView):
-    def post(self, request):
-        name = request.data.get('name', 'default_name') 
-        return Response({'message': f'Hello, {name}!'})
+        params = self.request.query_params
+        page_size_param = params.get(self.pagination_class.page_size_query_param)
+
+        # Client explicitly disabled pagination with ?page_size=0 or ?page_size=all
+        if page_size_param in ('0', 'all'):
+            return CourseShortSerializer
+
+        return CourseSerializer
+
+# ----------------- SIMPLE API VIEWS -----------------
 
 class PermissionsView(APIView):
     def get(self, request):

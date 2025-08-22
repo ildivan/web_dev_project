@@ -39,7 +39,7 @@ export function createGroupComponent(data) {
     return apiRequest('/api/group-components/', 'POST', data);
 }
 export function updateGroupComponent(id, data) {
-    return apiRequest(`/api/group-components/${id}/`, 'PUT', data);
+    return apiRequest(`/api/group-components/${id}/`, 'PATCH', data);
 }
 export function deleteGroupComponent(id) {
     return apiRequest(`/api/group-components/${id}/`, 'DELETE');

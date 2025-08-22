@@ -3,46 +3,69 @@ import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 
 const props = defineProps({
-  component: Object
+  component: { type: Object, required: true },
+  clickable: { type: Boolean, default: true }
 })
-
-
-const groupsString = computed(() => {
-  return props.component.user.groups?.join(', ') || 'Nessun gruppo'
-})
-
 
 const router = useRouter()
 
+const groupsString = computed(() => {
+  return props.component?.user?.groups?.join(', ') || 'Nessun gruppo'
+})
+
+const containerClasses = computed(() => {
+  const base = 'border rounded-xl p-4 bg-indigo-50 transition'
+  const border = 'border-indigo-300'
+  if (props.clickable) {
+    return [
+      base,
+      border,
+      'cursor-pointer hover:shadow-lg hover:bg-indigo-100 hover:border-indigo-500',
+      'focus:outline-none focus:ring-2 focus:ring-indigo-200'
+    ].join(' ')
+  }
+  // static / non-interactive: no hover, no pointer, no focus, no clicks
+  return [base, border, 'cursor-default pointer-events-none'].join(' ')
+})
+
+function onClick() {
+  if (!props.clickable) return
+  const id = props.component?.user?.id
+  if (id != null) router.push(`/members/${id}`)
+}
 </script>
 
 <template>
   <div
-    @click="() => { router.push(`/members/${props.component.user.id}`) }"
-    class="border border-indigo-300 rounded-xl p-4 bg-indigo-50 cursor-pointer transition hover:shadow-lg hover:bg-indigo-100 hover:border-indigo-500"
+    :class="containerClasses"
+    @click="onClick"
+    :role="clickable ? 'button' : undefined"
+    :aria-disabled="!clickable"
   >
     <h3 class="text-lg font-bold text-indigo-900 capitalize">
-      {{ props.component.user.first_name }} {{ props.component.user.last_name }}
+      {{ component.user.first_name }} {{ component.user.last_name }}
     </h3>
 
-    <p class="text-gray-700 font-medium">
+    <p class="text-gray-700 font-medium mt-1">
       <span class="font-semibold">Email: </span>
-      <a :href="`mailto:${props.component.user.email}`" class="text-gray-700 hover:underline">
-        {{ props.component.user.email }}
+      <a
+        :href="clickable ? `mailto:${component.user.email}` : undefined"
+        :class="clickable ? 'text-gray-700 hover:underline' : 'text-gray-700 no-underline'"
+      >
+        {{ component.user.email }}
       </a>
     </p>
 
-    <p class="text-gray-700 font-medium">
+    <p class="text-gray-700 font-medium mt-1">
       <span class="font-semibold">Gruppi:</span> {{ groupsString }}
     </p>
 
-    <!-- Esempio campi opzionali -->
-    <p v-if="props.component.role" class="text-gray-700 font-medium">
-      <span class="font-semibold">Ruolo:</span> {{ props.component.role }}
+    <p v-if="component.role" class="text-gray-700 font-medium mt-1">
+      <span class="font-semibold">Ruolo:</span> {{ component.role }}
     </p>
 
-    <p v-if="props.component.phone" class="text-gray-700 font-medium">
-      <span class="font-semibold">Telefono:</span> {{ props.component.phone }}
+    <p v-if="component.phone" class="text-gray-700 font-medium mt-1">
+      <span class="font-semibold">Telefono:</span> {{ component.phone }}
     </p>
   </div>
 </template>

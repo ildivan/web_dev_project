@@ -1,13 +1,12 @@
 <script setup>
 import { ref, watch } from 'vue'
 import EntityForm from './EntityForm.vue'
-import EntityMultiSelect from './EntityMultiSelect.vue'
+import EntitySelect from './EntitySelect.vue'
 
 // Props: user object, groups options, and loading state
 const props = defineProps({
   user: { type: Object, required: true },
   projects: {type: Array, default: () => [] },
-  ownedProjects: {type: Array, default: () => [] },
   teachedCourses: {type: Array, default: () => [] },
   publications: {type: Array, default: () => [] },
   projectOptions: { type: Array, default: () => [] }, 
@@ -20,7 +19,6 @@ const emit = defineEmits(['save'])
 
 const description = ref(props.user.description)
 const localProjects = ref([...props.projects])
-const localOwnedProjects = ref([...props.ownedProjects])
 const localTeachedCourses = ref([...props.teachedCourses])
 const localPublications = ref([...props.publications])
 
@@ -30,10 +28,6 @@ watch(() => props.user.description, (val) => {
 
 watch(() => props.projects, (val) => {
   localProjects.value = [...val]
-})
-
-watch(() => props.ownedProjects, (val) => {
-  localOwnedProjects.value = [...val]
 })
 
 watch(() => props.teachedCourses, (val) => {
@@ -64,10 +58,6 @@ function onSave() {
 
   if(!arraysHaveSameElements(localProjects.value, props.projects)) {
     toSave.projects = localProjects.value.map(p => p.id)
-  }
-
-  if(!arraysHaveSameElements(localOwnedProjects.value, props.ownedProjects)) {
-    toSave.owned_projects = localOwnedProjects.value.map(p => p.id)
   }
 
   if(!arraysHaveSameElements(localTeachedCourses.value, props.teachedCourses)) {
@@ -109,42 +99,35 @@ function onCancel() {
       <!-- Research Projects -->
       <div class="mt-4">
         <label class="block text-sm font-medium mb-1">Research Projects Participations</label>
-        <EntityMultiSelect
+        <EntitySelect
           v-model="localProjects"
           :options="projectOptions"
           placeholder="Select projects"
           label="title"
           trackBy="id"
-        />
-      </div>
-      <div class="mt-4">
-        <label class="block text-sm font-medium mb-1">Owned Research Projects</label>
-        <EntityMultiSelect
-          v-model="localOwnedProjects"
-          :options="projectOptions"
-          placeholder="Select projects"
-          label="title"
-          trackBy="id"
+          :multiple="true"
         />
       </div>
       <div class="mt-4">
         <label class="block text-sm font-medium mb-1">Publications</label>
-        <EntityMultiSelect
+        <EntitySelect
           v-model="localPublications"
           :options="publicationOptions"
           placeholder="Select publications"
           label="title"
           trackBy="id"
+          :multiple="true"
         />
       </div>
       <div class="mt-4">
         <label class="block text-sm font-medium mb-1">Taught Courses</label>
-        <EntityMultiSelect
+        <EntitySelect
           v-model="localTeachedCourses"
           :options="courseOptions"
           placeholder="Select courses"
           label="name"
           :trackBy="'id'"
+          :multiple="true"
         />
       </div>
     </template>

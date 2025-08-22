@@ -18,7 +18,7 @@ const onCancel = () => {
 </script>
 
 <template>
-  <div class="p-6 bg-white rounded-2xl shadow-md max-w-2xl mx-auto border-2 border-violet-600">
+  <div class="p-6 bg-white rounded-2xl shadow-md w-full border-2 border-violet-600">
     <!-- Header -->
     <h2 class="text-xl font-semibold mb-4 text-violet-700">{{ title }}</h2>
 

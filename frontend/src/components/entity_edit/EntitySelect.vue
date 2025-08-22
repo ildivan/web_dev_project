@@ -3,11 +3,12 @@ import { computed } from 'vue'
 import Multiselect from 'vue-multiselect'
 import 'vue-multiselect/dist/vue-multiselect.min.css'
 
+const modelValue = defineModel('modelValue', {
+  type: Array,
+  default: () => []
+})
+
 const props = defineProps({
-  modelValue: {
-    type: Array,
-    default: () => []
-  },
   options: {
     type: Array,
     default: () => []
@@ -23,17 +24,10 @@ const props = defineProps({
   trackBy: {
     type: String,
     default: 'value'
-  }
-})
-
-const emit = defineEmits(['update:modelValue'])
-
-const modelComputed = computed({
-  get() {
-    return props.modelValue
   },
-  set(val) {
-    emit('update:modelValue', val)
+  multiple: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -42,9 +36,9 @@ const modelComputed = computed({
 <template>
   <div>
     <Multiselect
-      v-model="modelComputed"
+      v-model="modelValue"
       :options="props.options"
-      :multiple="true"
+      :multiple="props.multiple"
       :taggable="true"
       :close-on-select="false"
       :clear-on-select="false"
