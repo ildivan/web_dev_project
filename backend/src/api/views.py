@@ -223,8 +223,8 @@ class PublicationViewSet(viewsets.ModelViewSet):
         return PublicationSerializer
 
 class CourseViewSet(viewsets.ModelViewSet):
-    queryset = Course.objects.select_related('teacher')
-    permission_classes = [DjangoModelPermissions()]
+    queryset = Course.objects.prefetch_related('teachers')
+    permission_classes = [DjangoModelPermissions]
     pagination_class = DefaultPagination
 
     def get_serializer_class(self):

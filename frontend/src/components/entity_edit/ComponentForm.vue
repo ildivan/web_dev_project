@@ -74,7 +74,6 @@ function onSave() {
 function onCancel() {
   description.value = props.user.description
   localProjects.value = [...props.projects]
-  localOwnedProjects.value = [...props.ownedProjects]
   localTeachedCourses.value = [...props.teachedCourses]
   localPublications.value = [...props.publications]
 }
