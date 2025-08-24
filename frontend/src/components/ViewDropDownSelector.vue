@@ -36,7 +36,7 @@ const isSelected = (key) => currentRoute.name === key
         aria-expanded="mobileMenuOpen"
         aria-controls="profile-menu"
         >
-        <span>{{ props.menuOptions.find(opt => opt.relURL === currentRoute.name)?.label || 'Menu' }}</span>
+        <span>{{ props.menuOptions.find(opt => opt.relURL === currentRoute.path)?.label || 'Menu' }}</span>
         <svg :class="{'transform rotate-180': menuOpen}" class="w-5 h-5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
         </svg>
