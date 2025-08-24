@@ -1,0 +1,120 @@
+<script setup>
+import { ref, computed } from 'vue'
+import Footer from '../../components/Footer.vue'
+import Navbar from '../../components/Navbar.vue'
+import { useMenu } from '../../composables/useMenu.js'
+import useUsers from '../../composables/useUsers.js'
+import { onMounted } from 'vue'
+import useProjects from '../../composables/useProjects.js'
+import usePublications from '../../composables/usePublications.js'
+import ProjectList from '../../components/entity_edit/ProjectList.vue'
+import ProjectForm from '../../components/entity_edit/ProjectForm.vue'
+import {useProject} from '../../composables/useProject.js'
+import useResearchAreas from '../../composables/useResearchAreas.js'
+import ViewDropDownSelector from '../../components/ViewDropDownSelector.vue'
+
+const selectedProjectId = ref(null)
+
+function fetchProjectId() {
+    return selectedProjectId.value
+}
+
+const { menu } = useMenu()
+
+const { users: allUsers, fetchAllUsers } = useUsers()
+const { projects: paginatedProjects, count: totalProjects, fetchProjectsPaginated } = useProjects()
+const { publications: allPublications, fetchAllPublications } = usePublications()
+const { researchAreas: allResearchAreas, fetchAllResearchAreas } = useResearchAreas()
+
+onMounted(() => {
+  fetchProjectsPaginated(1, 10)
+  fetchAllUsers()
+  fetchAllPublications()
+  fetchAllResearchAreas()
+})
+
+const {
+  loading: projectToEditLoading,
+  error: projectToEditError,
+  project: projectToEdit,
+  components: projectToEditComponents,
+  publications: projectToEditPublications,
+  researchArea: projectToEditResearchArea,
+  projectOwner: projectToEditProjectOwner,
+  updateProjectData: projectToEditUpdate,
+  fetchProjectData: projectToEditFetch
+} = useProject(fetchProjectId)
+
+const projectSave = (toSave) => {
+  try {
+    projectToEditUpdate(toSave)
+  } catch (error) {
+    console.error('Error saving project data:', error)
+  }
+}
+
+const onProjectEdit = (id) => {
+  selectedProjectId.value = id
+  projectToEditFetch()
+}
+
+const onProjectPaginate = (page, pageSize) => {
+  fetchProjectsPaginated(page, pageSize)
+}
+
+const adminPageSelector = [
+  {
+    label: 'Profilo',
+    relURL: '/profile'
+  },
+  {
+    label: 'Amministrazione Componenti del Gruppo',
+    relURL: '/admin/components'
+  },
+  {
+    label: 'Amministrazione Progetti',
+    relURL: '/admin/projects'
+  },
+]
+</script>
+
+<template>
+  <div class="min-h-screen flex flex-col bg-gray-50 text-gray-800 pt-16">
+    <Navbar
+        :menuItems="menu"
+    />
+
+    <main class="flex-grow container max-w-6xl mx-auto p-2 sm:p-4 md:p-6 mt-4">
+      <div class="flex flex-col md:flex-row gap-4 md:gap-8">
+        <ViewDropDownSelector :menuOptions="adminPageSelector"/>
+
+        <section class="flex-1 bg-white rounded-xl shadow p-6 min-h-[300px]">
+            <div class="flex flex-col gap-6 md:flex-row md:items-start md:gap-8 md:flex-nowrap">
+                <ProjectList 
+                  :projects="paginatedProjects"
+                  :maxHeight="'28rem'"
+                  :totalItems="totalProjects"
+                  @edit="onProjectEdit"
+                  @paginate="onProjectPaginate"
+                />
+                <ProjectForm 
+                  v-if="!projectToEditLoading && !projectToEditError && projectToEdit"
+                  :project="projectToEdit"
+                  :components="projectToEditComponents"
+                  :publications="projectToEditPublications"
+                  :researchArea="projectToEditResearchArea"
+                  :projectOwner="projectToEditProjectOwner"
+                  :saving="projectToEditLoading"
+                  :componentOptions="allUsers"
+                  :publicationOptions="allPublications"
+                  :researchAreaOptions="allResearchAreas"
+                  @save="projectSave"
+                />
+            </div>
+        </section>
+      </div>
+    </main>
+
+    <Footer/>
+  </div>
+</template>

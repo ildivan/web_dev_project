@@ -1,49 +1,40 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import HomeView from '../views/public/HomeView.vue';
-import LoginView from '../views/LoginView.vue';
-import RegisterView from '../views/RegisterView.vue';
-import ProjectsView from '../views/public/ProjectsView.vue';
-import PubblicationsView from '../views/public/PubblicationsView.vue';
-import ContactsView from '../views/public/ContactsView.vue';
-import ProfileView from '../views/private/ProfileView.vue';
-import MembersView from '../views/public/MembersView.vue';
-import ComponentDetailsView from '../views/public/ComponentDetailsView.vue';
 
 const routes = [
   {
     path: '/',
     name: 'Home',
-    component: HomeView,
+    component: () => import('../views/public/HomeView.vue'),
   },
   {
     path: '/login',
     name: 'Login',
-    component: LoginView,
+    component: () => import('../views/LoginView.vue'),
   },
   {
     path: '/register',
     name: 'Registration',
-    component: RegisterView,
+    component: () => import('../views/RegisterView.vue'),
   },
   {
     path: '/projects',
     name: 'Projects',
-    component: ProjectsView,
+    component: () => import('../views/public/ProjectsView.vue'),
   },
   {
     path: '/pubblications',
     name: 'Pubblications',
-    component: PubblicationsView,
+    component: () => import('../views/public/PubblicationsView.vue'),
   },
   {
     path: '/contacts',
     name: 'Contacts',
-    component: ContactsView,
+    component: () => import('../views/public/ContactsView.vue'),
   },
   {
     path: '/profile',
     name: 'Profile',
-    component: ProfileView,
+    component: () => import('../views/private/ProfileView.vue'),
     meta: {
       authenticationRequired: true,
     }
@@ -51,12 +42,28 @@ const routes = [
   {
     path: '/members',
     name: 'Members',
-    component: MembersView,
+    component: () => import('../views/public/MembersView.vue'),
   },
   {
     path: '/members/:id',
     name: 'MemberDetail',
-    component: ComponentDetailsView,
+    component: () => import( '../views/public/ComponentDetailsView.vue'),
+  },
+  {
+    path: '/admin/projects',
+    name: 'AdminProjects',
+    component: () => import( '../views/private/ProjectAdministrationView.vue'),
+    meta: {
+      authenticationRequired: true,
+    }
+  },
+  {
+    path: '/admin/components',
+    name: 'AdminComponents',
+    component: () => import('../views/private/ComponentAdministrationView.vue'),
+    meta: {
+      authenticationRequired: true,
+    }
   }
 ];
 
