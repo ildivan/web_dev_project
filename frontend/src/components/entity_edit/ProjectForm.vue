@@ -107,6 +107,7 @@ function onCancel() {
                     label="name"
                     trackBy="id"
                     :multiple="false"
+                    :allow-empty="false"
                 />
             </div>
 
@@ -137,6 +138,7 @@ function onCancel() {
             label="username"
             trackBy="id"
             :multiple="false"
+            :allow-empty="false"
           />
         </div>
 

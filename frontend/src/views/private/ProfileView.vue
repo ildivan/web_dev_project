@@ -16,6 +16,7 @@ import usePublications from '../../composables/usePublications.js'
 import ProjectList from '../../components/entity_edit/ProjectList.vue'
 import ProjectForm from '../../components/entity_edit/ProjectForm.vue'
 import {useProject} from '../../composables/useProject.js'
+import useResearchAreas from '../../composables/useResearchAreas.js'
 
 const selectedMenu = ref('info')
 const mobileMenuOpen = ref(false)
@@ -48,6 +49,7 @@ const { projects: paginatedProjects, count: totalProjects, fetchProjectsPaginate
 const { projects: allProjects, fetchAllProjects } = useProjects()
 const { publications: allPublications, fetchAllPublications } = usePublications()
 const { courses: allCourses, fetchAllCourses } = useCourses()
+const { researchAreas: allResearchAreas, fetchAllResearchAreas } = useResearchAreas()
 
 onMounted(() => {
   fetchUsersPaginated(1, 10)
@@ -56,6 +58,7 @@ onMounted(() => {
   fetchAllUsers()
   fetchAllPublications()
   fetchAllCourses()
+  fetchAllResearchAreas()
 })
 
 const {
@@ -138,20 +141,12 @@ const projectSave = (toSave) => {
 
 const onComponentEdit = (id) => {
   selectedUserId.value = id
-  userToEditFetch().then(
-    () => {
-      loggedUserFetch()
-    }
-  )
+  userToEditFetch().then(loggedUserFetch)
 }
 
 const onProjectEdit = (id) => {
   selectedProjectId.value = id
-  projectToEditFetch().then(
-    () => {
-      loggedUserFetch()
-    }
-  )
+  projectToEditFetch().then(loggedUserFetch)
 }
 
 const onComponentPaginate = (page, pageSize) => {
@@ -260,6 +255,7 @@ const onProjectPaginate = (page, pageSize) => {
                 :projectOptions="allProjects"
                 :componentOptions="allUsers"
                 :publicationOptions="allPublications"
+                :researchAreaOptions="allResearchAreas"
                 @save="projectSave"
               />
             </div>

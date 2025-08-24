@@ -28,6 +28,10 @@ const props = defineProps({
   multiple: {
     type: Boolean,
     default: false
+  },
+  allowEmpty: {
+    type: Boolean,
+    default: true
   }
 })
 
@@ -46,6 +50,7 @@ const props = defineProps({
       :placeholder="props.placeholder"
       :label="props.label"
       :track-by="props.trackBy"
+      :allow-empty="props.allowEmpty"
       class="custom-multiselect"
     />
   </div>
