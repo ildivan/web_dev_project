@@ -92,43 +92,40 @@ function onCancel() {
     @cancel="onCancel"
   >
     <template #fields>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-                <label class="block text-sm font-medium mb-1">Title</label>
-                <input v-model="title" type="text" class="w-full border rounded px-3 py-2" required />
-            </div>
+      <div>
+          <label class="block text-sm font-medium mb-1">Title</label>
+          <input v-model="title" type="text" class="w-full border rounded px-3 py-2" required />
+      </div>
+      <div class="grid md:grid-cols-2 gap-4">
+          <div>
+              <label class="block text-sm font-medium mb-1">Start Date</label>
+              <input v-model="startDate" type="date" class="w-full border rounded px-3 py-2" required />
+          </div>
 
-            <div>
-                <label class="block text-sm font-medium mb-1">Research Area</label>
-                <EntitySelect
-                    v-model="localResearchArea"
-                    :options="props.researchAreaOptions"
-                    placeholder="Select research area"
-                    label="name"
-                    trackBy="id"
-                    :multiple="false"
-                    :allow-empty="false"
-                />
-            </div>
-
-            <div>
-                <label class="block text-sm font-medium mb-1">Start Date</label>
-                <input v-model="startDate" type="date" class="w-full border rounded px-3 py-2" required />
-            </div>
-
-            <div>
-                <label class="block text-sm font-medium mb-1">End Date</label>
-                <input v-model="endDate" type="date" class="w-full border rounded px-3 py-2" />
-            </div>
-
-            <div class="md:col-span-2">
-                <label class="block text-sm font-medium mb-1">Description</label>
-                <textarea v-model="description" class="w-full border rounded px-3 py-2" rows="4"></textarea>
-            </div>
+          <div>
+              <label class="block text-sm font-medium mb-1">End Date</label>
+              <input v-model="endDate" type="date" class="w-full border rounded px-3 py-2" />
+          </div>
         </div>
+      <div class="md:col-span-2">
+          <label class="block text-sm font-medium mb-1">Description</label>
+          <textarea v-model="description" class="w-full border rounded px-3 py-2" rows="4"></textarea>
+      </div>
     </template>
 
     <template #relations>
+        <div>
+          <label class="block text-sm font-medium mb-1">Research Area</label>
+          <EntitySelect
+              v-model="localResearchArea"
+              :options="props.researchAreaOptions"
+              placeholder="Select research area"
+              label="name"
+              trackBy="id"
+              :multiple="false"
+              :allow-empty="false"
+          />
+        </div>
         <div>
           <label class="block text-sm font-medium mb-1">Project Owner</label>
           <EntitySelect

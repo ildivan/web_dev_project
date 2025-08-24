@@ -25,12 +25,12 @@ const onCancel = () => {
     <!-- Main content -->
     <form @submit.prevent="onSave" class="space-y-6">
       <!-- Standard fields (name, description, etc.) -->
-      <div>
+      <div class="space-y-4">
         <slot name="fields"></slot>
       </div>
 
       <!-- Relationships (multi-selects, subtables, etc.) -->
-      <div>
+      <div class="space-y-4">
         <slot name="relations"></slot>
       </div>
 
