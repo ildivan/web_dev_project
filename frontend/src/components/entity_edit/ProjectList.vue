@@ -1,10 +1,10 @@
 <script setup>
 import EntityList from './EntityList.vue'
 import EntityListItem from './EntityListItem.vue'
-import ComponentCard from '../cards/ComponentCard.vue'
+import ProjectCard from '../cards/ProjectCard.vue'
 
 const props = defineProps({
-  users: { type: Array, default: () => [] },
+  projects: { type: Array, default: () => [] },
   maxHeight: { type: String, default: '28rem' }
 })
 
@@ -17,31 +17,30 @@ function onEdit(id) {
 function onPaginate(page, per_page) {
   emit('paginate', page, per_page)
 }
-
 </script>
 
 <template>
   <EntityList 
-    :maxHeight="maxHeight" 
+    :maxHeight="maxHeight"
     @paginate="onPaginate"
   >
     <template #header>
       <div class="flex items-center justify-between px-3 py-2 text-sm font-medium text-gray-600">
-        <span>Users</span>
+        <span>Projects</span>
       </div>
     </template>
- 
-    <template v-if="users.length === 0">
-      <div class="px-3 py-4 text-sm text-gray-500">No users</div>
+
+    <template v-if="projects.length === 0">
+      <div class="px-3 py-4 text-sm text-gray-500">No projects</div>
     </template>
 
     <EntityListItem
-      v-for="user in users"
-      :key="user.user.id"
-      :id="user.user.id"
+      v-for="project in projects"
+      :key="project.id"
+      :id="project.id"
       @edit="onEdit"
     >
-      <ComponentCard :component="user" :clickable="false"/>
+      <ProjectCard :project="project" />
     </EntityListItem>
   </EntityList>
 </template>

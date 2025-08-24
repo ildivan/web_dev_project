@@ -13,10 +13,14 @@ import { onMounted } from 'vue'
 import useProjects from '../../composables/useProjects.js'
 import useCourses from '../../composables/useCourses.js'
 import usePublications from '../../composables/usePublications.js'
+import ProjectList from '../../components/entity_edit/ProjectList.vue'
+import ProjectForm from '../../components/entity_edit/ProjectForm.vue'
+import {useProject} from '../../composables/useProject.js'
 
 const selectedMenu = ref('info')
 const mobileMenuOpen = ref(false)
 const selectedUserId = ref(null)
+const selectedProjectId = ref(null)
 
 async function fetchLoggedUserId() {
   try {
@@ -28,21 +32,28 @@ async function fetchLoggedUserId() {
   }
 }
 
-async function fetchUserId() {
+function fetchUserId() {
     return selectedUserId.value
+}
+
+function fetchProjectId() {
+    return selectedProjectId.value
 }
 
 const { menu } = useMenu()
 
 const { users: paginatedUsers, count: totalUsers, fetchUsersPaginated } = useUsers()
 const { users: allUsers, fetchAllUsers } = useUsers()
+const { projects: paginatedProjects, count: totalProjects, fetchProjectsPaginated } = useProjects()
 const { projects: allProjects, fetchAllProjects } = useProjects()
 const { publications: allPublications, fetchAllPublications } = usePublications()
 const { courses: allCourses, fetchAllCourses } = useCourses()
 
 onMounted(() => {
   fetchUsersPaginated(1, 10)
+  fetchProjectsPaginated(1, 10)
   fetchAllProjects()
+  fetchAllUsers()
   fetchAllPublications()
   fetchAllCourses()
 })
@@ -71,10 +82,22 @@ const {
   fetchUserData: userToEditFetch
 } = useUser(fetchUserId)
 
+const {
+  loading: projectToEditLoading,
+  error: projectToEditError,
+  project: projectToEdit,
+  components: projectToEditComponents,
+  publications: projectToEditPublications,
+  researchArea: projectToEditResearchArea,
+  projectOwner: projectToEditProjectOwner,
+  updateProjectData: projectToEditUpdate,
+  fetchProjectData: projectToEditFetch
+} = useProject(fetchProjectId)
+
 const menuOptions = [
   { key: 'info', label: 'Panoramica' },
   { key: 'components', label: 'Gestione componenti del gruppo' },
-  { key: 'security', label: 'Sicurezza' },
+  { key: 'projects', label: 'Gestione Progetti' },
 ]
 
 const selectOption = (option) => {
@@ -97,7 +120,7 @@ const selectedLabel = computed(() => {
 
 const isSelected = (key) => selectedMenu.value === key
 
-const save = (toSave) => {
+const componentSave = (toSave) => {
   try {
     userToEditUpdate(toSave)
   } catch (error) {
@@ -105,13 +128,38 @@ const save = (toSave) => {
   }
 }
 
-const onEdit = (id) => {
-  selectedUserId.value = id
-  userToEditFetch()
+const projectSave = (toSave) => {
+  try {
+    projectToEditUpdate(toSave)
+  } catch (error) {
+    console.error('Error saving project data:', error)
+  }
 }
 
-const onPaginate = (page, pageSize) => {
+const onComponentEdit = (id) => {
+  selectedUserId.value = id
+  userToEditFetch().then(
+    () => {
+      loggedUserFetch()
+    }
+  )
+}
+
+const onProjectEdit = (id) => {
+  selectedProjectId.value = id
+  projectToEditFetch().then(
+    () => {
+      loggedUserFetch()
+    }
+  )
+}
+
+const onComponentPaginate = (page, pageSize) => {
   fetchUsersPaginated(page, pageSize)
+}
+
+const onProjectPaginate = (page, pageSize) => {
+  fetchProjectsPaginated(page, pageSize)
 }
 </script>
 
@@ -175,8 +223,8 @@ const onPaginate = (page, pageSize) => {
                 :users="paginatedUsers"
                 :maxHeight="'28rem'"
                 :totalItems="totalUsers"
-                @edit="onEdit"
-                @paginate="onPaginate"
+                @edit="onComponentEdit"
+                @paginate="onComponentPaginate"
               />
               <ComponentForm 
                 v-if="!userToEditLoading && !userToEditError && userToEditComponent"
@@ -188,13 +236,33 @@ const onPaginate = (page, pageSize) => {
                 :projectOptions="allProjects"
                 :courseOptions="allCourses"
                 :publicationOptions="allPublications"
-                @save="save"
+                @save="componentSave"
               />
             </div>
            </template>
-          <template v-else-if="selectedMenu === 'security'">
-            <h2 class="text-2xl font-bold mb-4">Sicurezza</h2>
-            <p>Gestisci le impostazioni di sicurezza del tuo account.</p>
+          <template v-else-if="selectedMenu === 'projects'">
+            <div class="flex flex-col gap-6 md:flex-row md:items-start md:gap-8 md:flex-nowrap">
+              <ProjectList 
+                :projects="paginatedProjects"
+                :maxHeight="'28rem'"
+                :totalItems="totalProjects"
+                @edit="onProjectEdit"
+                @paginate="onProjectPaginate"
+              />
+              <ProjectForm 
+                v-if="!projectToEditLoading && !projectToEditError && projectToEdit"
+                :project="projectToEdit"
+                :components="projectToEditComponents"
+                :publications="projectToEditPublications"
+                :researchArea="projectToEditResearchArea"
+                :projectOwner="projectToEditProjectOwner"
+                :saving="projectToEditLoading"
+                :projectOptions="allProjects"
+                :componentOptions="allUsers"
+                :publicationOptions="allPublications"
+                @save="projectSave"
+              />
+            </div>
           </template>
         </section>
       </div>

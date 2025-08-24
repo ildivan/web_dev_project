@@ -62,8 +62,12 @@ class PublicationShortSerializer(serializers.ModelSerializer):
 class ResearchProjectSerializer(serializers.ModelSerializer):
     research_area_detail = ResearchAreaSerializer(source='research_area', read_only=True)
     project_owner_detail = ResearchGroupComponentShortSerializer(source='project_owner', read_only=True)
-    components_detail = ResearchGroupComponentShortSerializer(source='components', many=True, read_only=True)
-    publications = PublicationShortSerializer(many=True, read_only=True)
+    components = serializers.PrimaryKeyRelatedField(
+        many=True, queryset=ResearchGroupComponent.objects.all()
+    )
+    publications = serializers.PrimaryKeyRelatedField(
+        many=True, queryset=Publication.objects.all()
+    )
 
     class Meta:
         model = ResearchProject

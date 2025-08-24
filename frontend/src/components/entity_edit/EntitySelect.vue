@@ -4,7 +4,7 @@ import Multiselect from 'vue-multiselect'
 import 'vue-multiselect/dist/vue-multiselect.min.css'
 
 const modelValue = defineModel('modelValue', {
-  type: Array,
+  type: [Array, Object],
   default: () => []
 })
 

@@ -56,7 +56,7 @@ export function createProject(data) {
     return apiRequest('/api/projects/', 'POST', data);
 }
 export function updateProject(id, data) {
-    return apiRequest(`/api/projects/${id}/`, 'PUT', data);
+    return apiRequest(`/api/projects/${id}/`, 'PATCH', data);
 }
 export function deleteProject(id) {
     return apiRequest(`/api/projects/${id}/`, 'DELETE');
@@ -73,7 +73,7 @@ export function createPublication(data) {
     return apiRequest('/api/publications/', 'POST', data);
 }
 export function updatePublication(id, data) {
-    return apiRequest(`/api/publications/${id}/`, 'PUT', data);
+    return apiRequest(`/api/publications/${id}/`, 'PATCH', data);
 }
 export function deletePublication(id) {
     return apiRequest(`/api/publications/${id}/`, 'DELETE');
@@ -90,7 +90,7 @@ export function createCourse(data) {
     return apiRequest('/api/courses/', 'POST', data);
 }
 export function updateCourse(id, data) {
-    return apiRequest(`/api/courses/${id}/`, 'PUT', data);
+    return apiRequest(`/api/courses/${id}/`, 'PATCH', data);
 }
 export function deleteCourse(id) {
     return apiRequest(`/api/courses/${id}/`, 'DELETE');
@@ -107,7 +107,7 @@ export function createUser(data) {
     return apiRequest('/api/users/', 'POST', data);
 }
 export function updateUser(id, data) {
-    return apiRequest(`/api/users/${id}/`, 'PUT', data);
+    return apiRequest(`/api/users/${id}/`, 'PATCH', data);
 }
 export function deleteUser(id) {
     return apiRequest(`/api/users/${id}/`, 'DELETE');

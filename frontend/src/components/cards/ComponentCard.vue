@@ -24,7 +24,6 @@ const containerClasses = computed(() => {
       'focus:outline-none focus:ring-2 focus:ring-indigo-200'
     ].join(' ')
   }
-  // static / non-interactive: no hover, no pointer, no focus, no clicks
   return [base, border, 'cursor-default pointer-events-none'].join(' ')
 })
 
