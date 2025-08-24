@@ -32,21 +32,22 @@ watch(
 <template>
   <div class="min-h-screen flex flex-col bg-gray-50 text-gray-800">
     <Navbar :menuItems="menu" />
-
-    <div v-if="loading" class="text-center my-8 text-lg text-gray-500">Loading...</div>
-    <div v-else-if="error" class="text-center my-8 text-red-500">{{ error }}</div>
-
-    <ProfileContent
-      v-else-if="component"
-      :component="component"
-      :projects="projects"
-      :owned-projects="ownedProjects"
-      :teached-courses="teachedCourses"
-      :publications="publications"
-    />
-
-    <div v-else>
-      <p class="text-center text-gray-500">Component not found.</p>
-    </div>
+    <main class="flex-grow pt-18">
+      <div v-if="loading" class="text-center my-8 text-lg text-gray-500">Loading...</div>
+      <div v-else-if="error" class="text-center my-8 text-red-500">{{ error }}</div>
+  
+      <ProfileContent
+        v-else-if="component"
+        :component="component"
+        :projects="projects"
+        :owned-projects="ownedProjects"
+        :teached-courses="teachedCourses"
+        :publications="publications"
+      />
+  
+      <div v-else>
+        <p class="text-center text-gray-500">Component not found.</p>
+      </div>
+    </main>
   </div>
 </template>

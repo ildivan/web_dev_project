@@ -61,8 +61,8 @@ const adminPageSelector = [
             v-if="!loggedUserLoading && !loggedUserError"
             :component="loggedUserComponent"
             :projects="loggedUserProjects"
-            :owned-projects="loggedUserOwnedProjects"
-            :teached-courses="loggedUserTeachedCourses"
+            :ownedProjects="loggedUserOwnedProjects"
+            :teachedCourses="loggedUserTeachedCourses"
             :publications="loggedUserPublications"
           />
           <div v-else-if="loggedUserLoading">

@@ -21,7 +21,7 @@ defineProps({
 </script>
 
 <template>
-  <main class="flex-grow container max-w-8xl mx-auto p-6 mt-10 pt-16">
+  <main class="flex-grow container max-w-8xl mx-auto p-6 mt-10 ">
     <section class="bg-violet-50 rounded-xl p-8 mb-8 shadow-md">
       <h2 class="text-3xl font-semibold text-violet-700 mb-2">
         {{ component.user.first_name }} {{ component.user.last_name }}
@@ -38,17 +38,7 @@ defineProps({
       <p class="mt-4 text-gray-700" v-if="component.description">{{ component.description }}</p>
     </section>
 
-    <section v-if="projects && projects.length" class="mb-8">
-      <h3 class="text-xl font-bold text-violet-700 mb-4">Projects</h3>
-      <div class="flex flex-wrap gap-4">
-        <ProjectCard
-          v-for="project in projects"
-          :key="project.id"
-          :project="project"
-        />
-      </div>
-    </section>
-
+    
     <section v-if="ownedProjects && ownedProjects.length" class="mb-8">
       <h3 class="text-xl font-bold text-violet-700 mb-4">Owned Projects</h3>
       <div class="flex flex-wrap gap-4">
@@ -60,25 +50,27 @@ defineProps({
       </div>
     </section>
 
-    <!--
-    <section v-if="teachedCourses && teachedCourses.length" class="mb-8">
-      <h3 class="text-xl font-bold text-violet-700 mb-4">Teached Courses</h3>
+    <section v-if="projects && projects.length" class="mb-8">
+      <h3 class="text-xl font-bold text-violet-700 mb-4">Projects</h3>
       <div class="flex flex-wrap gap-4">
-        <div
-        v-for="course in teachedCourses"
-        :key="course.id"
-        class="bg-violet-100 rounded-lg px-6 py-4 min-w-[120px] text-center shadow"
-        >
-        <RouterLink
-          :to="{ name: 'CourseDetails', params: { id: course.id } }"
-          class="text-violet-700 hover:underline"
-        >
-          Course #{{ course.id }}
-        </RouterLink>
-        </div>
+        <ProjectCard
+          v-for="project in projects"
+          :key="project.id"
+          :project="project"
+        />
       </div>
     </section>
-    -->
+
+    <section v-if="teachedCourses && teachedCourses.length" class="mb-8">
+      <h3 class="text-xl font-bold text-violet-700 mb-4">Taught Courses</h3>
+      <div class="flex flex-wrap gap-4">
+        <CourseCard
+          v-for="course in teachedCourses"
+          :key="course.id"
+          :course="course"
+        />
+      </div>
+    </section>
 
     <section v-if="publications && publications.length" class="mb-8">
       <h3 class="text-xl font-bold text-violet-700 mb-4">Publications</h3>
@@ -95,5 +87,6 @@ defineProps({
 
 <script>
 import ProjectCard from './/cards/ProjectCard.vue'
+import CourseCard from './cards/CourseCard.vue';
 import PublicationCard from './cards/PublicationCard.vue'
 </script>

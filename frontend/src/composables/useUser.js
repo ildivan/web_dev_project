@@ -32,6 +32,9 @@ export function useUser(getId) {
         for (const projectId of component.value.projects || []) {
           projects.value.push(await getProject(projectId))
         }
+        for (const projectId of component.value.owned_projects || []) {
+          ownedProjects.value.push(await getProject(projectId))
+        }
         for (const courseId of component.value.teached_courses || []) {
           teachedCourses.value.push(await getCourse(courseId))
         }
