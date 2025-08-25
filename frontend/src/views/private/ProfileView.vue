@@ -3,9 +3,10 @@ import Footer from '../../components/Footer.vue'
 import Navbar from '../../components/Navbar.vue'
 import { useUser } from '../../composables/useUser.js'
 import ProfileContent from '../../components/ProfileContent.vue'
-import { useMenu } from '../../composables/useMenu.js'
+import { usePublicMenu } from '../../composables/usePublicMenu.js'
 import axiosInstance from '../../axios'
 import ViewDropDownSelector from '../../components/ViewDropDownSelector.vue'
+import usePrivateMenu from '../../composables/usePrivateMenu.js'
 
 async function fetchLoggedUserId() {
   try {
@@ -17,7 +18,7 @@ async function fetchLoggedUserId() {
   }
 }
 
-const { menu } = useMenu()
+const { menu } = usePublicMenu()
 
 const {
   loading: loggedUserLoading,
@@ -29,20 +30,7 @@ const {
   publications: loggedUserPublications,
 } = useUser(fetchLoggedUserId)
 
-const adminPageSelector = [
-  {
-    label: 'Profilo',
-    relURL: '/profile'
-  },
-  {
-    label: 'Amministrazione Componenti del Gruppo',
-    relURL: '/admin/components'
-  },
-  {
-    label: 'Amministrazione Progetti',
-    relURL: '/admin/projects'
-  },
-]
+const {menu: privateMenu} = usePrivateMenu()
 
 </script>
 
@@ -54,7 +42,7 @@ const adminPageSelector = [
 
     <main class="flex-grow container max-w-6xl mx-auto p-2 sm:p-4 md:p-6 mt-4">
       <div class="flex flex-col md:flex-row gap-4 md:gap-8">
-        <ViewDropDownSelector :menuOptions="adminPageSelector"/>
+        <ViewDropDownSelector :menuOptions="privateMenu"/>
 
         <div class="flex-1 bg-white rounded-xl shadow p-6 min-h-[300px]">
           <ProfileContent

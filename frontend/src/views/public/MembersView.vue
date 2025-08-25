@@ -6,9 +6,9 @@ import { getGroupComponents } from '../../apiCalls/apiCalls.js'
 import Button from '../../components/Button.vue'
 import Title from '../../components/Title.vue'
 import ComponentCard from '../../components/cards/ComponentCard.vue'
-import { useMenu } from '../../composables/useMenu.js'
+import { usePublicMenu } from '../../composables/usePublicMenu.js'
 
-const { menu } = useMenu()
+const { menu } = usePublicMenu()
 const title = 'Componenti del Gruppo di Ricerca'
 
 const components = ref([])

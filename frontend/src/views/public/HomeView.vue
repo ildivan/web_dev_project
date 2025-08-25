@@ -7,9 +7,9 @@ import ProjectCard from '../../components/cards/ProjectCard.vue'
 import { getProjects } from '../../apiCalls/apiCalls.js'
 import Button from '../../components/Button.vue'
 import HeroSection from '../../components/HeroSection.vue'
-import { useMenu } from '../../composables/useMenu.js'
+import { usePublicMenu } from '../../composables/usePublicMenu.js'
 
-const { menu } = useMenu()
+const { menu } = usePublicMenu()
 const router = useRouter()
 const welcomeMessage = 'Benvenuti nel nostro gruppo di ricerca!'
 const description = 'Siamo un team dedicato allo sviluppo di soluzioni innovative nelle aree di Intelligenza Artificiale, Sicurezza Informatica e Data Science. Esplora i nostri progetti e le nostre ricerche per scoprire come stiamo contribuendo al progresso tecnologico e scientifico.'

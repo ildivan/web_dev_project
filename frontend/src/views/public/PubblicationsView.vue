@@ -5,9 +5,9 @@ import Navbar from '../../components/Navbar.vue'
 import { getPublications } from '../../apiCalls/apiCalls.js'
 import Button from '../../components/Button.vue'
 import PublicationCard from '../../components/cards/PublicationCard.vue'
-import { useMenu } from '../../composables/useMenu.js'
+import { usePublicMenu } from '../../composables/usePublicMenu.js'
 
-const { menu } = useMenu()
+const { menu } = usePublicMenu()
 const welcomeMessage = ref('Pubblicazioni')
 
 const publications = ref([])

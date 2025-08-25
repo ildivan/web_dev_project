@@ -64,6 +64,14 @@ const routes = [
     meta: {
       authenticationRequired: true,
     }
+  },
+  {
+    path: '/admin/publications',
+    name: 'AdminPublications',
+    component: () => import('../views/private/PublicationAdministrationView.vue'),
+    meta: {
+      authenticationRequired: true,
+    }
   }
 ];
 

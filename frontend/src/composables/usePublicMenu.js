@@ -1,7 +1,7 @@
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 
-export function useMenu() {
+export function usePublicMenu() {
   const route = useRoute()
 
   const MENUS = {

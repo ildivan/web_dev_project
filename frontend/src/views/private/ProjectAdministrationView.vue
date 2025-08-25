@@ -2,7 +2,7 @@
 import { ref, computed } from 'vue'
 import Footer from '../../components/Footer.vue'
 import Navbar from '../../components/Navbar.vue'
-import { useMenu } from '../../composables/useMenu.js'
+import { usePublicMenu } from '../../composables/usePublicMenu.js'
 import useUsers from '../../composables/useUsers.js'
 import { onMounted } from 'vue'
 import useProjects from '../../composables/useProjects.js'
@@ -12,6 +12,7 @@ import ProjectForm from '../../components/entity_edit/ProjectForm.vue'
 import {useProject} from '../../composables/useProject.js'
 import useResearchAreas from '../../composables/useResearchAreas.js'
 import ViewDropDownSelector from '../../components/ViewDropDownSelector.vue'
+import usePrivateMenu from '../../composables/usePrivateMenu.js'
 
 const selectedProjectId = ref(null)
 
@@ -19,7 +20,7 @@ function fetchProjectId() {
     return selectedProjectId.value
 }
 
-const { menu } = useMenu()
+const { menu } = usePublicMenu()
 
 const { users: allUsers, fetchAllUsers } = useUsers()
 const { projects: paginatedProjects, count: totalProjects, fetchProjectsPaginated } = useProjects()
@@ -62,20 +63,7 @@ const onProjectPaginate = (page, pageSize) => {
   fetchProjectsPaginated(page, pageSize)
 }
 
-const adminPageSelector = [
-  {
-    label: 'Profilo',
-    relURL: '/profile'
-  },
-  {
-    label: 'Amministrazione Componenti del Gruppo',
-    relURL: '/admin/components'
-  },
-  {
-    label: 'Amministrazione Progetti',
-    relURL: '/admin/projects'
-  },
-]
+const {menu: privateMenu} = usePrivateMenu()
 </script>
 
 <template>
@@ -86,7 +74,7 @@ const adminPageSelector = [
 
     <main class="flex-grow container max-w-6xl mx-auto p-2 sm:p-4 md:p-6 mt-4">
       <div class="flex flex-col md:flex-row gap-4 md:gap-8">
-        <ViewDropDownSelector :menuOptions="adminPageSelector"/>
+        <ViewDropDownSelector :menuOptions="privateMenu"/>
 
         <section class="flex-1 bg-white rounded-xl shadow p-6 min-h-[300px]">
             <div class="flex flex-col gap-6 md:flex-row md:items-start md:gap-8 md:flex-nowrap">

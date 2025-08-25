@@ -83,8 +83,10 @@ class ResearchProjectShortSerializer(serializers.ModelSerializer):
 
 
 class PublicationSerializer(serializers.ModelSerializer):
-    components_detail = ResearchGroupComponentShortSerializer(source='components', many=True, read_only=True)
-    research_project_detail = ResearchProjectShortSerializer(source='research_project', read_only=True)
+    components = serializers.PrimaryKeyRelatedField(
+        many=True, queryset=ResearchGroupComponent.objects.all()
+    )
+    research_project = ResearchProjectShortSerializer(read_only=True)
 
     class Meta:
         model = Publication

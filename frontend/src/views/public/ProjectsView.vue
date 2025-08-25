@@ -5,9 +5,9 @@ import Navbar from '../../components/Navbar.vue'
 import ProjectCard from '../../components/cards/ProjectCard.vue'
 import { getProjects } from '../../apiCalls/apiCalls.js'
 import Button from '../../components/Button.vue'
-import { useMenu } from '../../composables/useMenu.js'
+import { usePublicMenu } from '../../composables/usePublicMenu.js'
 
-const { menu } = useMenu()
+const { menu } = usePublicMenu()
 const welcomeMessage = ref('I nostri progetti')
 
 const projects = ref([])

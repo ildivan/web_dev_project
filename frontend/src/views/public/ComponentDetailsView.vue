@@ -4,9 +4,9 @@ import { useRoute } from 'vue-router'
 import Navbar from '../../components/Navbar.vue'
 import ProfileContent from '../../components/ProfileContent.vue'
 import { useUser } from '../../composables/useUser'
-import { useMenu } from '../../composables/useMenu.js'
+import { usePublicMenu } from '../../composables/usePublicMenu.js'
 
-const { menu } = useMenu()
+const { menu } = usePublicMenu()
 const route = useRoute()
 const id = route.params.id
 const {
