@@ -146,7 +146,7 @@ const filteredPublications = computed(() => {
                         </div>
                     </transition> -->
 
-                    <div class="grid md:grid-cols-1 gap-6">
+                    <div class="w-full space-y-6">
                         <PublicationCard
                         v-for="publication in filteredPublications"
                         :key="publication.id"
