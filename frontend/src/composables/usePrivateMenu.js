@@ -42,6 +42,14 @@ export default function usePrivateMenu() {
                         }
                     )
                 }
+                if(permissions.value.includes('api.change_course')) {
+                    menu.value.push(
+                        {
+                            label: 'Amministrazione Corsi',
+                            relURL: '/admin/courses'
+                        }
+                    )
+                }
             }
         )
     })

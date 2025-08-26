@@ -72,6 +72,14 @@ const routes = [
     meta: {
       authenticationRequired: true,
     }
+  },
+  {
+    path: '/admin/courses',
+    name: 'AdminCourses',
+    component: () => import('../views/private/CourseAdministrationView.vue'),
+    meta: {
+      authenticationRequired: true,
+    }
   }
 ];
 

@@ -94,7 +94,8 @@ class PublicationSerializer(serializers.ModelSerializer):
 
 
 class CourseSerializer(serializers.ModelSerializer):
-    teacher_detail = ResearchGroupComponentShortSerializer(source='teacher', many=True, read_only=True)
+    # accept list of ResearchGroupComponent PKs on write, expose nested summary on read
+    teachers = serializers.PrimaryKeyRelatedField(many=True, queryset=ResearchGroupComponent.objects.all())
 
     class Meta:
         model = Course

@@ -26,8 +26,8 @@ watch(() => props.publication.title, (v) => title.value = v || '')
 watch(() => props.publication.description, (v) => description.value = v || '')
 watch(() => props.publication.publication_date, (v) => publicationDate.value = v || '')
 watch(() => props.publication.link, (v) => link.value = v || '')
-watch(() => props.publication.project_owner, (v) => localProject.value = v)
-watch(() => props.publication.components, (v) => localComponents.value = v)
+watch(() => props.project, (v) => localProject.value = v)
+watch(() => props.components, (v) => localComponents.value = v)
 
 function deepEqual(a, b) {
   return JSON.stringify(a) === JSON.stringify(b)
