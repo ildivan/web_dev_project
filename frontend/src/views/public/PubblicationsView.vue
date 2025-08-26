@@ -6,12 +6,15 @@ import { getPublications } from '../../apiCalls/apiCalls.js'
 import Button from '../../components/Button.vue'
 import PublicationCard from '../../components/cards/PublicationCard.vue'
 import { usePublicMenu } from '../../composables/usePublicMenu.js'
+import EntitySelect from '../../components/entity_edit/EntitySelect.vue'
+
 
 const { menu } = usePublicMenu()
 const welcomeMessage = ref('Pubblicazioni')
 
 const publications = ref([])
 const selectedFilters = ref([])
+const selectedProjects = ref([])
 // const filterPanelOpen = ref(false)
 
 const currentPage = ref(1)
@@ -39,6 +42,15 @@ onMounted(() => {
   loadPublications()
 })
 
+const projects = computed(() => {
+  const allProjects = publications.value
+    .map(pub => pub.research_project?.title)
+    .filter(Boolean)
+  const unique = [...new Set(allProjects)]
+  return unique.map(title => ({ label: title, value: title }))
+})
+
+
 
 const filteredPublications = computed(() => {
   let filtered = publications.value
@@ -57,6 +69,14 @@ const filteredPublications = computed(() => {
       // project.description?.toLowerCase().includes(query)
     )
   }
+
+  // filtro per progetti multiselect
+  if (selectedProjects.value.length > 0) {
+    filtered = filtered.filter(pub =>
+      selectedProjects.value.some(proj => proj.value === pub.research_project?.title)
+    )
+  }
+
 
   return filtered
 })
@@ -81,71 +101,32 @@ const filteredPublications = computed(() => {
 
         <section id="pubblicazioni" class="bg-white py-6 px-4 rounded-lg shadow relative">
             <div class="container mx-auto">
-            <div class="flex items-center justify-between mb-4">
-               <!-- <Button
-                  message="Filtra"
-                  @click="toggleFilterPanel"
-                  class="mr-4"
-                /> -->
-                <input
-                  v-model="searchQuery"
-                  type="text"
-                  placeholder="Cerca pubblicazioni..."
-                  class="border border-gray-300 rounded-lg px-4 py-2 flex-1 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                <div class="flex items-center justify-between mb-4">
+                    <input
+                      v-model="searchQuery"
+                      type="text"
+                      placeholder="Cerca pubblicazioni..."
+                      class="border border-gray-300 rounded-lg px-4 py-2 flex-1 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    />
+                </div>  
+                
+                <div class="flex items-center justify-between mb-4">
+               <EntitySelect
+                  v-model="selectedProjects"
+                  :options="projects"
+                  multiple
+                  placeholder="Filtra per progetto"
+                  label="label"
+                  track-by="value"
+                  class="flex-1"
                 />
-            </div>  
 
-                <!-- flex div for projects and filters -->
+
+
+                </div>
+
+
                 <div class="flex transition-all duration-300">
-
-                    <!-- filter panel
-                    <transition name="slide-side">
-                        <div 
-                        v-if="filterPanelOpen" 
-                        class="w-64 bg-gray-100 shadow-lg rounded-lg p-4 relative flex-shrink-0 mr-4"
-                        >
-
-                            <button 
-                                @click="filterPanelOpen = false"
-                                class="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
-                            >
-                                ✕
-                            </button>
-
-                            <div class="space-y-2">
-                                <label class="flex items-center space-x-2">
-                                <input 
-                                    type="checkbox" 
-                                    value="active"
-                                    v-model="selectedFilters"
-                                    class="w-3 h-3 bg-white rounded-sm border border-gray-300 !appearance-none checked:bg-indigo-500 transition-colors duration-200"
-                                    style="box-shadow: inset 0 1px 2px rgba(0,0,0,0.10);"
-
-                                />
-                                <span 
-                                class="px-2 py-1 rounded-md hover:bg-gray-300 transition-colors duration-300"
-                                >
-                                    Attivi
-                                </span>
-                                </label>
-                                <label class="flex items-center space-x-2">
-                                <input 
-                                    type="checkbox" 
-                                    value="finished"
-                                    v-model="selectedFilters"
-                                    class="w-3 h-3 bg-white rounded-sm border border-gray-300 !appearance-none checked:bg-indigo-500 transition-colors duration-200"
-                                    style="box-shadow: inset 0 1px 2px rgba(0,0,0,0.10);"
-                                />
-                                <span 
-                                class="px-2 py-1 rounded-md hover:bg-gray-300 transition-colors duration-300"
-                                >
-                                    Conclusi
-                                </span>
-                                </label>
-                            </div>
-                        </div>
-                    </transition> -->
-
                     <div class="w-full space-y-6">
                         <PublicationCard
                         v-for="publication in filteredPublications"

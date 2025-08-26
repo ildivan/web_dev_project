@@ -63,12 +63,14 @@ const props = defineProps({
   min-height: 42px;
   box-shadow: 0 1px 2px 0 rgba(124, 58, 237, 0.08);
 }
+
 :deep(.custom-multiselect .multiselect__tags) {
   background-color: #fff;
   border-bottom: 2px solid #7c3aed;
   border-top-left-radius: 0.5rem;
   border-top-right-radius: 0.5rem;
 }
+
 :deep(.custom-multiselect .multiselect__tag) {
   background-color: #a78bfa;
   color: #fff;
@@ -78,21 +80,48 @@ const props = defineProps({
   margin-bottom: 0.25rem;
   font-size: 0.875rem;
 }
-:deep(.custom-multiselect .multiselect__option--highlight) {
-  background-color: #7c3aed;
-  color: #fff;
-}
-:deep(.custom-multiselect .multiselect__option--selected) {
-  background-color: #a78bfa;
-  color: #fff;
-}
+
 :deep(.custom-multiselect .multiselect__input),
 :deep(.custom-multiselect .multiselect__single) {
   background-color: #fff;
   color: #7c3aed;
+    font-size: 0.875rem;
 }
+
 :deep(.custom-multiselect .multiselect__placeholder) {
   color: #7c3aed;
   opacity: 0.8;
+    font-size: 0.875rem;
+}
+
+/* Dropdown container */
+:deep(.custom-multiselect .multiselect__content-wrapper) {
+  background-color: #fff;
+  border: 2px solid #7c3aed;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 8px rgba(124, 58, 237, 0.2);
+  margin-top: 0.25rem;
+    font-size: 0.875rem;
+  z-index: 50;
+}
+
+/* Singole opzioni nel dropdown */
+:deep(.custom-multiselect .multiselect__option) {
+  font-family: ui-sans-serif, system-ui, sans-serif;
+    font-size: 0.875rem;
+  color: #1f2937;
+  background-color: #fff;
+}
+
+/* Evidenziata al passaggio del mouse */
+:deep(.custom-multiselect .multiselect__option--highlight) {
+  background-color: #9c77dd;
+  color: #fff;
+}
+
+/* Opzione selezionata */
+:deep(.custom-multiselect .multiselect__option--selected) {
+  background-color: #a78bfa;
+  color: #fff;
 }
 </style>
