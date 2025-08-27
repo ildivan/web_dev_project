@@ -12,16 +12,16 @@ const statusClass = computed(() => {
 
 <template>
   <div class="w-full max-w-full p-4 bg-gray-100 rounded shadow hover:shadow-lg transition-shadow duration-300">
-    <h3 class="font-semibold text-base sm:text-lg break-words whitespace-normal">
+    <h3 class="font-semibold break-words whitespace-normal">
       {{ props.project.title }}
     </h3>
 
-    <p class="text-sm sm:text-base text-gray-600 mt-1 break-words whitespace-normal">
+    <p class="text-sm text-gray-600 mt-1 break-words whitespace-normal">
       {{ props.project.description }}
     </p>
 
     <!-- Status derivato da end_date -->
-    <p class="mt-2 text-xs sm:text-sm font-medium text-gray-500">
+    <p class="mt-2 text-xs font-medium text-gray-500">
       Stato:
       <span :class="statusClass" class="ml-1">
         {{ props.project.end_date ? 'Concluso' : 'Attivo' }}
@@ -29,13 +29,13 @@ const statusClass = computed(() => {
     </p>
 
     <!-- Date -->
-    <p class="text-xs sm:text-sm text-gray-400">
+    <p class="text-xs text-gray-400">
       Da: {{ props.project.start_date }}
       <span v-if="props.project.end_date"> - A: {{ props.project.end_date }}</span>
     </p>
 
     <!-- Research area -->
-    <p class="text-xs sm:text-sm text-gray-500 mt-1 break-words whitespace-normal">
+    <p class="text-xs text-gray-500 mt-1 break-words whitespace-normal">
       Area: {{ props.project.research_area?.name || 'N/A' }}
     </p>
   </div>
