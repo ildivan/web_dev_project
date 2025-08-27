@@ -91,13 +91,15 @@ const toggleFilterPanel = () => {
                   message="Filtra"
                   @click="toggleFilterPanel"
                   class="mr-4"
+                  style=" font-size: 0.875rem;"
                 />
                 <input
                   v-model="searchQuery"
                   type="text"
                   placeholder="Cerca progetti..."
                   class="border border-gray-300 rounded-lg px-4 py-2 flex-1 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                />
+                  style=" font-size: 0.875rem;"
+                  />
             </div>  
 
                 <!-- flex div for projects and filters -->
