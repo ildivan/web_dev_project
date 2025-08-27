@@ -56,72 +56,76 @@ const props = defineProps({
 </template>
 
 <style scoped>
-:deep(.custom-multiselect .multiselect) {
-  background-color: #fff;
-  border: 2px solid #7c3aed;
-  border-radius: 0.5rem;
-  min-height: 42px;
-  box-shadow: 0 1px 2px 0 rgba(124, 58, 237, 0.08);
+:deep(.custom-multiselect .multiselect:focus-within) {
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.5); /* focus:ring-indigo-500 */
 }
 
-:deep(.custom-multiselect .multiselect__tags) {
-  background-color: #fff;
-  border-bottom: 2px solid #7c3aed;
-  border-top-left-radius: 0.5rem;
-  border-top-right-radius: 0.5rem;
+:deep(.custom-multiselect .multiselect__tags){
+  border: none !important;
+  background-color: rgb(195, 160, 233) !important; 
+  box-shadow: none; /* rimuove l'ombra di default */
 }
 
-:deep(.custom-multiselect .multiselect__tag) {
-  background-color: #a78bfa;
-  color: #fff;
-  border-radius: 0.25rem;
-  padding: 0.5rem 1.3rem;
-  margin-right: 0.25rem;
-  margin-bottom: 0.25rem;
-  font-size: 0.875rem;
-}
-
-:deep(.custom-multiselect .multiselect__input),
-:deep(.custom-multiselect .multiselect__single) {
-  background-color: #fff;
-  color: #7c3aed;
-    font-size: 0.875rem;
+:deep(.custom-multiselect .multiselect__tags),
+:deep(.custom-multiselect .multiselect__single),
+:deep(.custom-multiselect .multiselect__input) {
+  background-color: rgb(195, 160, 233) !important;
+  color: #1f2937;          /* text-gray-800 */
+  font-size: 0.875rem;     /* text-sm */
 }
 
 :deep(.custom-multiselect .multiselect__placeholder) {
-  color: #7c3aed;
-  opacity: 0.8;
-    font-size: 0.875rem;
+  color: #1f2937; /* text-gray-500 */
+  font-size: 0.875rem;
+  margin-left: 4px;
 }
+
 
 /* Dropdown container */
 :deep(.custom-multiselect .multiselect__content-wrapper) {
   background-color: #fff;
-  border: 2px solid #7c3aed;
+  border: 1px solid rgb(209, 213, 219);  /* border-gray-300 */
   border-radius: 0.5rem;
-  box-shadow: 0 4px 8px rgba(124, 58, 237, 0.2);
+  box-shadow: 0 4px 6px rgba(124, 58, 237, 0.1);
   margin-top: 0.25rem;
-    font-size: 0.875rem;
+  font-size: 0.875rem;
   z-index: 50;
 }
 
 /* Singole opzioni nel dropdown */
 :deep(.custom-multiselect .multiselect__option) {
-  font-family: ui-sans-serif, system-ui, sans-serif;
-    font-size: 0.875rem;
-  color: #1f2937;
+  font-size: 0.875rem;
+  color: #1f2937;   /* text-gray-800 */
   background-color: #fff;
+  opacity: 1;
 }
 
 /* Evidenziata al passaggio del mouse */
 :deep(.custom-multiselect .multiselect__option--highlight) {
-  background-color: #9c77dd;
-  color: #fff;
+  background-color: rgba(99, 102, 241, 0.1); /* violet soft hover */
+  color: #1f2937;
 }
 
 /* Opzione selezionata */
 :deep(.custom-multiselect .multiselect__option--selected) {
-  background-color: #a78bfa;
-  color: #fff;
+  background-color: rgba(99, 102, 241, 0.1); /* stesso hover leggero */
+  color: #1f2937; /* text-gray-800 */
 }
+
+/* Tag multipli selezionati (barra sopra) */
+:deep(.custom-multiselect .multiselect__tag) {
+  background-color:rgb(233, 220, 241); /* chiaro come le opzioni */
+  color: #1f2937; /* testo scuro */
+  border-radius: 0.25rem; 
+  padding: 0.25rem 0.75rem;
+  margin-right: 0.25rem;
+  font-size: 0.875rem;
+}
+
+/* Single select (barra sopra) */
+:deep(.custom-multiselect .multiselect__single) {
+  background-color: #fff; /* stesso sfondo input */
+  color: #1f2937; /* testo scuro */
+}
+
 </style>

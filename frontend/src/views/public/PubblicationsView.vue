@@ -107,6 +107,7 @@ const filteredPublications = computed(() => {
                       type="text"
                       placeholder="Cerca pubblicazioni..."
                       class="border border-gray-300 rounded-lg px-4 py-2 flex-1 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      style=" font-size: 0.875rem;"
                     />
                 </div>  
                 
