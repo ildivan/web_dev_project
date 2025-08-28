@@ -1,8 +1,7 @@
 import { ref } from 'vue'
 import {
-getPublication,
-getGroupComponent,
-updatePublication
+    getPublication,
+    updatePublication
 } from '../apiCalls/apiCalls'
 
 export function usePublication(getId) {
@@ -35,14 +34,7 @@ export function usePublication(getId) {
             }
 
             researchProject.value = publication.value.research_project
-
-            // components: may be array of ids or array of objects
-            const comps = []
-            const rawComps = publication.value.components || []
-            for (const c of rawComps) {
-                comps.push(await getGroupComponent(c))
-            }
-            components.value = comps.map(c => c.user)
+            components.value = publication.value.components.map(c => c.user)
         } catch (err) {
             error.value = err.message || 'Could not load publication data.'
         } finally {

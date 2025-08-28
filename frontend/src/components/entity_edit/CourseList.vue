@@ -35,7 +35,7 @@ function onPaginate(page, per_page) {
     </template>
 
     <EntityListItem
-      v-for="course in props.courses"
+      v-for="course in props.courses.filter(course => course.can_change || course.can_delete)"
       :key="course.id"
       :id="course.id"
       @edit="onEdit"

@@ -19,6 +19,7 @@ INSTALLED_APPS = [
     'djoser',
     'corsheaders',
     'api',
+    'guardian'
 ]
 
 CORS_ALLOWED_ORIGINS = [
@@ -111,3 +112,8 @@ SIMPLE_JWT = {
 }
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+    'guardian.backends.ObjectPermissionBackend',
+)

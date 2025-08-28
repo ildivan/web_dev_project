@@ -30,12 +30,12 @@ function onPaginate(page, per_page) {
       </div>
     </template>
 
-    <template v-if="projects.length === 0">
+    <template v-if="props.projects.length === 0">
       <div class="px-3 py-4 text-sm text-gray-500">No projects</div>
     </template>
 
     <EntityListItem
-      v-for="project in projects"
+      v-for="project in props.projects.filter(project => project.can_change || project.can_delete)"
       :key="project.id"
       :id="project.id"
       @edit="onEdit"

@@ -7,7 +7,7 @@ import Button from '../../components/Button.vue'
 import PublicationCard from '../../components/cards/PublicationCard.vue'
 import { usePublicMenu } from '../../composables/usePublicMenu.js'
 import EntitySelect from '../../components/entity_edit/EntitySelect.vue'
-
+import  useProjects from '../../composables/useProjects.js'
 
 const { menu } = usePublicMenu()
 const welcomeMessage = ref('Pubblicazioni')
@@ -15,7 +15,6 @@ const welcomeMessage = ref('Pubblicazioni')
 const publications = ref([])
 const selectedFilters = ref([])
 const selectedProjects = ref([])
-// const filterPanelOpen = ref(false)
 
 const currentPage = ref(1)
 const pageSize = 4
@@ -23,6 +22,7 @@ const hasMore = ref(true)
 
 const searchQuery = ref('')
 
+const {projects, fetchAllProjects} = useProjects()
 
 async function loadPublications() {
   const data = await getPublications(currentPage.value, pageSize)
@@ -40,14 +40,7 @@ function loadMore() {
 
 onMounted(() => {
   loadPublications()
-})
-
-const projects = computed(() => {
-  const allProjects = publications.value
-    .map(pub => pub.research_project?.title)
-    .filter(Boolean)
-  const unique = [...new Set(allProjects)]
-  return unique.map(title => ({ label: title, value: title }))
+  fetchAllProjects()
 })
 
 
@@ -65,15 +58,13 @@ const filteredPublications = computed(() => {
     const query = searchQuery.value.toLowerCase()
     filtered = filtered.filter(publication =>
       publication.title?.toLowerCase().includes(query)
-      //  ||
-      // project.description?.toLowerCase().includes(query)
     )
   }
 
   // filtro per progetti multiselect
   if (selectedProjects.value.length > 0) {
     filtered = filtered.filter(pub =>
-      selectedProjects.value.some(proj => proj.value === pub.research_project?.title)
+      selectedProjects.value.some(proj => proj.id === pub.research_project)
     )
   }
 
@@ -81,9 +72,6 @@ const filteredPublications = computed(() => {
   return filtered
 })
 
-// const toggleFilterPanel = () => {
-//   filterPanelOpen.value = !filterPanelOpen.value
-// }
 </script>
 
 
@@ -117,15 +105,11 @@ const filteredPublications = computed(() => {
                   :options="projects"
                   multiple
                   placeholder="Filtra per progetto"
-                  label="label"
-                  track-by="value"
+                  label="title"
+                  track-by="id"
                   class="flex-1"
                 />
-
-
-
                 </div>
-
 
                 <div class="flex transition-all duration-300">
                     <div class="w-full space-y-6">

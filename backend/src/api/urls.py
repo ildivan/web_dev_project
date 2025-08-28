@@ -14,6 +14,5 @@ urlpatterns = [
     path('auth/', include('djoser.urls')),
     path('auth/', include('djoser.urls.jwt')),
     path('auth/permissions/', views.PermissionsView.as_view(), name='permissions'),
-    path('', include(router.urls)),  
-    path('is-component/', views.IsComponentView.as_view(), name='is-component'),
+    path('', include(router.urls)), 
 ]

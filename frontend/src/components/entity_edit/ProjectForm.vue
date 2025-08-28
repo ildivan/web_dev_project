@@ -12,7 +12,6 @@ const props = defineProps({
   saving: { type: Boolean, default: false },
   researchAreaOptions: { type: Array, default: () => [] },
   componentOptions: { type: Array, default: () => [] },
-  publicationOptions: { type: Array, default: () => [] }
 })
 
 const emit = defineEmits(['save'])
@@ -24,7 +23,6 @@ const endDate = ref(props.project.end_date || '')
 const localResearchArea = ref(props.researchArea || null)
 const localProjectOwner = ref(props.projectOwner || null)
 const localComponents = ref([...(props.components || [])])
-const localPublications = ref([...(props.publications || [])])
 
 watch(() => props.project.title, (v) => title.value = v || '')
 watch(() => props.project.description, (v) => description.value = v || '')
@@ -33,7 +31,6 @@ watch(() => props.project.end_date, (v) => endDate.value = v || '')
 watch(() => props.project.research_area, (v) => localResearchArea.value = v || null)
 watch(() => props.project.project_owner, (v) => localProjectOwner.value = v || null)
 watch(() => props.project.components, (v) => localComponents.value = [...(v || [])])
-watch(() => props.project.publications, (v) => localPublications.value = [...(v || [])])
 
 function deepEqual(a, b) {
   return JSON.stringify(a) === JSON.stringify(b)
@@ -65,10 +62,6 @@ function onSave() {
     toSave.components = localComponents.value.map(c => c.id)
   }
 
-  if (!arraysHaveSameElements(localPublications.value, props.publications || [])) {
-    toSave.publications = localPublications.value.map(p => p.id)
-  }
-
   emit('save', toSave)
 }
 
@@ -80,7 +73,6 @@ function onCancel() {
   localResearchArea.value = props.researchArea || null
   localProjectOwner.value = props.projectOwner || null
   localComponents.value = [...(props.components || [])]
-  localPublications.value = [...(props.publications || [])]
 }
 </script>
 
@@ -146,18 +138,6 @@ function onCancel() {
                 :options="props.componentOptions.map(c => c.user)"
                 placeholder="Select components"
                 label="username"
-                trackBy="id"
-                :multiple="true"
-            />
-        </div>
-
-        <div class="mt-4">
-            <label class="block text-sm font-medium mb-1">Publications</label>
-            <EntitySelect
-                v-model="localPublications"
-                :options="props.publicationOptions"
-                placeholder="Select publications"
-                label="title"
                 trackBy="id"
                 :multiple="true"
             />

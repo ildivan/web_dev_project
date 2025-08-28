@@ -48,7 +48,7 @@ function onSave() {
   if (link.value !== props.publication.link) toSave.link = link.value
 
   if (!deepEqual(localProject.value, props.project)) {
-    toSave.project = localProject.value.id
+    toSave.research_project = localProject.value.id
   }
 
   if (!arraysHaveSameElements(localComponents.value, props.components)) {

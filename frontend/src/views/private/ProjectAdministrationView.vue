@@ -6,7 +6,6 @@ import { usePublicMenu } from '../../composables/usePublicMenu.js'
 import useUsers from '../../composables/useUsers.js'
 import { onMounted } from 'vue'
 import useProjects from '../../composables/useProjects.js'
-import usePublications from '../../composables/usePublications.js'
 import ProjectList from '../../components/entity_edit/ProjectList.vue'
 import ProjectForm from '../../components/entity_edit/ProjectForm.vue'
 import {useProject} from '../../composables/useProject.js'
@@ -24,13 +23,11 @@ const { menu } = usePublicMenu()
 
 const { users: allUsers, fetchAllUsers } = useUsers()
 const { projects: paginatedProjects, count: totalProjects, fetchProjectsPaginated } = useProjects()
-const { publications: allPublications, fetchAllPublications } = usePublications()
 const { researchAreas: allResearchAreas, fetchAllResearchAreas } = useResearchAreas()
 
 onMounted(() => {
   fetchProjectsPaginated(1, 10)
   fetchAllUsers()
-  fetchAllPublications()
   fetchAllResearchAreas()
 })
 
@@ -39,7 +36,6 @@ const {
   error: projectToEditError,
   project: projectToEdit,
   components: projectToEditComponents,
-  publications: projectToEditPublications,
   researchArea: projectToEditResearchArea,
   projectOwner: projectToEditProjectOwner,
   updateProjectData: projectToEditUpdate,
@@ -89,12 +85,10 @@ const {menu: privateMenu} = usePrivateMenu()
                   v-if="!projectToEditLoading && !projectToEditError && projectToEdit"
                   :project="projectToEdit"
                   :components="projectToEditComponents"
-                  :publications="projectToEditPublications"
                   :researchArea="projectToEditResearchArea"
                   :projectOwner="projectToEditProjectOwner"
                   :saving="projectToEditLoading"
                   :componentOptions="allUsers"
-                  :publicationOptions="allPublications"
                   :researchAreaOptions="allResearchAreas"
                   @save="projectSave"
                 />

@@ -40,26 +40,11 @@ export function useProject(getId) {
             throw new Error('Project not found')
         }
         
-        researchArea.value = project.value.research_area_detail
-        projectOwner.value = project.value.project_owner_detail.user
+        researchArea.value = project.value.research_area
+        projectOwner.value = project.value.project_owner.user
+        components.value = project.value.components.map(c => c.user)
 
-        let comps = []
-        for (const compId of project.value.components || []) {
-            const comp = await getGroupComponent(compId)
-            if (comp) {
-                comps.push(comp)
-            }
-        }
-        components.value = comps.map(c => c.user)
-
-        publications.value = []
-        for (const pubId of project.value.publications || []) {
-            const pub = await getPublication(pubId)
-            if (pub) {
-                publications.value.push(pub)
-            }
-        }
-
+        publications.value = project.value.publications
     } catch (err) {
       error.value = err.message || 'Could not load project data.'
     } finally {

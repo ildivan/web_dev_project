@@ -1,144 +1,74 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import viewsets, serializers
-from rest_framework.permissions import IsAuthenticated, DjangoModelPermissions
-from rest_framework.pagination import PageNumberPagination
+from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated
+from .pagination import DefaultPagination
+
+from guardian.shortcuts import assign_perm, remove_perm
 from django.contrib.auth.models import User
+from django.db import transaction
 
 from .models import ResearchArea, ResearchGroupComponent, ResearchProject, Publication, Course
-
-# ----------------- SERIALIZER -----------------
-
-class ResearchAreaSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ResearchArea
-        fields = '__all__'
+from . import serializers as api_serializers
+from . import permissions as api_permissions
 
 
-class UserPublicSerializer(serializers.ModelSerializer):
-    groups = serializers.SlugRelatedField(
-        many=True,
-        read_only=True,
-        slug_field='name'
-    )
+# ----------------- HELPERS / BASES -----------------
 
-    class Meta:
-        model = User
-        fields = ['id', 'username', 'first_name', 'last_name', 'email', 'groups']
+class DynamicSerializerMixin:
+    """Select serializer dynamically:
+    - use detailed_serializer_class (or serializer_class) for non-list write actions
+    - use short_serializer_class when client disables pagination (?page_size=0 or all)
+    - otherwise use serializer_class
+    """
+    short_serializer_class = None
+    # serializer used for detail (single-object) GET responses
+    detail_serializer_class = None
+    edit_serializer_class = None
 
+    def get_serializer_class(self):
+        # detail GET -> use detail serializer when provided
+        if getattr(self, 'action', None) == 'retrieve' and self.request.method == 'GET':
+            return self.detail_serializer_class or self.serializer_class
 
-class ResearchGroupComponentSerializer(serializers.ModelSerializer):
-    user = UserPublicSerializer(read_only=True)
-    projects = serializers.PrimaryKeyRelatedField(
-        many=True, queryset=ResearchProject.objects.all()
-    )
-    owned_projects = serializers.PrimaryKeyRelatedField(
-        many=True, queryset=ResearchProject.objects.all()
-    )
-    teached_courses = serializers.PrimaryKeyRelatedField(
-        many=True, queryset=Course.objects.all()
-    )
-    publications = serializers.PrimaryKeyRelatedField(
-        many=True, queryset=Publication.objects.all()
-    )
+        # non-list write actions (create/update/partial_update) -> use edit serializer
+        if getattr(self, 'action', None) not in ('list', None) and self.request.method != 'GET':
+            return self.edit_serializer_class or self.serializer_class
 
-    class Meta:
-        model = ResearchGroupComponent
-        fields = '__all__'
+        # list action: choose between paginated (serializer_class) and non-paginated (short)
+        params = self.request.query_params
+        page_size_param = getattr(self.pagination_class, 'page_size_query_param', 'page_size')
+        if params.get(page_size_param) in ('0', 'all'):
+            return self.short_serializer_class or self.serializer_class
 
-
-class ResearchGroupComponentShortSerializer(serializers.ModelSerializer):
-    user = UserPublicSerializer(read_only=True)
-
-    class Meta:
-        model = ResearchGroupComponent
-        fields = ['user']
-
-class PublicationShortSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Publication
-        fields = ['id', 'title', 'description', 'publication_date']
-
-class ResearchProjectSerializer(serializers.ModelSerializer):
-    research_area_detail = ResearchAreaSerializer(source='research_area', read_only=True)
-    project_owner_detail = ResearchGroupComponentShortSerializer(source='project_owner', read_only=True)
-    components = serializers.PrimaryKeyRelatedField(
-        many=True, queryset=ResearchGroupComponent.objects.all()
-    )
-    publications = serializers.PrimaryKeyRelatedField(
-        many=True, queryset=Publication.objects.all()
-    )
-
-    class Meta:
-        model = ResearchProject
-        fields = '__all__'
+        return self.serializer_class
+    
+    
 
 
-class ResearchProjectShortSerializer(serializers.ModelSerializer):
-    research_area_detail = ResearchAreaSerializer(source='research_area', read_only=True)
+class BaseModelViewSet(DynamicSerializerMixin, viewsets.ModelViewSet):
+    permission_classes = [api_permissions.ModelOrObjectPermissions]
+    pagination_class = DefaultPagination
 
-    class Meta:
-        model = ResearchProject
-        fields = ['id', 'title', 'description', 'research_area_detail']
-
-
-class PublicationSerializer(serializers.ModelSerializer):
-    components = serializers.PrimaryKeyRelatedField(
-        many=True, queryset=ResearchGroupComponent.objects.all()
-    )
-    research_project = ResearchProjectShortSerializer(read_only=True)
-
-    class Meta:
-        model = Publication
-        fields = '__all__'
-
-
-class CourseSerializer(serializers.ModelSerializer):
-    # accept list of ResearchGroupComponent PKs on write, expose nested summary on read
-    teachers = serializers.PrimaryKeyRelatedField(many=True, queryset=ResearchGroupComponent.objects.all())
-
-    class Meta:
-        model = Course
-        fields = '__all__'
-
-class CourseShortSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Course
-        fields = ['id', 'name']
-
-# ----------------- PAGINATION -----------------
-
-class DefaultPagination(PageNumberPagination):
-    page_size = 10
-    page_size_query_param = 'page_size'
-    max_page_size = 100
-
-    def paginate_queryset(self, queryset, request, view=None):
-        # allow client to disable pagination per-request with ?page_size=0 or ?page_size=all
-        param = request.query_params.get(self.page_size_query_param)
-        if param in ('0', 'all'):
-            return None
-        return super().paginate_queryset(queryset, request, view)
 
 # ----------------- VIEWSETS -----------------
 
-class ResearchAreaViewSet(viewsets.ModelViewSet):
-    queryset = ResearchArea.objects.prefetch_related('projects')
-    serializer_class = ResearchAreaSerializer
-    permission_classes = [DjangoModelPermissions]
-    pagination_class = DefaultPagination
 
-class ResearchGroupComponentViewSet(viewsets.ModelViewSet):
+class ResearchAreaViewSet(BaseModelViewSet):
+    queryset = ResearchArea.objects.prefetch_related('projects')
+    serializer_class = api_serializers.ResearchAreaListSerializer
+    detail_serializer_class = api_serializers.ResearchAreaDetailSerializer
+
+class ResearchGroupComponentViewSet(BaseModelViewSet):
     queryset = ResearchGroupComponent.objects.prefetch_related(
         'projects', 'owned_projects', 'teached_courses', 'publications', 'user__groups'
     ).select_related('user')
-    pagination_class = DefaultPagination
 
-    def get_permissions(self):
-        if self.request.method == 'GET':
-            return []
-        return [DjangoModelPermissions()]
+    # use list serializer (PK relationships) for paginated GET
+    serializer_class = api_serializers.ResearchGroupComponentListSerializer
+    detail_serializer_class = api_serializers.ResearchGroupComponentDetailSerializer
+    short_serializer_class = api_serializers.ResearchGroupComponentShortSerializer
+    edit_serializer_class = api_serializers.ResearchGroupComponentEditSerializer
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -146,113 +76,142 @@ class ResearchGroupComponentViewSet(viewsets.ModelViewSet):
         if username:
             queryset = queryset.filter(user__username=username)
         return queryset
+    
+    def perform_create(self, serializer):
+        # Salva il progetto assegnando owner come l'utente richiedente
+        with transaction.atomic():
+            component = serializer.save()
+            courses = set(component.teached_courses.all())
+            for course in courses:
+                assign_perm('api.change_course', component.user, course)
+                assign_perm('api.delete_course', component.user, course)
 
-    def get_serializer_class(self):
-        """
-        Use a short serializer for paginated list responses and the full serializer
-        for non-paginated requests or detail endpoints.
-        """
-        # if this is not a list action, use the full serializer
-        if getattr(self, 'action', None) not in ('list', None) and self.request.method != 'GET':
-            return ResearchGroupComponentSerializer
+    def perform_update(self, serializer):
+        component = serializer.instance  # istanza prima dell'update
+        old_courses = set(component.teached_courses.all())
+        # Salva l'istanza aggiornata + perm changes in a transaction
+        with transaction.atomic():
+            component = serializer.save()
+            new_courses = set(component.teached_courses.all())
+            # Gestisci i permessi
 
-        params = self.request.query_params
-        page_size_param = params.get(self.pagination_class.page_size_query_param)
+            for course in new_courses - old_courses:
+                assign_perm('api.change_course', component.user, course)
+                assign_perm('api.delete_course', component.user, course)
 
-        # Client explicitly disabled pagination with ?page_size=0 or ?page_size=all
-        if page_size_param in ('0', 'all'):
-            return ResearchGroupComponentShortSerializer
-
-        return ResearchGroupComponentSerializer
+            for course in old_courses - new_courses:
+                remove_perm('api.change_course', component.user, course)
+                remove_perm('api.delete_course', component.user, course)
 
 class AllUsersViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = User.objects.prefetch_related('groups')
-    serializer_class = UserPublicSerializer
+    serializer_class = api_serializers.UserPublicSerializer
     permission_classes = [IsAuthenticated]
     pagination_class = DefaultPagination
 
-class ResearchProjectViewSet(viewsets.ModelViewSet):
+class ResearchProjectViewSet(BaseModelViewSet):
     queryset = ResearchProject.objects.select_related(
         'research_area', 'project_owner'
     ).prefetch_related('components', 'publications')
-    pagination_class = DefaultPagination
 
-    def get_permissions(self):
-        if self.request.method == 'GET':
-            return []
-        return [DjangoModelPermissions()]
-    
-    def get_serializer_class(self):
-        """
-        Use a short serializer for paginated list responses and the full serializer
-        for non-paginated requests or detail endpoints.
-        """
-        # if this is not a list action, use the full serializer
-        if getattr(self, 'action', None) not in ('list', None) and self.request.method != 'GET':
-            return ResearchProjectSerializer
+    serializer_class = api_serializers.ResearchProjectListSerializer
+    detail_serializer_class = api_serializers.ResearchProjectDetailSerializer
+    short_serializer_class = api_serializers.ResearchProjectShortSerializer
+    edit_serializer_class = api_serializers.ResearchProjectEditSerializer
 
-        params = self.request.query_params
-        page_size_param = params.get(self.pagination_class.page_size_query_param)
+    def perform_create(self, serializer):
+        with transaction.atomic():
+            project = serializer.save()
+            new_owner = project.project_owner
 
-        # Client explicitly disabled pagination with ?page_size=0 or ?page_size=all
-        if page_size_param in ('0', 'all'):
-            return ResearchProjectShortSerializer
+            # grant project perms to new owner
+            assign_perm('api.change_researchproject', new_owner.user, project)
+            assign_perm('api.delete_researchproject', new_owner.user, project)
 
-        return ResearchProjectSerializer
+    def perform_update(self, serializer):
+        project = serializer.instance  # istanza prima dell'update
+        old_owner = project.project_owner
+        # Salva l'istanza aggiornata inside a transaction
+        with transaction.atomic():
+            project = serializer.save()
+            new_owner = project.project_owner
+            # Gestisci i permessi
+            if old_owner != new_owner:
+                remove_perm('api.change_researchproject', old_owner.user, project)
+                remove_perm('api.delete_researchproject', old_owner.user, project)
+                assign_perm('api.change_researchproject', new_owner.user, project)
+                assign_perm('api.delete_researchproject', new_owner.user, project)
 
-class PublicationViewSet(viewsets.ModelViewSet):
+
+class PublicationViewSet(BaseModelViewSet):
     queryset = Publication.objects.select_related(
         'research_project'
     ).prefetch_related('components')
-    pagination_class = DefaultPagination
 
-    def get_permissions(self):
-        if self.request.method == 'GET':
-            return []
-        return [DjangoModelPermissions()]
-    
-    def get_serializer_class(self):
-        """
-        Use a short serializer for paginated list responses and the full serializer
-        for non-paginated requests or detail endpoints.
-        """
-        # if this is not a list action, use the full serializer
-        if getattr(self, 'action', None) not in ('list', None) and self.request.method != 'GET':
-            return PublicationSerializer
+    serializer_class = api_serializers.PublicationListSerializer
+    detail_serializer_class = api_serializers.PublicationDetailSerializer
+    short_serializer_class = api_serializers.PublicationShortSerializer
 
-        params = self.request.query_params
-        page_size_param = params.get(self.pagination_class.page_size_query_param)
+    def perform_create(self, serializer):
+        # Salva il progetto assegnando owner come l'utente richiedente
+        with transaction.atomic():
+            publication = serializer.save()
+            project_owner = publication.research_project.project_owner
+            assign_perm('api.change_publication', project_owner.user, publication)
+            assign_perm('api.delete_publication', project_owner.user, publication)
 
-        # Client explicitly disabled pagination with ?page_size=0 or ?page_size=all
-        if page_size_param in ('0', 'all'):
-            return PublicationShortSerializer
+    def perform_update(self, serializer):
+        publication = serializer.instance  # istanza prima dell'update
+        old_owner = publication.research_project.project_owner
+        # Salva l'istanza aggiornata + perms in transaction
+        with transaction.atomic():
+            publication = serializer.save()
+            new_owner = publication.research_project.project_owner
+            # Gestisci i permessi
+            if old_owner != new_owner:
+                remove_perm('api.change_publication', old_owner.user, publication)
+                remove_perm('api.delete_publication', old_owner.user, publication)
+                assign_perm('api.change_publication', new_owner.user, publication)
+                assign_perm('api.delete_publication', new_owner.user, publication)
 
-        return PublicationSerializer
-
-class CourseViewSet(viewsets.ModelViewSet):
+class CourseViewSet(BaseModelViewSet):
     queryset = Course.objects.prefetch_related('teachers')
-    permission_classes = [DjangoModelPermissions]
-    pagination_class = DefaultPagination
+    serializer_class = api_serializers.CourseListSerializer
+    detail_serializer_class = api_serializers.CourseDetailSerializer
+    short_serializer_class = api_serializers.CourseShortSerializer
 
-    def get_serializer_class(self):
-        """
-        Use a short serializer for paginated list responses and the full serializer
-        for non-paginated requests or detail endpoints.
-        """
-        # if this is not a list action, use the full serializer
-        if getattr(self, 'action', None) not in ('list', None) and self.request.method != 'GET':
-            return CourseSerializer
+    def perform_create(self, serializer):
+        with transaction.atomic():
+            course = serializer.save()
+            # Assegna permessi di cambio/cancellazione a ciascun membro 
+            for teacher in course.teachers.all():
+                    assign_perm('api.change_course', teacher.user, course)
+                    assign_perm('api.delete_course', teacher.user, course)
 
-        params = self.request.query_params
-        page_size_param = params.get(self.pagination_class.page_size_query_param)
+    def perform_update(self, serializer):
+        course = serializer.instance  # istanza prima dell'update
+        old_teachers = set(course.teachers.all())
+        # Salva l'istanza aggiornata + perms in transaction
+        with transaction.atomic():
+            course = serializer.save()
+            new_teachers = set(course.teachers.all())
 
-        # Client explicitly disabled pagination with ?page_size=0 or ?page_size=all
-        if page_size_param in ('0', 'all'):
-            return CourseShortSerializer
+            # Calcola utenti aggiunti e rimossi
+            added = new_teachers - old_teachers
+            removed = old_teachers - new_teachers
 
-        return CourseSerializer
+            # Assegna permessi ai nuovi membri
+            for teacher in added:
+                if teacher != self.request.user:
+                    assign_perm('api.change_course', teacher.user, course)
+                    assign_perm('api.delete_course', teacher.user, course)
 
-# ----------------- SIMPLE API VIEWS -----------------
+            # Rimuovi permessi agli utenti rimossi
+            for teacher in removed:
+                remove_perm('api.change_course', teacher.user, course)
+                remove_perm('api.delete_course', teacher.user, course)
+
+# ----------------- API VIEWS -----------------
 
 class PermissionsView(APIView):
     def get(self, request):
@@ -261,11 +220,3 @@ class PermissionsView(APIView):
             return Response({'detail': 'Authentication failed.'}, status=401)
         permissions = user.get_all_permissions()
         return Response({'permissions': list(permissions)})
-    
-class IsComponentView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request):
-        user = request.user
-        is_component = user.groups.filter(name='Componente').exists()
-        return Response({'is_component': is_component})

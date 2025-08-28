@@ -31,12 +31,12 @@ function onPaginate(page, per_page) {
       </div>
     </template>
  
-    <template v-if="users.length === 0">
+    <template v-if="props.users.length === 0">
       <div class="px-3 py-4 text-sm text-gray-500">No users</div>
     </template>
 
     <EntityListItem
-      v-for="user in users"
+      v-for="user in users.filter(user => user.can_change || user.can_delete)"
       :key="user.user.id"
       :id="user.user.id"
       @edit="onEdit"

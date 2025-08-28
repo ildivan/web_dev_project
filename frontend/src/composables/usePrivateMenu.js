@@ -1,60 +1,39 @@
-import { getPermissions } from "../apiCalls/apiCalls"
-import { ref, onMounted } from "vue"
+import { computed, watch } from 'vue'
+import { useUser } from './useUser'
+import axiosInstance from '../axios'
 
 export default function usePrivateMenu() {
-    const menu = ref([
-        {
-            label: 'Profilo',
-            relURL: '/profile'
+    
+
+    async function fetchLoggedUserId() {
+        try {
+            const res = await axiosInstance.get('/api/auth/users/me/')
+            return res.data.id
+        } catch (err) {
+            console.error('Error fetching logged user ID:', err)
+            throw err
         }
-    ])
-    const permissions = ref([])
-
-    const loadPermissions = async () => {
-        const data = await getPermissions()
-        permissions.value = data.permissions
     }
-
-    onMounted(() => {
-        loadPermissions().then(
-            () => {
-                if(permissions.value.includes('api.change_researchgroupcomponent')) {
-                    menu.value.push(
-                        {
-                            label: 'Amministrazione Componenti del Gruppo',
-                            relURL: '/admin/components'
-                        }
-                    )
-                }
-                if(permissions.value.includes('api.change_researchproject')) {
-                    menu.value.push(
-                        {
-                            label: 'Amministrazione Progetti',
-                            relURL: '/admin/projects'
-                        }
-                    )
-                }
-                if(permissions.value.includes('api.change_publication')) {
-                    menu.value.push(
-                        {
-                            label: 'Amministrazione Pubblicazioni',
-                            relURL: '/admin/publications'
-                        }
-                    )
-                }
-                if(permissions.value.includes('api.change_course')) {
-                    menu.value.push(
-                        {
-                            label: 'Amministrazione Corsi',
-                            relURL: '/admin/courses'
-                        }
-                    )
-                }
+    
+    const { loading: userLoading, error: userError } = useUser(fetchLoggedUserId)
+    
+    const menu = computed(() => {
+            const base = [ { label: 'Profilo', relURL: '/profile' } ]
+            if (!userError.value) {
+                base.push({ label: 'Amministrazione Componenti del Gruppo', relURL: '/admin/components' })
+                base.push({ label: 'Amministrazione Progetti', relURL: '/admin/projects' })
+                base.push({ label: 'Amministrazione Pubblicazioni', relURL: '/admin/publications' })
+                base.push({ label: 'Amministrazione Corsi', relURL: '/admin/courses' })
             }
-        )
-    })
+            return base
+        })
+    
+    // keep watch to trigger evaluation early if desired; computed will update automatically
+    watch([userLoading, userError], () => {}, { immediate: true })
 
     return {
-        menu: menu.value
+    menu: menu,
+        loading: userLoading,
+        error: userError
     }
 }

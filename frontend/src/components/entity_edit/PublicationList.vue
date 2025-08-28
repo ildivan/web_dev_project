@@ -35,7 +35,7 @@ function onPaginate(page, per_page) {
     </template>
 
     <EntityListItem
-      v-for="publication in props.publications"
+      v-for="publication in props.publications.filter(publication => publication.can_change || publication.can_delete)"
       :key="publication.id"
       :id="publication.id"
       @edit="onEdit"

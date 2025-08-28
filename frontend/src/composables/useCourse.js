@@ -32,13 +32,7 @@ export function useCourse(getId) {
                 throw new Error('Course not found')
             }
 
-            // components: may be array of ids or array of objects
-            const comps = []
-            const rawComps = course.value.teachers || []
-            for (const c of rawComps) {
-                comps.push(await getGroupComponent(c))
-            }
-            components.value = comps.map(c => c.user)
+            components.value = course.value.teachers.map(c => c.user)
         } catch (err) {
             error.value = err.message || 'Could not load course data.'
         } finally {
