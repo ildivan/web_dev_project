@@ -28,7 +28,7 @@ const { publications: allPublications, fetchAllPublications } = usePublications(
 const { courses: allCourses, fetchAllCourses } = useCourses()
 
 onMounted(() => {
-  fetchUsersPaginated(1, 10)
+  fetchUsersPaginated(1, 10, true)
   fetchAllProjects()
   fetchAllPublications()
   fetchAllCourses()
@@ -60,7 +60,7 @@ const onComponentEdit = (id) => {
 }
 
 const onComponentPaginate = (page, pageSize) => {
-  fetchUsersPaginated(page, pageSize)
+  fetchUsersPaginated(page, pageSize, true)
 }
 
 const {menu: privateMenu} = usePrivateMenu()

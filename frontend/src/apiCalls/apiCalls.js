@@ -12,8 +12,8 @@ function apiRequest(endpoint, method = 'GET', data = null, params = null) {
 }
 
 // Research Areas
-export function getResearchAreas(page = 1, pageSize = 10) {
-    return apiRequest('/api/research-areas/', 'GET', null, { page, page_size: pageSize });
+export function getResearchAreas(page = 1, pageSize = 10, editable=false) {
+    return apiRequest('/api/research-areas/', 'GET', null, { page, page_size: pageSize, editable });
 }
 export function getResearchArea(id) {
     return apiRequest(`/api/research-areas/${id}/`, 'GET');
@@ -29,8 +29,8 @@ export function deleteResearchArea(id) {
 }
 
 // Research Group Components
-export function getGroupComponents(page = 1, pageSize = 10) {
-    return apiRequest('/api/group-components/', 'GET', null, { page, page_size: pageSize });
+export function getGroupComponents(page = 1, pageSize = 10, editable=false) {
+    return apiRequest('/api/group-components/', 'GET', null, { page, page_size: pageSize, editable });
 }
 export function getGroupComponent(id) {
     return apiRequest(`/api/group-components/${id}/`, 'GET');
@@ -46,8 +46,8 @@ export function deleteGroupComponent(id) {
 }
 
 // Research Projects
-export function getProjects(page = 1, pageSize = 10) {
-    return apiRequest('/api/projects/', 'GET', null, { page, page_size: pageSize });
+export function getProjects(page = 1, pageSize = 10, editable=false) {
+    return apiRequest('/api/projects/', 'GET', null, { page, page_size: pageSize, editable });
 }
 export function getProject(id) {
     return apiRequest(`/api/projects/${id}/`, 'GET');
@@ -63,8 +63,8 @@ export function deleteProject(id) {
 }
 
 // Publications
-export function getPublications(page = 1, pageSize = 10) {
-    return apiRequest('/api/publications/', 'GET', null, { page, page_size: pageSize });
+export function getPublications(page = 1, pageSize = 10, editable=false) {
+    return apiRequest('/api/publications/', 'GET', null, { page, page_size: pageSize, editable });
 }
 export function getPublication(id) {
     return apiRequest(`/api/publications/${id}/`, 'GET');
@@ -80,8 +80,8 @@ export function deletePublication(id) {
 }
 
 // Courses
-export function getCourses(page = 1, pageSize = 10) {
-    return apiRequest('/api/courses/', 'GET', null, { page, page_size: pageSize });
+export function getCourses(page = 1, pageSize = 10, editable=false) {
+    return apiRequest('/api/courses/', 'GET', null, { page, page_size: pageSize, editable });
 }
 export function getCourse(id) {
     return apiRequest(`/api/courses/${id}/`, 'GET');
@@ -97,8 +97,8 @@ export function deleteCourse(id) {
 }
 
 // Users
-export function getUsers(page = 1, pageSize = 10) {
-    return apiRequest('/api/users/', 'GET', null, { page, page_size: pageSize });
+export function getUsers(page = 1, pageSize = 10, editable=false) {
+    return apiRequest('/api/users/', 'GET', null, { page, page_size: pageSize, editable });
 }
 export function getUser(id) {
     return apiRequest(`/api/users/${id}/`, 'GET');

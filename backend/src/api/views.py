@@ -4,7 +4,7 @@ from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 from .pagination import DefaultPagination
 
-from guardian.shortcuts import assign_perm, remove_perm
+from guardian.shortcuts import assign_perm, remove_perm, get_objects_for_user
 from django.contrib.auth.models import User
 from django.db import transaction
 
@@ -50,6 +50,30 @@ class BaseModelViewSet(DynamicSerializerMixin, viewsets.ModelViewSet):
     permission_classes = [api_permissions.ModelOrObjectPermissions]
     pagination_class = DefaultPagination
 
+    def get_queryset(self):
+        """
+        Support ?editable=1 (or true/yes) to return only objects the request.user
+        can change (object-level 'change_<model>' permission).
+        If the user has the model-level change permission, return the full queryset.
+        """
+        queryset = super().get_queryset()
+        params = getattr(self.request, "query_params", {})
+        editable = params.get('editable')
+        if editable and str(editable).lower() in ('1', 'true', 'yes'):
+            user = self.request.user
+            if not user or not user.is_authenticated:
+                return queryset.none()
+            model = queryset.model
+            app_label = model._meta.app_label
+            model_name = model._meta.model_name
+            perm = f"{app_label}.change_{model_name}"
+            # If user has the model-level change perm, return all
+            if user.has_perm(perm):
+                return queryset
+            # Otherwise return only objects for which the user has the object perm
+            return get_objects_for_user(user, perm, klass=queryset)
+        return queryset
+            
 
 # ----------------- VIEWSETS -----------------
 
@@ -69,13 +93,6 @@ class ResearchGroupComponentViewSet(BaseModelViewSet):
     detail_serializer_class = api_serializers.ResearchGroupComponentDetailSerializer
     short_serializer_class = api_serializers.ResearchGroupComponentShortSerializer
     edit_serializer_class = api_serializers.ResearchGroupComponentEditSerializer
-
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        username = self.request.query_params.get('username')
-        if username:
-            queryset = queryset.filter(user__username=username)
-        return queryset
     
     def perform_create(self, serializer):
         # Salva il progetto assegnando owner come l'utente richiedente

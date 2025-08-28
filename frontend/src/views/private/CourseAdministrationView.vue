@@ -24,7 +24,7 @@ const { users: allUsers, fetchAllUsers } = useUsers()
 const { courses: paginatedCourses, count: totalCourses, fetchCoursesPaginated } = useCourses()
 
 onMounted(() => {
-  fetchCoursesPaginated(1, 10)
+  fetchCoursesPaginated(1, 10, true)
   fetchAllUsers()
 })
 
@@ -51,7 +51,7 @@ const onCourseEdit = (id) => {
 }
 
 const onCoursePaginate = (page, pageSize) => {
-  fetchCoursesPaginated(page, pageSize)
+  fetchCoursesPaginated(page, pageSize, true)
 }
 
 const {menu: privateMenu} = usePrivateMenu()

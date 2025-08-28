@@ -5,9 +5,9 @@ export default function useUsers() {
     const users = ref([])
     const count = ref(0)
 
-    async function fetchUsersPaginated(page = 1, pageSize = 10) {
+    async function fetchUsersPaginated(page = 1, pageSize = 10, editable=false) {
         try {
-            const response = await getGroupComponents(page, pageSize)
+            const response = await getGroupComponents(page, pageSize, editable)
             users.value = response.results
             count.value = response.count
         } catch (error) {
@@ -15,11 +15,9 @@ export default function useUsers() {
         }
     }
 
-    async function fetchAllUsers() {
+    async function fetchAllUsers(editable=false) {
         try {
-            // request the API to disable pagination per-request (backend supports ?page_size=0 or ?page_size=all)
-            // pass undefined for page and 'all' for pageSize; adjust if your apiCalls implementation differs
-            const response = await getGroupComponents(undefined, 0)
+            const response = await getGroupComponents(undefined, 0, editable)
 
             users.value = response
             count.value = response.length

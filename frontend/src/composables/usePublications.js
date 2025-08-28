@@ -5,9 +5,9 @@ export default function usePublications() {
     const publications = ref([])
     const count = ref(0)
 
-    async function fetchPublicationsPaginated(page = 1, pageSize = 10) {
+    async function fetchPublicationsPaginated(page = 1, pageSize = 10, editable=false) {
         try {
-            const response = await getPublications(page, pageSize)
+            const response = await getPublications(page, pageSize, editable)
             publications.value = response.results
             count.value = response.count
         } catch (error) {
@@ -15,10 +15,10 @@ export default function usePublications() {
         }
     }
 
-    async function fetchAllPublications() {
+    async function fetchAllPublications(editable=false) {
         try {
             // backend supports ?page_size=0 or ?page_size=all to disable pagination
-            const response = await getPublications(undefined, 0)
+            const response = await getPublications(undefined, 0, editable)
             publications.value = response
             count.value = response.length
         } catch (error) {

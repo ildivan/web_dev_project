@@ -26,7 +26,7 @@ const { projects: allProjects, fetchAllProjects } = useProjects()
 const { publications: paginatedPublications, count: totalPublications, fetchPublicationsPaginated } = usePublications()
 
 onMounted(() => {
-  fetchPublicationsPaginated(1, 10)
+  fetchPublicationsPaginated(1, 10, true)
   fetchAllUsers()
   fetchAllProjects()
 })
@@ -55,7 +55,7 @@ const onPublicationEdit = (id) => {
 }
 
 const onPublicationPaginate = (page, pageSize) => {
-  fetchPublicationsPaginated(page, pageSize)
+  fetchPublicationsPaginated(page, pageSize, true)
 }
 
 const {menu: privateMenu} = usePrivateMenu()
