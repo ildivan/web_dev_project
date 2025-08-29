@@ -1,15 +1,17 @@
 <script setup>
-
 const props = defineProps({
-  publication: Object
+  publication: Object,
+  projects: Array   // <-- passiamo anche l'array dei progetti
 })
 
-
-
+// funzione helper per trovare il titolo del progetto
+function getProjectTitle(projectId) {
+  const proj = props.projects.find(p => p.id === projectId)
+  return proj ? proj.title : '-'
+}
 </script>
 
 <template>
-  <!-- changed: make card take available width in flex layouts (min-w-0) and allow wrapping -->
   <div class="w-full p-4 bg-indigo-50 rounded shadow hover:shadow-lg transition-shadow duration-300">
     <h3 class="font-semibold break-words whitespace-normal">
       {{ props.publication.title }}
@@ -24,7 +26,7 @@ const props = defineProps({
     </p>
 
     <p class="text-xs text-gray-500 mt-1 whitespace-normal break-words">
-      Progetto di ricerca: {{ props.publication.research_project?.title || '-' }}
+      Progetto di ricerca: {{ getProjectTitle(props.publication.research_project) }}
     </p>
   </div>
 </template>

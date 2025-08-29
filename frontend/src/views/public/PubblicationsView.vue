@@ -22,7 +22,9 @@ const hasMore = ref(true)
 
 const searchQuery = ref('')
 
-const {projects, fetchAllProjects} = useProjects()
+const {projects ,fetchAllProjects} = useProjects()
+
+console.log('Projects in PublicationsView:', projects)
 
 async function loadPublications() {
   const data = await getPublications(currentPage.value, pageSize)
@@ -39,8 +41,11 @@ function loadMore() {
 }
 
 onMounted(() => {
-  loadPublications()
-  fetchAllProjects()
+  const init = async () => {
+    await loadPublications()
+    await fetchAllProjects()
+  }
+  init()
 })
 
 
@@ -114,10 +119,12 @@ const filteredPublications = computed(() => {
                 <div class="flex transition-all duration-300">
                     <div class="w-full space-y-6">
                         <PublicationCard
-                        v-for="publication in filteredPublications"
-                        :key="publication.id"
-                        :publication="publication"
+                          v-for="publication in filteredPublications"
+                          :key="publication.id"
+                          :publication="publication"
+                          :projects="projects"
                         />
+
                     </div>
                 </div>
 
