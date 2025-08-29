@@ -5,6 +5,7 @@ import PublicationCard from '../cards/PublicationCard.vue'
 
 const props = defineProps({
   publications: { type: Array, default: () => [] },
+  projects: { type: Array, default: () => [] },
   maxHeight: { type: String, default: '28rem' }
 })
 
@@ -40,7 +41,7 @@ function onPaginate(page, per_page) {
       :id="publication.id"
       @edit="onEdit"
     >
-      <PublicationCard :publication="publication" />
+      <PublicationCard :publication="publication" :projects="props.projects"/>
     </EntityListItem>
   </EntityList>
 </template>

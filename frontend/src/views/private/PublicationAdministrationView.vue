@@ -77,6 +77,7 @@ const {menu: privateMenu} = usePrivateMenu()
                   :publications="paginatedPublications"
                   :maxHeight="'28rem'"
                   :totalItems="totalPublications"
+                  :projects="allProjects"
                   @edit="onPublicationEdit"
                   @paginate="onPublicationPaginate"
                 />
