@@ -8,7 +8,7 @@ const props = defineProps({
   maxHeight: { type: String, default: '28rem' }
 })
 
-const emit = defineEmits(['edit', 'paginate'])
+const emit = defineEmits(['edit', 'paginate', 'create'])
 
 function onEdit(id) {
   emit('edit', id)
@@ -18,11 +18,16 @@ function onPaginate(page, per_page) {
   emit('paginate', page, per_page)
 }
 
+function onCreate() {
+  emit('create')
+}
+
 </script>
 
 <template>
   <EntityList 
     :maxHeight="maxHeight" 
+    @create="onCreate"
     @paginate="onPaginate"
   >
     <template #header>

@@ -13,8 +13,12 @@ import useCourses from '../../composables/useCourses.js'
 import usePublications from '../../composables/usePublications.js'
 import ViewDropDownSelector from '../../components/ViewDropDownSelector.vue'
 import usePrivateMenu from '../../composables/usePrivateMenu.js'
+import { createGroupComponent } from '../../apiCalls/apiCalls.js'
+import { getUsers } from '../../apiCalls/apiCalls.js'
+import ComponentCreationForm from '../../components/entity_edit/ComponentCreationForm.vue'
 
 const selectedUserId = ref(null)
+const creatingNewInstance = ref(false)
 
 function fetchUserId() {
     return selectedUserId.value
@@ -22,16 +26,27 @@ function fetchUserId() {
 
 const { menu } = usePublicMenu()
 
+const users = ref([])
 const { users: paginatedUsers, count: totalUsers, fetchUsersPaginated } = useUsers()
 const { projects: allProjects, fetchAllProjects } = useProjects()
 const { publications: allPublications, fetchAllPublications } = usePublications()
 const { courses: allCourses, fetchAllCourses } = useCourses()
+const { users: allComponents, fetchAllUsers: fetchAllComponents } = useUsers()
 
 onMounted(() => {
   fetchUsersPaginated(1, 10, true)
   fetchAllProjects()
   fetchAllPublications()
   fetchAllCourses()
+  fetchAllComponents().then(
+    () => {
+      getUsers().then(fetchedUsers => {
+        const users_already_components = new Set(allComponents.value.map(c => c.user.id))
+        const users_not_components = fetchedUsers.filter(user => !users_already_components.has(user.id))
+        users.value = users_not_components
+      })
+    }
+  )
 })
 
 const {
@@ -54,13 +69,28 @@ const componentSave = (toSave) => {
   }
 }
 
+const componentCreate = (toCreate) => {
+  try {
+    createGroupComponent(toCreate)
+    creatingNewInstance.value = false
+  } catch (error) {
+    console.error('Error creating user data:', error)
+  }
+}
+
 const onComponentEdit = (id) => {
   selectedUserId.value = id
+  creatingNewInstance.value = false
   userToEditFetch()
 }
 
 const onComponentPaginate = (page, pageSize) => {
   fetchUsersPaginated(page, pageSize, true)
+}
+
+const onCreate = () => {
+  creatingNewInstance.value = true
+  selectedUserId.value = null
 }
 
 const {menu: privateMenu} = usePrivateMenu()
@@ -85,9 +115,19 @@ const {menu: privateMenu} = usePrivateMenu()
             :totalItems="totalUsers"
             @edit="onComponentEdit"
             @paginate="onComponentPaginate"
+            @create="onCreate"
+            />
+            <ComponentCreationForm
+            v-if="creatingNewInstance"
+            :users="users"
+            :saving="userToEditLoading"
+            :projectOptions="allProjects"
+            :courseOptions="allCourses"
+            :publicationOptions="allPublications"
+            @save="componentCreate"
             />
             <ComponentForm 
-            v-if="!userToEditLoading && !userToEditError && userToEditComponent"
+            v-if="!creatingNewInstance && !userToEditLoading && !userToEditError && userToEditComponent"
             :user="userToEditComponent"
             :projects="userToEditProjects"
             :teachedCourses="userToEditTeachedCourses"
@@ -96,6 +136,7 @@ const {menu: privateMenu} = usePrivateMenu()
             :projectOptions="allProjects"
             :courseOptions="allCourses"
             :publicationOptions="allPublications"
+            title="Modifica Componente"
             @save="componentSave"
             />
           </div>

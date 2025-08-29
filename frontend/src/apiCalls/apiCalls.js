@@ -97,8 +97,8 @@ export function deleteCourse(id) {
 }
 
 // Users
-export function getUsers(page = 1, pageSize = 10, editable=false) {
-    return apiRequest('/api/users/', 'GET', null, { page, page_size: pageSize, editable });
+export function getUsers() {
+    return apiRequest('/api/users/', 'GET');
 }
 export function getUser(id) {
     return apiRequest(`/api/users/${id}/`, 'GET');

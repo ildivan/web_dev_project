@@ -124,7 +124,6 @@ class AllUsersViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = User.objects.prefetch_related('groups')
     serializer_class = api_serializers.UserPublicSerializer
     permission_classes = [IsAuthenticated]
-    pagination_class = DefaultPagination
 
 class ResearchProjectViewSet(BaseModelViewSet):
     queryset = ResearchProject.objects.select_related(

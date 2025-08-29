@@ -11,7 +11,7 @@ const props = defineProps({
   showPagination: { type: Boolean, default: true }
 })
 
-const emit = defineEmits(['paginate'])
+const emit = defineEmits(['paginate', 'create'])
 
 const page = ref(props.initialPage)
 const perPage = ref(props.initialPerPage)
@@ -61,6 +61,10 @@ const rightOverflow = computed(() => {
   const last = visiblePageNumbers.value[visiblePageNumbers.value.length - 1]
   return last < totalPages.value
 })
+
+function onCreate() {
+  emit('create')
+}
 </script>
 
 
@@ -71,13 +75,22 @@ const rightOverflow = computed(() => {
     class="entity-list w-full bg-white border border-gray-200 rounded shadow-sm flex flex-col"
     :style="{ maxHeight }"
   >
-    <!-- optional header slot (always visible, outside scroller) -->
+    <!-- header with add button and optional slot -->
     <div
-      v-if="$slots.header"
-      class="header px-3 py-2 bg-white/95 backdrop-blur-sm z-10 border-b border-gray-100"
+      class="header px-3 py-2 bg-white/95 backdrop-blur-sm z-10 border-b border-gray-100 flex items-center justify-between"
       role="row"
     >
       <slot name="header" />
+      <button
+        type="button"
+        @click="onCreate"
+        class="inline-flex items-center gap-1 px-3 py-1.5 rounded-md text-sm font-semibold
+               bg-violet-600 text-white hover:bg-violet-700 transition focus:outline-none focus:ring-2 focus:ring-violet-400"
+        aria-label="Add new"
+      >
+        <span class="text-lg leading-none">+</span>
+        <span class="hidden sm:inline">Add</span>
+      </button>
     </div>
 
     <!-- scrollable items area (flex-grow) -->

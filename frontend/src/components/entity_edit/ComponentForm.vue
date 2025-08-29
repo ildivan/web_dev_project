@@ -5,14 +5,15 @@ import EntitySelect from './EntitySelect.vue'
 
 // Props: user object, groups options, and loading state
 const props = defineProps({
-  user: { type: Object, required: true },
+  user: { type: Object, default: {description: ''} },
   projects: {type: Array, default: () => [] },
   teachedCourses: {type: Array, default: () => [] },
   publications: {type: Array, default: () => [] },
   projectOptions: { type: Array, default: () => [] }, 
   courseOptions: { type: Array, default: () => [] }, 
   publicationOptions: { type: Array, default: () => [] },
-  saving: { type: Boolean, default: false }
+  saving: { type: Boolean, default: false },
+  title: { type: String, default: '' }
 })
 
 const emit = defineEmits(['save'])
@@ -82,7 +83,7 @@ function onCancel() {
 <template>
   <EntityForm
     :saving="saving"
-    title="Modifica Componente"
+    :title="title"
     @save="onSave"
     @cancel="onCancel"
   >
