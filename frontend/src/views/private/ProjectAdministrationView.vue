@@ -12,8 +12,10 @@ import {useProject} from '../../composables/useProject.js'
 import useResearchAreas from '../../composables/useResearchAreas.js'
 import ViewDropDownSelector from '../../components/ViewDropDownSelector.vue'
 import usePrivateMenu from '../../composables/usePrivateMenu.js'
+import { createProject } from '../../apiCalls/apiCalls.js'
 
 const selectedProjectId = ref(null)
+const creatingNewInstance = ref(false)
 
 function fetchProjectId() {
     return selectedProjectId.value
@@ -50,13 +52,28 @@ const projectSave = (toSave) => {
   }
 }
 
+const projectCreate = (toCreate) => {
+  try {
+    createProject(toCreate)
+    creatingNewInstance.value = false
+  } catch (error) {
+    console.error('Error creating project data:', error)
+  }
+}
+
 const onProjectEdit = (id) => {
   selectedProjectId.value = id
+  creatingNewInstance.value = false
   projectToEditFetch()
 }
 
 const onProjectPaginate = (page, pageSize) => {
   fetchProjectsPaginated(page, pageSize, true)
+}
+
+const onCreate = () => {
+  creatingNewInstance.value = true
+  selectedProjectId.value = null
 }
 
 const {menu: privateMenu} = usePrivateMenu()
@@ -80,9 +97,17 @@ const {menu: privateMenu} = usePrivateMenu()
                   :totalItems="totalProjects"
                   @edit="onProjectEdit"
                   @paginate="onProjectPaginate"
+                  @create="onCreate"
                 />
                 <ProjectForm 
-                  v-if="!projectToEditLoading && !projectToEditError && projectToEdit"
+                  v-if="creatingNewInstance"
+                  :componentOptions="allUsers"
+                  :researchAreaOptions="allResearchAreas"
+                  formTitle="Creazione Progetto"
+                  @save="projectCreate"
+                />
+                <ProjectForm 
+                  v-if="!creatingNewInstance && !projectToEditLoading && !projectToEditError && projectToEdit"
                   :project="projectToEdit"
                   :components="projectToEditComponents"
                   :researchArea="projectToEditResearchArea"
@@ -90,6 +115,7 @@ const {menu: privateMenu} = usePrivateMenu()
                   :saving="projectToEditLoading"
                   :componentOptions="allUsers"
                   :researchAreaOptions="allResearchAreas"
+                  formTitle="Modifica Progetto"
                   @save="projectSave"
                 />
             </div>

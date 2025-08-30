@@ -4,14 +4,15 @@ import EntityForm from './EntityForm.vue'
 import EntitySelect from './EntitySelect.vue'
 
 const props = defineProps({
-  project: { type: Object, required: true },
-  researchArea : { type: Object, default: () => ({}) },
-  projectOwner: { type: Object, default: () => ({}) },
+  project: { type: Object, default: {title: '', description: '', start_date: '', end_date: ''} },
+  researchArea : { type: Object, default: null },
+  projectOwner: { type: Object, default: null },
   components: { type: Array, default: () => [] },
   publications: { type: Array, default: () => [] },
   saving: { type: Boolean, default: false },
   researchAreaOptions: { type: Array, default: () => [] },
   componentOptions: { type: Array, default: () => [] },
+  formTitle: { type: String, default: 'Modifica Progetto' }
 })
 
 const emit = defineEmits(['save'])
@@ -20,8 +21,8 @@ const title = ref(props.project.title || '')
 const description = ref(props.project.description || '')
 const startDate = ref(props.project.start_date || '')
 const endDate = ref(props.project.end_date || '')
-const localResearchArea = ref(props.researchArea || null)
-const localProjectOwner = ref(props.projectOwner || null)
+const localResearchArea = ref(props.researchArea)
+const localProjectOwner = ref(props.projectOwner)
 const localComponents = ref([...(props.components || [])])
 
 watch(() => props.project.title, (v) => title.value = v || '')
@@ -79,7 +80,7 @@ function onCancel() {
 <template>
   <EntityForm
     :saving="saving"
-    title="Modifica Progetto"
+    :title="props.formTitle"
     @save="onSave"
     @cancel="onCancel"
   >
