@@ -106,8 +106,8 @@ export function getUser(id) {
 export function createUser(data) {
     return apiRequest('/api/users/', 'POST', data);
 }
-export function updateUser(id, data) {
-    return apiRequest(`/api/users/${id}/`, 'PATCH', data);
+export function updateUser(data) {
+    return apiRequest('/api/auth/users/me/', 'PATCH', data);
 }
 export function deleteUser(id) {
     return apiRequest(`/api/users/${id}/`, 'DELETE');

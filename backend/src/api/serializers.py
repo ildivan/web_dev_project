@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-
+from djoser.serializers import UserSerializer
+from django.contrib.auth.models import User
 from .models import ResearchArea, ResearchGroupComponent, ResearchProject, Publication, Course
 
 class PermissionFieldsMixin(serializers.ModelSerializer):
@@ -26,6 +27,11 @@ class PermissionFieldsMixin(serializers.ModelSerializer):
 
 
 # SHORT SERIALIZERS
+
+class UserMeSerializer(UserSerializer):
+    class Meta(UserSerializer.Meta):
+        model = User
+        fields = ('id', 'username', 'email', 'first_name', 'last_name')
 
 class UserPublicSerializer(serializers.ModelSerializer):
     groups = serializers.SlugRelatedField(

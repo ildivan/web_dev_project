@@ -104,6 +104,9 @@ DJOSER = {
     'LOGIN_FIELD': 'username', 
     'SERIALIZERS': {},
     'TOKEN_MODEL': None,
+    'SERIALIZERS': {
+        'current_user': 'api.serializers.UserMeSerializer',
+    },
 }
 
 SIMPLE_JWT = {

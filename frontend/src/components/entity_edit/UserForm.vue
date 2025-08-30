@@ -12,22 +12,27 @@ const emit = defineEmits(['save', 'cancel'])
 
 const localUser = reactive({
   username: props.user.username,
-  email: props.user.email
+  email: props.user.email,
+  first_name: props.user.first_name || '',
+  last_name: props.user.last_name || ''
 })
 
 watch(() => props.user, (newUser) => {
   if (newUser) {
     localUser.username = newUser.username
     localUser.email = newUser.email
+    localUser.first_name = newUser.first_name || ''
+    localUser.last_name = newUser.last_name || ''
   }
 })
 
-const onSave = () => emit('save', { username: localUser.username, email: localUser.email })
-const onCancel = () => {
-  localUser.username = props.user.username
-  localUser.email = props.user.email
-  emit('cancel')
-}
+const onSave = () => emit('save', { 
+  username: localUser.username,
+  email: localUser.email,
+  first_name: localUser.first_name,
+  last_name: localUser.last_name
+})
+
 </script>
 
 <template>
@@ -55,6 +60,26 @@ const onCancel = () => {
           type="email"
           class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-indigo-500"
           required
+        />
+      </div>
+
+       <div class="mb-4">
+        <label class="block text-sm font-medium mb-1">Nome</label>
+        <input
+          v-model="localUser.first_name"
+          type="text"
+          class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-indigo-500"
+          
+        />
+      </div>
+
+       <div class="mb-4">
+        <label class="block text-sm font-medium mb-1">Cognome</label>
+        <input
+          v-model="localUser.last_name"
+          type="text"
+          class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-indigo-500"
+          
         />
       </div>
     </template>
