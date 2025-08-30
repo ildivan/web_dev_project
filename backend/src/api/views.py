@@ -79,14 +79,14 @@ class BaseModelViewSet(DynamicSerializerMixin, viewsets.ModelViewSet):
 
 
 class ResearchAreaViewSet(BaseModelViewSet):
-    queryset = ResearchArea.objects.prefetch_related('projects')
+    queryset = ResearchArea.objects.prefetch_related('projects').order_by('id')
     serializer_class = api_serializers.ResearchAreaListSerializer
     detail_serializer_class = api_serializers.ResearchAreaDetailSerializer
 
 class ResearchGroupComponentViewSet(BaseModelViewSet):
     queryset = ResearchGroupComponent.objects.prefetch_related(
         'projects', 'owned_projects', 'teached_courses', 'publications', 'user__groups'
-    ).select_related('user')
+    ).select_related('user').order_by('user_id')
 
     # use list serializer (PK relationships) for paginated GET
     serializer_class = api_serializers.ResearchGroupComponentListSerializer
@@ -121,14 +121,14 @@ class ResearchGroupComponentViewSet(BaseModelViewSet):
                 remove_perm('api.delete_course', component.user, course)
 
 class AllUsersViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = User.objects.prefetch_related('groups')
+    queryset = User.objects.prefetch_related('groups').order_by('id')
     serializer_class = api_serializers.UserPublicSerializer
     permission_classes = [IsAuthenticated]
 
 class ResearchProjectViewSet(BaseModelViewSet):
     queryset = ResearchProject.objects.select_related(
         'research_area', 'project_owner'
-    ).prefetch_related('components', 'publications')
+    ).prefetch_related('components', 'publications').order_by('id')
 
     serializer_class = api_serializers.ResearchProjectListSerializer
     detail_serializer_class = api_serializers.ResearchProjectDetailSerializer
@@ -162,7 +162,7 @@ class ResearchProjectViewSet(BaseModelViewSet):
 class PublicationViewSet(BaseModelViewSet):
     queryset = Publication.objects.select_related(
         'research_project'
-    ).prefetch_related('components')
+    ).prefetch_related('components').order_by('id')
 
     serializer_class = api_serializers.PublicationListSerializer
     detail_serializer_class = api_serializers.PublicationDetailSerializer
@@ -191,7 +191,7 @@ class PublicationViewSet(BaseModelViewSet):
                 assign_perm('api.delete_publication', new_owner.user, publication)
 
 class CourseViewSet(BaseModelViewSet):
-    queryset = Course.objects.prefetch_related('teachers')
+    queryset = Course.objects.prefetch_related('teachers').order_by('id')
     serializer_class = api_serializers.CourseListSerializer
     detail_serializer_class = api_serializers.CourseDetailSerializer
     short_serializer_class = api_serializers.CourseShortSerializer
