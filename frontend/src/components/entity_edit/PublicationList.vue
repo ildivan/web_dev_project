@@ -43,7 +43,7 @@ function onPaginate(page, per_page) {
       :id="publication.id"
       @edit="onEdit"
     >
-      <PublicationCard :publication="publication" :projects="props.projects"/>
+      <PublicationCard :publication="publication" :projects="props.projects" :clickable="false"/>
     </EntityListItem>
   </EntityList>
 </template>

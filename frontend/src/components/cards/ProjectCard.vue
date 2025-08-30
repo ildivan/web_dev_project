@@ -3,13 +3,26 @@ import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 
 const props = defineProps({
-  project: Object
+  project: { type: Object, required: true },
+  clickable: { type: Boolean, default: true }
 })
 
 const router = useRouter()
 
+const containerClasses = computed(() => {
+  const base = 'w-full max-w-full p-4 bg-gray-100 rounded'
+  if (props.clickable) {
+    return [
+      base,
+      'cursor-pointer hover:shadow-lg transition-shadow duration-300',
+      'focus:outline-none focus:ring-2 focus:ring-indigo-200'
+    ].join(' ')
+  }
+  return [base, 'cursor-default pointer-events-none'].join(' ')
+})
 
 function onClick() {
+  if (!props.clickable) return
   const id = props.project?.id
   if (id != null) router.push(`/projects/${id}`)
 }
@@ -21,9 +34,11 @@ const statusClass = computed(() => {
 
 <template>
   <div 
-  @click="onClick"
-      role="button"
-  class="w-full max-w-full p-4 bg-gray-100 rounded shadow hover:shadow-lg transition-shadow duration-300">
+      :class="containerClasses"
+      @click="onClick"
+      :role="clickable ? 'button' : undefined"
+      :aria-disabled="!clickable"
+      >
     <h3 class="font-semibold break-words whitespace-normal">
       {{ props.project.title }}
     </h3>

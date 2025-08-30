@@ -49,7 +49,7 @@ function onDelete(id) {
       @delete="onDelete"
       @edit="onEdit"
     >
-      <ProjectCard :project="project" />
+      <ProjectCard :project="project" :clickable="false"/>
     </EntityListItem>
   </EntityList>
 </template>
