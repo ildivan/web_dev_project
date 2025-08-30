@@ -5,7 +5,7 @@ import EntitySelect from './EntitySelect.vue'
 
 // Props: user object, groups options, and loading state
 const props = defineProps({
-  user: { type: Object, default: {description: ''} },
+  component: { type: Object, default: {description: ''} },
   projects: {type: Array, default: () => [] },
   teachedCourses: {type: Array, default: () => [] },
   publications: {type: Array, default: () => [] },
@@ -18,12 +18,12 @@ const props = defineProps({
 
 const emit = defineEmits(['save'])
 
-const description = ref(props.user.description)
+const description = ref(props.component.description)
 const localProjects = ref([...props.projects])
 const localTeachedCourses = ref([...props.teachedCourses])
 const localPublications = ref([...props.publications])
 
-watch(() => props.user.description, (val) => {
+watch(() => props.component.description, (val) => {
   description.value = val
 })
 
@@ -53,7 +53,7 @@ function arraysHaveSameElements(arr1, arr2) {
 
 function onSave() {
   let toSave = {}
-  if(description.value != props.user.description) {
+  if(description.value != props.component.description) {
     toSave.description = description.value
   }
 
@@ -73,7 +73,7 @@ function onSave() {
 }
 
 function onCancel() {
-  description.value = props.user.description
+  description.value = props.component.description
   localProjects.value = [...props.projects]
   localTeachedCourses.value = [...props.teachedCourses]
   localPublications.value = [...props.publications]

@@ -9,10 +9,14 @@ const props = defineProps({
   allowCreate: { type: Boolean, default: false }
 })
 
-const emit = defineEmits(['edit', 'paginate'])
+const emit = defineEmits(['edit', 'paginate', 'delete'])
 
 function onEdit(id) {
   emit('edit', id)
+}
+
+function onDelete(id) {
+  emit('delete', id)
 }
 
 function onPaginate(page, per_page) {
@@ -41,7 +45,10 @@ function onPaginate(page, per_page) {
       v-for="user in components.filter(user => user.can_change || user.can_delete)"
       :key="user.user.id"
       :id="user.user.id"
+      :showEdit="user.can_change"
+      :showDelete="user.can_delete"
       @edit="onEdit"
+      @delete="onDelete"
     >
       <ComponentCard :component="user" :clickable="false"/>
     </EntityListItem>
