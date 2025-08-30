@@ -30,12 +30,16 @@ onMounted(() => {
         {{ project.title }}
       </h2>
       <p class="text-gray-600 mb-2">{{ project.description }}</p>
-      <p class="text-xs text-gray-500 mt-1">
-        Area di ricerca: {{ researchArea?.name || '-' }}
-      </p>
-      <p class="text-xs text-gray-500 mt-1">
-        Owner: {{ projectOwner?.first_name }} {{ projectOwner?.last_name }}
-      </p>
+    </section>
+
+    <section class="mb-8">
+      <h3 class="text-xl font-bold text-indigo-700 mb-2">Area di ricerca</h3>
+      <p class="text-gray-600">{{ researchArea?.name || '-' }}</p>
+    </section>
+
+    <section class="mb-8">
+      <h3 class="text-xl font-bold text-indigo-700 mb-2">Proprietario</h3>
+      <p class="text-gray-600">{{ projectOwner?.first_name }} {{ projectOwner?.last_name }}</p>
     </section>
 
     <!-- Sezione componenti -->

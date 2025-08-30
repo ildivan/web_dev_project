@@ -16,6 +16,7 @@ defineProps({
   }
 })
 
+
 // Helper per visualizzare il titolo del progetto
 const getProjectTitle = (project) => {
   return project?.title || '-'
@@ -31,17 +32,27 @@ const getProjectTitle = (project) => {
         {{ publication.title }}
       </h2>
       <p class="text-gray-600 mb-2">{{ publication.description }}</p>
-      <p class="text-xs text-gray-400">
-        Data pubblicazione: {{ publication.publication_date }}
-      </p>
-      <p class="text-xs text-gray-500 mt-1">
-        Progetto di ricerca: {{ getProjectTitle(researchProject) }}
-      </p>
     </section>
+    <section class="mb-8">
+      <h3 class="text-xl font-bold text-indigo-700 mb-2">Data pubblicazione</h3>
+      <p class="text-gray-600">{{ publication.publication_date }}</p>
+    </section>
+
+    <section class="mb-8">
+      <h3 class="text-xl font-bold text-indigo-700 mb-2">Progetto di ricerca</h3>
+      <RouterLink
+        v-if="researchProject?.id"
+        :to="`/projects/${researchProject.id}`"
+        class="text-grey-600 hover:underline"
+      >
+        {{ getProjectTitle(researchProject) }}
+      </RouterLink>
+    </section>
+
 
     <!-- Sezione componenti -->
     <section v-if="components && components.length" class="mb-8">
-      <h3 class="text-xl font-bold text-indigo-700 mb-4">Components</h3>
+      <h3 class="text-xl font-bold text-indigo-700 mb-4">Autori</h3>
       <div class="flex flex-wrap gap-4">
         <ComponentCard
           v-for="component in components"
