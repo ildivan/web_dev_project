@@ -1,5 +1,5 @@
 <script setup>
-defineProps({
+const props = defineProps({
   component: Object,
   projects: {
     type: Array,
@@ -14,6 +14,10 @@ defineProps({
     default: () => []
   },
   publications: {
+    type: Array,
+    default: () => []
+  },
+  allProjects: {
     type: Array,
     default: () => []
   }
@@ -79,6 +83,7 @@ defineProps({
           v-for="pub in publications"
           :key="pub.id"
           :publication="pub"
+          :projects="props.allProjects"
         />
       </div>
     </section>

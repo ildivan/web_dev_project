@@ -1,10 +1,11 @@
 <script setup>
-import { watch } from 'vue'
+import { onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import Navbar from '../../components/Navbar.vue'
 import ProfileContent from '../../components/ProfileContent.vue'
 import { useUser } from '../../composables/useUser'
 import { usePublicMenu } from '../../composables/usePublicMenu.js'
+import useProjects from '../../composables/useProjects.js'
 
 const { menu } = usePublicMenu()
 const route = useRoute()
@@ -19,6 +20,11 @@ const {
   publications,
   fetchUserData
 } = useUser(() => id)
+const {projects: allProjects, fetchAllProjects} = useProjects()
+
+onMounted(() => {
+  fetchAllProjects()
+})
 
 // Refetch if route param changes
 watch(
@@ -40,8 +46,9 @@ watch(
         v-else-if="component"
         :component="component"
         :projects="projects"
-        :owned-projects="ownedProjects"
-        :teached-courses="teachedCourses"
+        :allProjects="allProjects"
+        :ownedProjects="ownedProjects"
+        :teachedCourses="teachedCourses"
         :publications="publications"
       />
   
