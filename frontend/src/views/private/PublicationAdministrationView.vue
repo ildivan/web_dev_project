@@ -25,13 +25,13 @@ function fetchPublicationId() {
 
 const { menu } = usePublicMenu()
 
-const { users: allUsers, fetchAllUsers } = useComponents()
+const { components: allComponents, fetchAllComponents } = useComponents()
 const { projects: allProjects, fetchAllProjects } = useProjects()
 const { publications: paginatedPublications, count: totalPublications, fetchPublicationsPaginated } = usePublications()
 
 onMounted(() => {
   fetchPublicationsPaginated(1, 10, true)
-  fetchAllUsers()
+  fetchAllComponents()
   fetchAllProjects()
   getPermissions().then(fetchedPermissions => {
     permissions.value = fetchedPermissions.permissions
@@ -108,7 +108,7 @@ const {menu: privateMenu} = usePrivateMenu()
                 <PublicationForm 
                   v-if="creatingNewInstance"
                   :saving="publicationToEditLoading"
-                  :componentOptions="allUsers"
+                  :componentOptions="allComponents"
                   :projectOptions="allProjects"
                   formTitle="Creazione Pubblicazione"
                   @save="publicationCreate"
@@ -119,7 +119,7 @@ const {menu: privateMenu} = usePrivateMenu()
                   :components="publicationToEditComponents"
                   :project="publicationToEditProject"
                   :saving="publicationToEditLoading"
-                  :componentOptions="allUsers"
+                  :componentOptions="allComponents"
                   :projectOptions="allProjects"
                   formTitle="Modifica Pubblicazione"
                   @save="publicationSave"

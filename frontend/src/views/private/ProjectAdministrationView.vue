@@ -25,13 +25,13 @@ function fetchProjectId() {
 
 const { menu } = usePublicMenu()
 
-const { users: allUsers, fetchAllUsers } = useComponents()
+const { components: allComponents, fetchAllComponents } = useComponents()
 const { projects: paginatedProjects, count: totalProjects, fetchProjectsPaginated } = useProjects()
 const { researchAreas: allResearchAreas, fetchAllResearchAreas } = useResearchAreas()
 
 onMounted(() => {
   fetchProjectsPaginated(1, 10, true)
-  fetchAllUsers()
+  fetchAllComponents()
   fetchAllResearchAreas()
   getPermissions().then(fetchedPermissions => {
     permissions.value = fetchedPermissions.permissions
@@ -107,7 +107,7 @@ const {menu: privateMenu} = usePrivateMenu()
                 />
                 <ProjectForm 
                   v-if="creatingNewInstance"
-                  :componentOptions="allUsers"
+                  :componentOptions="allComponents"
                   :researchAreaOptions="allResearchAreas"
                   formTitle="Creazione Progetto"
                   @save="projectCreate"
@@ -119,7 +119,7 @@ const {menu: privateMenu} = usePrivateMenu()
                   :researchArea="projectToEditResearchArea"
                   :projectOwner="projectToEditProjectOwner"
                   :saving="projectToEditLoading"
-                  :componentOptions="allUsers"
+                  :componentOptions="allComponents"
                   :researchAreaOptions="allResearchAreas"
                   formTitle="Modifica Progetto"
                   @save="projectSave"

@@ -24,12 +24,12 @@ function fetchCourseId() {
 
 const { menu } = usePublicMenu()
 
-const { users: allUsers, fetchAllUsers } = useComponents()
+const { components: allComponents, fetchAllComponents } = useComponents()
 const { courses: paginatedCourses, count: totalCourses, fetchCoursesPaginated } = useCourses()
 
 onMounted(() => {
   fetchCoursesPaginated(1, 10, true)
-  fetchAllUsers()
+  fetchAllComponents()
   getPermissions().then(fetchedPermissions => {
     permissions.value = fetchedPermissions.permissions
   })
@@ -103,7 +103,7 @@ const {menu: privateMenu} = usePrivateMenu()
                 <CourseForm 
                   v-if="creatingNewInstance"
                   :saving="courseToEditLoading"
-                  :componentOptions="allUsers"
+                  :componentOptions="allComponents"
                   @save="courseCreate"
                 />
                 <CourseForm 
@@ -111,7 +111,7 @@ const {menu: privateMenu} = usePrivateMenu()
                   :course="courseToEdit"
                   :components="courseToEditComponents"
                   :saving="courseToEditLoading"
-                  :componentOptions="allUsers"
+                  :componentOptions="allComponents"
                   @save="courseSave"
                 />
             </div>
