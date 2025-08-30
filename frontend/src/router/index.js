@@ -24,7 +24,7 @@ const routes = [
   {
     path: '/pubblications',
     name: 'Pubblications',
-    component: () => import('../views/public/PubblicationsView.vue'),
+    component: () => import('../views/public/PublicationsView.vue'),
   },
   {
     path: '/contacts',
@@ -48,6 +48,16 @@ const routes = [
     path: '/members/:id',
     name: 'MemberDetail',
     component: () => import( '../views/public/ComponentDetailsView.vue'),
+  },
+  {
+    path: '/publications/:id',
+    name: 'PublicationDetail',
+    component: () => import( '../views/public/PublicationsDetailsView.vue'),
+  },
+  {
+    path: '/projects/:id',
+    name: 'ProjectDetail',
+    component: () => import( '../views/public/ProjectDetailsView.vue'),
   },
   {
     path: '/admin/projects',

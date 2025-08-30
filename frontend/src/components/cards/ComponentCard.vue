@@ -9,8 +9,11 @@ const props = defineProps({
 
 const router = useRouter()
 
+// usa user se esiste, altrimenti l'oggetto stesso
+const component = computed(() => props.component.user ?? props.component)
+
 const groupsString = computed(() => {
-  return props.component?.user?.groups?.join(', ') || 'Nessun gruppo'
+  return component.value?.groups?.join(', ') || 'Nessun gruppo'
 })
 
 const containerClasses = computed(() => {
@@ -29,7 +32,7 @@ const containerClasses = computed(() => {
 
 function onClick() {
   if (!props.clickable) return
-  const id = props.component?.user?.id
+  const id = component.value?.id
   if (id != null) router.push(`/members/${id}`)
 }
 </script>
@@ -42,16 +45,16 @@ function onClick() {
     :aria-disabled="!clickable"
   >
     <h3 class="text-lg font-bold text-indigo-900 capitalize">
-      {{ component.user.first_name }} {{ component.user.last_name }}
+      {{ component.first_name }} {{ component.last_name }}
     </h3>
 
     <p class="text-gray-700 font-medium mt-1">
       <span class="font-semibold">Email: </span>
       <a
-        :href="clickable ? `mailto:${component.user.email}` : undefined"
+        :href="clickable ? `mailto:${component.email}` : undefined"
         :class="clickable ? 'text-gray-700 hover:underline' : 'text-gray-700 no-underline'"
       >
-        {{ component.user.email }}
+        {{ component.email }}
       </a>
     </p>
 
