@@ -5,7 +5,8 @@ import ComponentCard from '../cards/ComponentCard.vue'
 
 const props = defineProps({
   users: { type: Array, default: () => [] },
-  maxHeight: { type: String, default: '28rem' }
+  maxHeight: { type: String, default: '28rem' },
+  allowCreate: { type: Boolean, default: false }
 })
 
 const emit = defineEmits(['edit', 'paginate', 'create'])
@@ -18,16 +19,12 @@ function onPaginate(page, per_page) {
   emit('paginate', page, per_page)
 }
 
-function onCreate() {
-  emit('create')
-}
-
 </script>
 
 <template>
   <EntityList 
     :maxHeight="maxHeight" 
-    @create="onCreate"
+    :allowCreate="allowCreate"
     @paginate="onPaginate"
   >
     <template #header>

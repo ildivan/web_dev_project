@@ -13,9 +13,11 @@ import useResearchAreas from '../../composables/useResearchAreas.js'
 import ViewDropDownSelector from '../../components/ViewDropDownSelector.vue'
 import usePrivateMenu from '../../composables/usePrivateMenu.js'
 import { createProject } from '../../apiCalls/apiCalls.js'
+import { getPermissions } from '../../apiCalls/apiCalls.js'
 
 const selectedProjectId = ref(null)
 const creatingNewInstance = ref(false)
+const permissions = ref([])
 
 function fetchProjectId() {
     return selectedProjectId.value
@@ -31,6 +33,9 @@ onMounted(() => {
   fetchProjectsPaginated(1, 10, true)
   fetchAllUsers()
   fetchAllResearchAreas()
+  getPermissions().then(fetchedPermissions => {
+    permissions.value = fetchedPermissions.permissions
+  })
 })
 
 const {
@@ -95,6 +100,7 @@ const {menu: privateMenu} = usePrivateMenu()
                   :projects="paginatedProjects"
                   :maxHeight="'28rem'"
                   :totalItems="totalProjects"
+                  :allowCreate="permissions.some(permission => permission == 'api.add_researchproject')"
                   @edit="onProjectEdit"
                   @paginate="onProjectPaginate"
                   @create="onCreate"

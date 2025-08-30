@@ -11,8 +11,12 @@ import CourseForm from '../../components/entity_edit/CourseForm.vue'
 import CourseList from '../../components/entity_edit/CourseList.vue'
 import usePrivateMenu from '../../composables/usePrivateMenu.js'
 import useCourses from '../../composables/useCourses.js'
+import { createCourse } from '../../apiCalls/apiCalls.js'
+import { getPermissions } from '../../apiCalls/apiCalls.js'
 
 const selectedCourseId = ref(null)
+const creatingNewInstance = ref(false)
+const permissions = ref([])
 
 function fetchCourseId() {
     return selectedCourseId.value
@@ -26,6 +30,9 @@ const { courses: paginatedCourses, count: totalCourses, fetchCoursesPaginated } 
 onMounted(() => {
   fetchCoursesPaginated(1, 10, true)
   fetchAllUsers()
+  getPermissions().then(fetchedPermissions => {
+    permissions.value = fetchedPermissions.permissions
+  })
 })
 
 const {
@@ -45,13 +52,28 @@ const courseSave = (toSave) => {
   }
 }
 
+const courseCreate = (newCourse) => {
+  try {
+    createCourse(newCourse)
+    creatingNewInstance.value = false
+  } catch (error) {
+    console.error('Error creating course data:', error)
+  }
+}
+
 const onCourseEdit = (id) => {
   selectedCourseId.value = id
+  creatingNewInstance.value = false
   courseToEditFetch()
 }
 
 const onCoursePaginate = (page, pageSize) => {
   fetchCoursesPaginated(page, pageSize, true)
+}
+
+const onCreateCourse = () => {
+  creatingNewInstance.value = true
+  selectedCourseId.value = null
 }
 
 const {menu: privateMenu} = usePrivateMenu()
@@ -73,11 +95,19 @@ const {menu: privateMenu} = usePrivateMenu()
                   :courses="paginatedCourses"
                   :maxHeight="'28rem'"
                   :totalItems="totalCourses"
+                  :allowCreate="permissions.some(permission => permission == 'api.add_course')"
                   @edit="onCourseEdit"
                   @paginate="onCoursePaginate"
+                  @create="onCreateCourse"
                 />
                 <CourseForm 
-                  v-if="!courseToEditLoading && !courseToEditError && courseToEdit"
+                  v-if="creatingNewInstance"
+                  :saving="courseToEditLoading"
+                  :componentOptions="allUsers"
+                  @save="courseCreate"
+                />
+                <CourseForm 
+                  v-if="!creatingNewInstance && !courseToEditLoading && !courseToEditError && courseToEdit"
                   :course="courseToEdit"
                   :components="courseToEditComponents"
                   :saving="courseToEditLoading"

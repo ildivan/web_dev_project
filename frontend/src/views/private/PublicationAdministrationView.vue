@@ -13,9 +13,11 @@ import PublicationForm from '../../components/entity_edit/PublicationForm.vue'
 import PublicationList from '../../components/entity_edit/PublicationList.vue'
 import usePrivateMenu from '../../composables/usePrivateMenu.js'
 import { createPublication } from '../../apiCalls/apiCalls.js'
+import { getPermissions } from '../../apiCalls/apiCalls.js'
 
 const selectedPublicationId = ref(null)
 const creatingNewInstance = ref(false)
+const permissions = ref([])
 
 function fetchPublicationId() {
     return selectedPublicationId.value
@@ -31,6 +33,9 @@ onMounted(() => {
   fetchPublicationsPaginated(1, 10, true)
   fetchAllUsers()
   fetchAllProjects()
+  getPermissions().then(fetchedPermissions => {
+    permissions.value = fetchedPermissions.permissions
+  })
 })
 
 const {
@@ -95,6 +100,7 @@ const {menu: privateMenu} = usePrivateMenu()
                   :maxHeight="'28rem'"
                   :totalItems="totalPublications"
                   :projects="allProjects"
+                  :allowCreate="permissions.some(permission => permission == 'api.add_publication')"
                   @edit="onPublicationEdit"
                   @paginate="onPublicationPaginate"
                   @create="onCreate"

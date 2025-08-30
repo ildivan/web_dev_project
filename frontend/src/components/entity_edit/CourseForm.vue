@@ -4,10 +4,11 @@ import EntityForm from './EntityForm.vue'
 import EntitySelect from './EntitySelect.vue'
 
 const props = defineProps({
-  course: { type: Object, required: true },
-  components: { type: Array, required: true },
+  course: { type: Object, default: {name: '', description: '', start_date: '', end_date: ''} },
+  components: { type: Array, default: () => [] },
   saving: { type: Boolean, default: false },
   componentOptions: { type: Array, required: true },
+  formTitle: {type: String, default: 'Modifica Corso'}
 })
 
 const emit = defineEmits(['save'])
@@ -61,7 +62,7 @@ function onCancel() {
 <template>
   <EntityForm
     :saving="saving"
-    title="Modifica Corso"
+    :title="formTitle"
     @save="onSave"
     @cancel="onCancel"
   >

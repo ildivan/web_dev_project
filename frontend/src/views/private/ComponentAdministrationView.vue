@@ -13,12 +13,13 @@ import useCourses from '../../composables/useCourses.js'
 import usePublications from '../../composables/usePublications.js'
 import ViewDropDownSelector from '../../components/ViewDropDownSelector.vue'
 import usePrivateMenu from '../../composables/usePrivateMenu.js'
-import { createGroupComponent } from '../../apiCalls/apiCalls.js'
+import { createGroupComponent, getPermissions } from '../../apiCalls/apiCalls.js'
 import { getUsers } from '../../apiCalls/apiCalls.js'
 import ComponentCreationForm from '../../components/entity_edit/ComponentCreationForm.vue'
 
 const selectedUserId = ref(null)
 const creatingNewInstance = ref(false)
+const permissions = ref([])
 
 function fetchUserId() {
     return selectedUserId.value
@@ -47,6 +48,9 @@ onMounted(() => {
       })
     }
   )
+  getPermissions().then(fetchedPermissions => {
+    permissions.value = fetchedPermissions.permissions
+  })
 })
 
 const {
@@ -113,6 +117,7 @@ const {menu: privateMenu} = usePrivateMenu()
             :users="paginatedUsers"
             :maxHeight="'28rem'"
             :totalItems="totalUsers"
+            :allowCreate="permissions.some(permission => permission == 'api.add_researchgroupcomponent')"
             @edit="onComponentEdit"
             @paginate="onComponentPaginate"
             @create="onCreate"
