@@ -9,7 +9,7 @@ const props = defineProps({
   allowCreate: { type: Boolean, default: false }
 })
 
-const emit = defineEmits(['edit', 'paginate', 'create'])
+const emit = defineEmits(['edit', 'paginate'])
 
 function onEdit(id) {
   emit('edit', id)
