@@ -12,8 +12,10 @@ import { usePublication } from '../../composables/usePublication.js'
 import PublicationForm from '../../components/entity_edit/PublicationForm.vue'
 import PublicationList from '../../components/entity_edit/PublicationList.vue'
 import usePrivateMenu from '../../composables/usePrivateMenu.js'
+import { createPublication } from '../../apiCalls/apiCalls.js'
 
 const selectedPublicationId = ref(null)
+const creatingNewInstance = ref(false)
 
 function fetchPublicationId() {
     return selectedPublicationId.value
@@ -49,13 +51,28 @@ const publicationSave = (toSave) => {
   }
 }
 
+const publicationCreate = (toCreate) => {
+  try {
+    createPublication(toCreate)
+    creatingNewInstance.value = false
+  } catch (error) {
+    console.error('Error creating publication data:', error)
+  }
+}
+
 const onPublicationEdit = (id) => {
   selectedPublicationId.value = id
+  creatingNewInstance.value = false
   publicationToEditFetch()
 }
 
 const onPublicationPaginate = (page, pageSize) => {
   fetchPublicationsPaginated(page, pageSize, true)
+}
+
+const onCreate = () => {
+  creatingNewInstance.value = true
+  selectedPublicationId.value = null
 }
 
 const {menu: privateMenu} = usePrivateMenu()
@@ -80,15 +97,25 @@ const {menu: privateMenu} = usePrivateMenu()
                   :projects="allProjects"
                   @edit="onPublicationEdit"
                   @paginate="onPublicationPaginate"
+                  @create="onCreate"
                 />
                 <PublicationForm 
-                  v-if="!publicationToEditLoading && !publicationToEditError && publicationToEdit"
+                  v-if="creatingNewInstance"
+                  :saving="publicationToEditLoading"
+                  :componentOptions="allUsers"
+                  :projectOptions="allProjects"
+                  formTitle="Creazione Pubblicazione"
+                  @save="publicationCreate"
+                />
+                <PublicationForm 
+                  v-if="!creatingNewInstance && !publicationToEditLoading && !publicationToEditError && publicationToEdit"
                   :publication="publicationToEdit"
                   :components="publicationToEditComponents"
                   :project="publicationToEditProject"
                   :saving="publicationToEditLoading"
                   :componentOptions="allUsers"
                   :projectOptions="allProjects"
+                  formTitle="Modifica Pubblicazione"
                   @save="publicationSave"
                 />
             </div>
