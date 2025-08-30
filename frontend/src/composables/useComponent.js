@@ -1,7 +1,7 @@
 import { ref } from 'vue'
 import { getGroupComponent , getProject, getPublication, getCourse, updateGroupComponent} from '../apiCalls/apiCalls'
 
-export function useUser(getId) {
+export function useComponent(getId) {
   const loading = ref(true)
   const error = ref(null)
   const component = ref(null)
@@ -12,7 +12,7 @@ export function useUser(getId) {
 
   const id = ref(null)
 
-  const fetchUserData = async () => {
+  const fetchComponentData = async () => {
     loading.value = true
     error.value = null
     component.value = null
@@ -36,12 +36,12 @@ export function useUser(getId) {
     }
   }
 
-  const updateUser = async (data) => {
+  const updateComponent = async (data) => {
     loading.value = true
     error.value = null
     try {
       component.value = await updateGroupComponent(id.value, data)
-      await fetchUserData() // Refresh data after update
+      await fetchComponentData() // Refresh data after update
     } catch (err) {
       error.value = err.message || 'Could not update user data.'
     } finally {
@@ -49,7 +49,7 @@ export function useUser(getId) {
     }
   }
 
-  fetchUserData()
+  fetchComponentData()
 
   return {
     loading,
@@ -59,7 +59,7 @@ export function useUser(getId) {
     ownedProjects,
     teachedCourses,
     publications,
-    fetchUserData,
-    updateUser
+    fetchComponentData,
+    updateComponent
   }
 }

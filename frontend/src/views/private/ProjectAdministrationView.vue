@@ -3,7 +3,7 @@ import { ref, computed } from 'vue'
 import Footer from '../../components/Footer.vue'
 import Navbar from '../../components/Navbar.vue'
 import { usePublicMenu } from '../../composables/usePublicMenu.js'
-import useUsers from '../../composables/useUsers.js'
+import useComponents from '../../composables/useComponents.js'
 import { onMounted } from 'vue'
 import useProjects from '../../composables/useProjects.js'
 import ProjectList from '../../components/entity_edit/ProjectList.vue'
@@ -25,7 +25,7 @@ function fetchProjectId() {
 
 const { menu } = usePublicMenu()
 
-const { users: allUsers, fetchAllUsers } = useUsers()
+const { users: allUsers, fetchAllUsers } = useComponents()
 const { projects: paginatedProjects, count: totalProjects, fetchProjectsPaginated } = useProjects()
 const { researchAreas: allResearchAreas, fetchAllResearchAreas } = useResearchAreas()
 

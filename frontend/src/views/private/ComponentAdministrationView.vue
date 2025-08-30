@@ -2,11 +2,11 @@
 import { ref } from 'vue'
 import Footer from '../../components/Footer.vue'
 import Navbar from '../../components/Navbar.vue'
-import { useUser } from '../../composables/useUser.js'
+import { useComponent } from '../../composables/useComponent.js'
 import ComponentForm from '../../components/entity_edit/ComponentForm.vue'
 import { usePublicMenu } from '../../composables/usePublicMenu.js'
 import ComponentList from '../../components/entity_edit/ComponentList.vue'
-import useUsers from '../../composables/useUsers.js'
+import useComponents from '../../composables/useComponents.js'
 import { onMounted } from 'vue'
 import useProjects from '../../composables/useProjects.js'
 import useCourses from '../../composables/useCourses.js'
@@ -17,25 +17,25 @@ import { createGroupComponent, getPermissions } from '../../apiCalls/apiCalls.js
 import { getUsers } from '../../apiCalls/apiCalls.js'
 import ComponentCreationForm from '../../components/entity_edit/ComponentCreationForm.vue'
 
-const selectedUserId = ref(null)
+const selectedComponentId = ref(null)
 const creatingNewInstance = ref(false)
 const permissions = ref([])
 
-function fetchUserId() {
-    return selectedUserId.value
+function fetchComponentId() {
+    return selectedComponentId.value
 }
 
 const { menu } = usePublicMenu()
 
-const users = ref([])
-const { users: paginatedUsers, count: totalUsers, fetchUsersPaginated } = useUsers()
+const usersNotComponents = ref([])
+const { components: paginatedComponents, count: totalComponents, fetchComponentsPaginated } = useComponents()
 const { projects: allProjects, fetchAllProjects } = useProjects()
 const { publications: allPublications, fetchAllPublications } = usePublications()
 const { courses: allCourses, fetchAllCourses } = useCourses()
-const { users: allComponents, fetchAllUsers: fetchAllComponents } = useUsers()
+const { components: allComponents, fetchAllComponents: fetchAllComponents } = useComponents()
 
 onMounted(() => {
-  fetchUsersPaginated(1, 10, true)
+  fetchComponentsPaginated(1, 10, true)
   fetchAllProjects()
   fetchAllPublications()
   fetchAllCourses()
@@ -44,7 +44,7 @@ onMounted(() => {
       getUsers().then(fetchedUsers => {
         const users_already_components = new Set(allComponents.value.map(c => c.user.id))
         const users_not_components = fetchedUsers.filter(user => !users_already_components.has(user.id))
-        users.value = users_not_components
+        usersNotComponents.value = users_not_components
       })
     }
   )
@@ -54,22 +54,22 @@ onMounted(() => {
 })
 
 const {
-  loading: userToEditLoading,
-  error: userToEditError,
-  component: userToEditComponent,
-  projects: userToEditProjects,
-  teachedCourses: userToEditTeachedCourses,
-  publications: userToEditPublications,
-  updateUser: userToEditUpdate,
-  fetchUserData: userToEditFetch
-} = useUser(fetchUserId)
+  loading: componentToEditLoading,
+  error: componentToEditError,
+  component: componentToEditComponent,
+  projects: componentToEditProjects,
+  teachedCourses: componentToEditTeachedCourses,
+  publications: componentToEditPublications,
+  updateComponent: componentToEditUpdate,
+  fetchComponentData: componentToEditFetch
+} = useComponent(fetchComponentId)
 
 
 const componentSave = (toSave) => {
   try {
-    userToEditUpdate(toSave)
+    componentToEditUpdate(toSave)
   } catch (error) {
-    console.error('Error saving user data:', error)
+    console.error('Error saving component data:', error)
   }
 }
 
@@ -78,23 +78,23 @@ const componentCreate = (toCreate) => {
     createGroupComponent(toCreate)
     creatingNewInstance.value = false
   } catch (error) {
-    console.error('Error creating user data:', error)
+    console.error('Error creating component data:', error)
   }
 }
 
 const onComponentEdit = (id) => {
-  selectedUserId.value = id
+  selectedComponentId.value = id
   creatingNewInstance.value = false
-  userToEditFetch()
+  componentToEditFetch()
 }
 
 const onComponentPaginate = (page, pageSize) => {
-  fetchUsersPaginated(page, pageSize, true)
+  fetchComponentsPaginated(page, pageSize, true)
 }
 
 const onCreate = () => {
   creatingNewInstance.value = true
-  selectedUserId.value = null
+  selectedComponentId.value = null
 }
 
 const {menu: privateMenu} = usePrivateMenu()
@@ -114,9 +114,9 @@ const {menu: privateMenu} = usePrivateMenu()
         <div class="flex-1 bg-white rounded-xl shadow p-6 min-h-[300px]">
           <div class="flex flex-col gap-6 md:flex-row md:items-start md:gap-8 md:flex-nowrap">
             <ComponentList 
-            :users="paginatedUsers"
+            :components="paginatedComponents"
             :maxHeight="'28rem'"
-            :totalItems="totalUsers"
+            :totalItems="totalComponents"
             :allowCreate="permissions.some(permission => permission == 'api.add_researchgroupcomponent')"
             @edit="onComponentEdit"
             @paginate="onComponentPaginate"
@@ -124,20 +124,20 @@ const {menu: privateMenu} = usePrivateMenu()
             />
             <ComponentCreationForm
             v-if="creatingNewInstance"
-            :users="users"
-            :saving="userToEditLoading"
+            :users="usersNotComponents"
+            :saving="componentToEditLoading"
             :projectOptions="allProjects"
             :courseOptions="allCourses"
             :publicationOptions="allPublications"
             @save="componentCreate"
             />
             <ComponentForm 
-            v-if="!creatingNewInstance && !userToEditLoading && !userToEditError && userToEditComponent"
-            :user="userToEditComponent"
-            :projects="userToEditProjects"
-            :teachedCourses="userToEditTeachedCourses"
-            :publications="userToEditPublications"
-            :saving="userToEditLoading"
+            v-if="!creatingNewInstance && !componentToEditLoading && !componentToEditError && componentToEditComponent"
+            :component="componentToEditComponent"
+            :projects="componentToEditProjects"
+            :teachedCourses="componentToEditTeachedCourses"
+            :publications="componentToEditPublications"
+            :saving="componentToEditLoading"
             :projectOptions="allProjects"
             :courseOptions="allCourses"
             :publicationOptions="allPublications"

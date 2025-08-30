@@ -1,5 +1,5 @@
 import { computed, watch } from 'vue'
-import { useUser } from './useUser'
+import { useComponent } from './useComponent'
 import axiosInstance from '../axios'
 
 export default function usePrivateMenu() {
@@ -15,7 +15,7 @@ export default function usePrivateMenu() {
         }
     }
     
-    const { loading: userLoading, error: userError } = useUser(fetchLoggedUserId)
+    const { loading: userLoading, error: userError } = useComponent(fetchLoggedUserId)
     
     const menu = computed(() => {
             const base = [ { label: 'Profilo', relURL: '/profile' } ]

@@ -3,7 +3,7 @@ import { onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import Navbar from '../../components/Navbar.vue'
 import ProfileContent from '../../components/ProfileContent.vue'
-import { useUser } from '../../composables/useUser'
+import { useComponent } from '../../composables/useComponent.js'
 import { usePublicMenu } from '../../composables/usePublicMenu.js'
 import useProjects from '../../composables/useProjects.js'
 
@@ -18,8 +18,8 @@ const {
   ownedProjects,
   teachedCourses,
   publications,
-  fetchUserData
-} = useUser(() => id)
+  fetchComponentData
+} = useComponent(() => id)
 const {projects: allProjects, fetchAllProjects} = useProjects()
 
 onMounted(() => {
@@ -30,7 +30,7 @@ onMounted(() => {
 watch(
   () => route.params.id,
   async (newId) => {
-    await fetchUserData(newId)
+    await fetchComponentData(newId)
   }
 )
 </script>

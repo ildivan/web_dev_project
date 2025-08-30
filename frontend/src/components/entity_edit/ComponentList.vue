@@ -4,7 +4,7 @@ import EntityListItem from './EntityListItem.vue'
 import ComponentCard from '../cards/ComponentCard.vue'
 
 const props = defineProps({
-  users: { type: Array, default: () => [] },
+  components: { type: Array, default: () => [] },
   maxHeight: { type: String, default: '28rem' },
   allowCreate: { type: Boolean, default: false }
 })
@@ -29,16 +29,16 @@ function onPaginate(page, per_page) {
   >
     <template #header>
       <div class="flex items-center justify-between px-3 py-2 text-sm font-medium text-gray-600">
-        <span>Users</span>
+        <span>Componenti</span>
       </div>
     </template>
  
-    <template v-if="props.users.length === 0">
-      <div class="px-3 py-4 text-sm text-gray-500">No users</div>
+    <template v-if="props.components.length === 0">
+      <div class="px-3 py-4 text-sm text-gray-500">No Componenti</div>
     </template>
 
     <EntityListItem
-      v-for="user in users.filter(user => user.can_change || user.can_delete)"
+      v-for="user in components.filter(user => user.can_change || user.can_delete)"
       :key="user.user.id"
       :id="user.user.id"
       @edit="onEdit"

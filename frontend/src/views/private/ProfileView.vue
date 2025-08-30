@@ -1,7 +1,7 @@
 <script setup>
 import Footer from '../../components/Footer.vue'
 import Navbar from '../../components/Navbar.vue'
-import { useUser } from '../../composables/useUser.js'
+import { useComponent } from '../../composables/useComponent.js'
 import ProfileContent from '../../components/ProfileContent.vue'
 import { usePublicMenu } from '../../composables/usePublicMenu.js'
 import axiosInstance from '../../axios'
@@ -28,7 +28,7 @@ const {
   ownedProjects: loggedUserOwnedProjects,
   teachedCourses: loggedUserTeachedCourses,
   publications: loggedUserPublications,
-} = useUser(fetchLoggedUserId)
+} = useComponent(fetchLoggedUserId)
 
 const {menu: privateMenu} = usePrivateMenu()
 
