@@ -7,7 +7,7 @@ const props = defineProps({
   clickable: { type: Boolean, default: false } // se vuoi abilitare il click
 })
 
-const router = useRouter() // <-- IMPORTANTE
+const router = useRouter()
 
 // funzione helper per trovare il titolo del progetto
 function getProjectTitle(projectId) {

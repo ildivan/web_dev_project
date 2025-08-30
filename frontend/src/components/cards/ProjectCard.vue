@@ -1,9 +1,18 @@
 <script setup>
 import { computed } from 'vue'
+import { useRouter } from 'vue-router'
 
 const props = defineProps({
   project: Object
 })
+
+const router = useRouter()
+
+
+function onClick() {
+  const id = props.project?.id
+  if (id != null) router.push(`/projects/${id}`)
+}
 
 const statusClass = computed(() => {
   return props.project.end_date ? 'text-red-600' : 'text-green-600'
@@ -11,7 +20,10 @@ const statusClass = computed(() => {
 </script>
 
 <template>
-  <div class="w-full max-w-full p-4 bg-gray-100 rounded shadow hover:shadow-lg transition-shadow duration-300">
+  <div 
+  @click="onClick"
+      role="button"
+  class="w-full max-w-full p-4 bg-gray-100 rounded shadow hover:shadow-lg transition-shadow duration-300">
     <h3 class="font-semibold break-words whitespace-normal">
       {{ props.project.title }}
     </h3>
