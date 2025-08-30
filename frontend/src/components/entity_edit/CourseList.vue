@@ -5,7 +5,8 @@ import CourseCard from '../cards/CourseCard.vue'
 
 const props = defineProps({
   courses: { type: Array, default: () => [] },
-  maxHeight: { type: String, default: '28rem' }
+  maxHeight: { type: String, default: '28rem' },
+  allowCreate: { type: Boolean, default: false }
 })
 
 const emit = defineEmits(['edit', 'paginate'])
@@ -22,6 +23,7 @@ function onPaginate(page, per_page) {
 <template>
   <EntityList 
     :maxHeight="maxHeight"
+    :allowCreate="allowCreate"
     @paginate="onPaginate"
   >
     <template #header>

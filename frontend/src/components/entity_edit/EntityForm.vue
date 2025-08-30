@@ -1,5 +1,4 @@
 <script setup>
-import { ref } from 'vue'
 
 const props = defineProps({
   saving: { type: Boolean, default: false }, // loading state

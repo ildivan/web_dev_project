@@ -8,7 +8,8 @@ const props = defineProps({
   initialPage: { type: Number, default: 1 },
   initialPerPage: { type: Number, default: 10 },
   perPageOptions: { type: Array, default: () => [5, 10, 20, 50] },
-  showPagination: { type: Boolean, default: true }
+  showPagination: { type: Boolean, default: true },
+  allowCreate: { type: Boolean, default: false }
 })
 
 const emit = defineEmits(['paginate', 'create'])
@@ -82,6 +83,7 @@ function onCreate() {
     >
       <slot name="header" />
       <button
+        v-if="allowCreate"
         type="button"
         @click="onCreate"
         class="inline-flex items-center gap-1 px-3 py-1.5 rounded-md text-sm font-semibold

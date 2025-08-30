@@ -12,9 +12,11 @@ import CourseList from '../../components/entity_edit/CourseList.vue'
 import usePrivateMenu from '../../composables/usePrivateMenu.js'
 import useCourses from '../../composables/useCourses.js'
 import { createCourse } from '../../apiCalls/apiCalls.js'
+import { getPermissions } from '../../apiCalls/apiCalls.js'
 
 const selectedCourseId = ref(null)
 const creatingNewInstance = ref(false)
+const permissions = ref([])
 
 function fetchCourseId() {
     return selectedCourseId.value
@@ -28,6 +30,9 @@ const { courses: paginatedCourses, count: totalCourses, fetchCoursesPaginated } 
 onMounted(() => {
   fetchCoursesPaginated(1, 10, true)
   fetchAllUsers()
+  getPermissions().then(fetchedPermissions => {
+    permissions.value = fetchedPermissions.permissions
+  })
 })
 
 const {
@@ -90,6 +95,7 @@ const {menu: privateMenu} = usePrivateMenu()
                   :courses="paginatedCourses"
                   :maxHeight="'28rem'"
                   :totalItems="totalCourses"
+                  :allowCreate="permissions.some(permission => permission == 'api.add_course')"
                   @edit="onCourseEdit"
                   @paginate="onCoursePaginate"
                   @create="onCreateCourse"
