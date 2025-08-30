@@ -154,7 +154,7 @@ const {menu: privateMenu} = usePrivateMenu()
             @save="componentCreate"
             />
             <ComponentForm 
-            v-if="!creatingNewInstance && !componentToEditLoading && !componentToEditError && componentToEditComponent"
+            v-if="!creatingNewInstance && !componentToEditLoading && !componentToEditError && componentToEditComponent && selectedComponentId"
             :component="componentToEditComponent"
             :projects="componentToEditProjects"
             :teachedCourses="componentToEditTeachedCourses"

@@ -12,7 +12,7 @@ import {useProject} from '../../composables/useProject.js'
 import useResearchAreas from '../../composables/useResearchAreas.js'
 import ViewDropDownSelector from '../../components/ViewDropDownSelector.vue'
 import usePrivateMenu from '../../composables/usePrivateMenu.js'
-import { createProject } from '../../apiCalls/apiCalls.js'
+import { createProject, deleteProject } from '../../apiCalls/apiCalls.js'
 import { getPermissions } from '../../apiCalls/apiCalls.js'
 
 const selectedProjectId = ref(null)
@@ -59,8 +59,12 @@ const projectSave = (toSave) => {
 
 const projectCreate = (toCreate) => {
   try {
-    createProject(toCreate)
-    creatingNewInstance.value = false
+    createProject(toCreate).then(
+      () => {
+        creatingNewInstance.value = false
+        fetchProjectsPaginated(1, 10, true)
+      }
+    )
   } catch (error) {
     console.error('Error creating project data:', error)
   }
@@ -76,7 +80,21 @@ const onProjectPaginate = (page, pageSize) => {
   fetchProjectsPaginated(page, pageSize, true)
 }
 
-const onCreate = () => {
+const onProjectDelete = (id) => {
+  deleteProject(id).then(() => {
+    // Refresh the project list after deletion
+    fetchProjectsPaginated(1, 10, true)
+    // If the deleted project was being edited, clear the form
+    if (selectedProjectId.value === id) {
+      selectedProjectId.value = null
+      creatingNewInstance.value = false
+    }
+  }).catch(error => {
+    console.error('Error deleting project:', error)
+  })
+}
+
+const onProjectCreate = () => {
   creatingNewInstance.value = true
   selectedProjectId.value = null
 }
@@ -102,8 +120,9 @@ const {menu: privateMenu} = usePrivateMenu()
                   :totalItems="totalProjects"
                   :allowCreate="permissions.some(permission => permission == 'api.add_researchproject')"
                   @edit="onProjectEdit"
+                  @delete="onProjectDelete"
                   @paginate="onProjectPaginate"
-                  @create="onCreate"
+                  @create="onProjectCreate"
                 />
                 <ProjectForm 
                   v-if="creatingNewInstance"
@@ -113,7 +132,7 @@ const {menu: privateMenu} = usePrivateMenu()
                   @save="projectCreate"
                 />
                 <ProjectForm 
-                  v-if="!creatingNewInstance && !projectToEditLoading && !projectToEditError && projectToEdit"
+                  v-if="!creatingNewInstance && !projectToEditLoading && !projectToEditError && projectToEdit && selectedProjectId"
                   :project="projectToEdit"
                   :components="projectToEditComponents"
                   :researchArea="projectToEditResearchArea"

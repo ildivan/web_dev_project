@@ -9,7 +9,7 @@ const props = defineProps({
   allowCreate: { type: Boolean, default: false }
 })
 
-const emit = defineEmits(['edit', 'paginate'])
+const emit = defineEmits(['edit', 'paginate', 'delete'])
 
 function onEdit(id) {
   emit('edit', id)
@@ -17,6 +17,10 @@ function onEdit(id) {
 
 function onPaginate(page, per_page) {
   emit('paginate', page, per_page)
+}
+
+function onDelete(id) {
+  emit('delete', id)
 }
 </script>
 
@@ -40,6 +44,9 @@ function onPaginate(page, per_page) {
       v-for="project in props.projects.filter(project => project.can_change || project.can_delete)"
       :key="project.id"
       :id="project.id"
+      :showEdit="project.can_change"
+      :showDelete="project.can_delete"
+      @delete="onDelete"
       @edit="onEdit"
     >
       <ProjectCard :project="project" />
