@@ -1,33 +1,81 @@
 <script setup>
-import Footer from '../../components/Footer.vue'
-import Navbar from '../../components/Navbar.vue'
-import { usePublicMenu } from '../../composables/usePublicMenu.js'
-import ViewDropDownSelector from '../../components/ViewDropDownSelector.vue'
-import usePrivateMenu from '../../composables/usePrivateMenu.js'
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useUser } from '../../composables/useUser.js'
+import Navbar from '../../components/Navbar.vue'
+import Footer from '../../components/Footer.vue'
+import ViewDropDownSelector from '../../components/ViewDropDownSelector.vue'
+import { usePublicMenu } from '../../composables/usePublicMenu.js'
+import usePrivateMenu from '../../composables/usePrivateMenu.js'
 import UserEditForm from '../../components/entity_edit/UserForm.vue'
+import ProfileContentPrivate from '../../components/ProfileContentPrivate.vue'
+import useProjects from '../../composables/useProjects.js'
+import { useComponent } from '../../composables/useComponent.js'
 
+// Menu
 const { menu } = usePublicMenu()
 const { menu: privateMenu } = usePrivateMenu()
+
+// Editing state
 const editing = ref(false)
 
-// Composable per gestire dati utente
-const { user, loading, error, updateUserData } = useUser()
+// User + progetti
+const { user, loading: loadingUser, error: errorUser, updateUserData, fetchUserData } = useUser()
+const { projects: allProjects, fetchAllProjects } = useProjects()
+
+// Stato componente
+const isGroupComponent = ref(false)
+let componentData = null
+
+// Queste saranno collegate direttamente al composable
+let loadingComponent = ref(false)
+let errorComponent = ref(null)
 
 // Funzioni editing
-const startEditing = () => editing.value = true
-const cancelEditing = () => editing.value = false
+const startEditing = () => (editing.value = true)
+const cancelEditing = () => (editing.value = false)
 const saveChanges = async (toSave) => {
   try {
-    await updateUserData(toSave) // PATCH /me/
+    if (isGroupComponent.value && componentData) {
+      await componentData.updateComponent(toSave)
+    } else {
+      await updateUserData(toSave)
+    }
     editing.value = false
-    // user.value è già aggiornato, non serve ulteriore fetch
   } catch (err) {
-    console.error('Error updating user:', err)
+    console.error('Error saving changes:', err)
   }
 }
+
+// Fetch dati
+onMounted(async () => {
+  try {
+    await fetchUserData()
+    await fetchAllProjects()
+
+    if (user.value.id) {
+      // Qui collego direttamente le ref del composable
+      const { loading, error, component, projects, ownedProjects, teachedCourses, publications, fetchComponentData, updateComponent } =
+        useComponent(() => user.value.id)
+      
+      // salvo i riferimenti reattivi
+      loadingComponent = loading
+      errorComponent = error
+
+      componentData = { loading, error, component, projects, ownedProjects, teachedCourses, publications, fetchComponentData, updateComponent }
+
+      await fetchComponentData()
+
+      isGroupComponent.value = !!component.value
+      console.log("Component loaded:", component.value) // 👀 debug
+    }
+  } catch (err) {
+    console.error(err)
+    isGroupComponent.value = false
+  }
+})
 </script>
+
+
 
 <template>
   <div class="min-h-screen flex flex-col bg-gray-50 text-gray-800 pt-16">
@@ -38,42 +86,74 @@ const saveChanges = async (toSave) => {
         <ViewDropDownSelector :menuOptions="privateMenu" />
 
         <div class="flex-1 bg-white rounded-xl shadow p-6">
-          <div v-if="loading" class="text-gray-500">Loading profile...</div>
-          <div v-else-if="error" class="text-red-500">{{ error }}</div>
-          <div v-else>
-            <h2 class="text-2xl font-bold mb-4">Profilo utente</h2>
 
-            <!-- Lettura -->
-            <div v-if="!editing" class="space-y-2">
-              <p><strong>Username:</strong> {{ user.username }}</p>
-              <p><strong>Email:</strong> {{ user.email }}</p>
-              <p>
-                <strong>Nome: </strong>
-                <span v-if="user.first_name">{{ user.first_name }}</span>
-                <span v-else class="text-gray-400 italic"> da compilare</span>
-              </p>
-              <p>
-                <strong>Cognome: </strong>
-                <span v-if="user.first_name">{{ user.last_name }}</span>
-                <span v-else class="text-gray-400 italic"> da compilare</span>
-              </p>
+          <!-- Loader generale -->
+          <div v-if="loadingUser || loadingComponent" class="text-gray-500 text-center">
+            Loading profile...
+          </div>
 
-              <button
-                @click="startEditing"
-                class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 mt-4"
-              >
-                Modifica
-              </button>
-            </div>
+          <!-- Error -->
+          <div v-else-if="errorUser || errorComponent" class="text-red-500">
+            {{ errorUser || errorComponent }}
+          </div>
 
-            <!-- Form -->
+          <!-- User loaded -->
+          <div v-else-if="user">
+            <h2 class="text-2xl font-bold mb-4 text-violet-700">Profilo utente</h2>
+
+            <!-- Edit mode -->
             <UserEditForm
               v-if="editing"
               :user="user"
               @save="saveChanges"
               @cancel="cancelEditing"
             />
+
+            <!-- Display mode -->
+            <div v-else>
+              <p><strong>Username:</strong> {{ user.username }}</p>
+              <p><strong>Email:</strong> {{ user.email }}</p>
+              <p>
+                <strong>Nome:</strong>
+                <span v-if="user.first_name">{{ user.first_name }}</span>
+                <span v-else class="text-gray-400 italic"> da compilare</span>
+              </p>
+              <p>
+                <strong>Cognome:</strong>
+                <span v-if="user.last_name">{{ user.last_name }}</span>
+                <span v-else class="text-gray-400 italic"> da compilare</span>
+              </p>
+
+               <!-- Pulsante modifica -->
+              <button
+                v-if="!editing"
+                @click="startEditing"
+                class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 mt-4"
+              >
+                Modifica
+              </button>
+
+            <!-- Profile content privato solo se componente -->
+              <ProfileContentPrivate
+                v-if="isGroupComponent && componentData"
+                :projects="componentData.projects.value || []"
+                :ownedProjects="componentData.ownedProjects.value || []"
+                :teachedCourses="componentData.teachedCourses.value || []"
+                :publications="componentData.publications.value || []"
+                :allProjects="allProjects.value || []"
+              />
+
+              <p v-else class="text-gray-500 italic mt-4">
+                L'utente non è componente di alcun gruppo.
+              </p>
+
+
+             
+            </div>
           </div>
+
+          <!-- User non trovato -->
+          <div v-else class="text-gray-500">Utente non trovato.</div>
         </div>
       </div>
     </main>

@@ -33,6 +33,15 @@ const onSave = () => emit('save', {
   last_name: localUser.last_name
 })
 
+const onCancel = () => {
+  // ripristina i valori locali dai props
+  localUser.username = props.user.username
+  localUser.email = props.user.email
+  localUser.first_name = props.user.first_name || ''
+  localUser.last_name = props.user.last_name || ''
+  emit('cancel')
+}
+
 </script>
 
 <template>

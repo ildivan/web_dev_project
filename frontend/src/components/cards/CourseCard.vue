@@ -4,6 +4,7 @@ import { computed } from 'vue'
 const props = defineProps({
   course: { type: Object, required: true },
   showActions: { type: Boolean, default: true },
+  clickable: { type: Boolean, default: true }
 })
 
 function formatDate(d) {
@@ -33,11 +34,33 @@ const teacherNames = computed(() => {
     .filter(Boolean)
     .join(', ')
 })
+
+const containerClasses = computed(() => {
+  const base = 'max-w-full w-full bg-violet-50 rounded-lg p-4'
+  if (props.clickable) {
+    return [
+      base,
+      'cursor-pointer hover:shadow-md transition bg-violet-50 duration-300',
+      'focus:outline-none focus:ring-2 focus:ring-indigo-200'
+    ].join(' ')
+  }
+  return [base, 'cursor-default pointer-events-none'].join(' ')
+})
+
+function onClick() {
+  //da implementare se si vuole inserire una pagina per il dettaglio dei corsi
+}
+
 </script>
 
 <template>
   <!-- limited width and subtle violet-50 background to match palette; falls back nicely to grey/white -->
-  <article class="max-w-full w-full border rounded-lg p-4 shadow-sm hover:shadow-md transition bg-violet-50 border-violet-100">
+  <article 
+    :class="containerClasses"
+    @click="onClick"
+    :role="clickable ? 'button' : undefined"
+    :aria-disabled="!clickable"
+  >
     <header class="flex items-start justify-between gap-4">
       <div>
         <h3 class="text-lg font-semibold text-gray-800">{{ course.name }}</h3>
