@@ -153,7 +153,7 @@ const toggleFilterPanel = () => {
                         </div>
                     </transition>
 
-                    <div class="grid md:grid-cols-1 gap-6">
+                    <div class="w-full grid md:grid-cols-1 gap-6">
                         <ProjectCard
                         v-for="project in filteredProjects"
                         :key="project.id"
