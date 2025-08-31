@@ -13,6 +13,7 @@ import usePrivateMenu from '../../composables/usePrivateMenu.js'
 import useCourses from '../../composables/useCourses.js'
 import { createCourse } from '../../apiCalls/apiCalls.js'
 import { getPermissions } from '../../apiCalls/apiCalls.js'
+import { deleteCourse } from '../../apiCalls/apiCalls.js'
 
 const selectedCourseId = ref(null)
 const creatingNewInstance = ref(false)
@@ -54,8 +55,10 @@ const courseSave = (toSave) => {
 
 const courseCreate = (newCourse) => {
   try {
-    createCourse(newCourse)
-    creatingNewInstance.value = false
+    createCourse(newCourse).then(() => {
+      creatingNewInstance.value = false
+      fetchCoursesPaginated(1, 10, true)
+    })
   } catch (error) {
     console.error('Error creating course data:', error)
   }
@@ -69,6 +72,18 @@ const onCourseEdit = (id) => {
 
 const onCoursePaginate = (page, pageSize) => {
   fetchCoursesPaginated(page, pageSize, true)
+}
+
+const onCourseDelete = (id) => {
+  deleteCourse(id).then(() => {
+    fetchCoursesPaginated(1, 10, true)
+    if (selectedCourseId.value === id) {
+      selectedCourseId.value = null
+      creatingNewInstance.value = false
+    }
+  }).catch(error => {
+    console.error('Error deleting course:', error)
+  })
 }
 
 const onCreateCourse = () => {
@@ -97,6 +112,7 @@ const {menu: privateMenu} = usePrivateMenu()
                   :totalItems="totalCourses"
                   :allowCreate="permissions.some(permission => permission == 'api.add_course')"
                   @edit="onCourseEdit"
+                  @delete="onCourseDelete"
                   @paginate="onCoursePaginate"
                   @create="onCreateCourse"
                 />
@@ -104,6 +120,7 @@ const {menu: privateMenu} = usePrivateMenu()
                   v-if="creatingNewInstance"
                   :saving="courseToEditLoading"
                   :componentOptions="allComponents"
+                  :formTitle="'Creazione Corso'"
                   @save="courseCreate"
                 />
                 <CourseForm 
@@ -112,6 +129,7 @@ const {menu: privateMenu} = usePrivateMenu()
                   :components="courseToEditComponents"
                   :saving="courseToEditLoading"
                   :componentOptions="allComponents"
+                  :formTitle="'Modifica Corso'"
                   @save="courseSave"
                 />
             </div>
