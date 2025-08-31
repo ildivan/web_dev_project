@@ -236,3 +236,11 @@ class PermissionsView(APIView):
             return Response({'detail': 'Authentication failed.'}, status=401)
         permissions = user.get_all_permissions()
         return Response({'permissions': list(permissions)})
+
+class IsComponentView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, pk=None):
+        user_id = pk or request.user.id
+        is_comp = ResearchGroupComponent.objects.filter(user__id=user_id).exists()
+        return Response({'is_component': is_comp})

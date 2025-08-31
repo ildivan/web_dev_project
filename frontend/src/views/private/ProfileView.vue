@@ -10,6 +10,7 @@ import UserEditForm from '../../components/entity_edit/UserForm.vue'
 import ProfileContentPrivate from '../../components/ProfileContentPrivate.vue'
 import useProjects from '../../composables/useProjects.js'
 import { useComponent } from '../../composables/useComponent.js'
+import { isComponent } from '../../apiCalls/apiCalls.js'
 
 // Menu
 const { menu } = usePublicMenu()
@@ -33,41 +34,52 @@ let errorComponent = ref(null)
 // Funzioni editing
 const startEditing = () => (editing.value = true)
 const cancelEditing = () => (editing.value = false)
-const saveChanges = async (toSave) => {
-  try {
-    if (isGroupComponent.value && componentData) {
-      await componentData.updateComponent(toSave)
-    } else {
-      await updateUserData(toSave)
-    }
-    editing.value = false
-  } catch (err) {
-    console.error('Error saving changes:', err)
-  }
-}
+// const saveChanges = async (toSave) => {
+//   try {
+//     if (isGroupComponent.value && componentData) {
+//       await componentData.updateComponent(toSave)
+//     } else {
+//       await updateUserData(toSave)
+//     }
+//     editing.value = false
+//   } catch (err) {
+//     console.error('Error saving changes:', err)
+//   }
+// }
 
-// Fetch dati
+const saveChanges = async (toSave) => {
+  console.log("🟣 saveChanges chiamato con:", toSave);
+  try {
+    // Aggiorna sempre tramite useUser()
+    await updateUserData(toSave);
+
+    // Fine editing
+    editing.value = false;
+  } catch (err) {
+    console.error('Error saving changes:', err);
+  }
+};
+
+
 onMounted(async () => {
   try {
     await fetchUserData()
     await fetchAllProjects()
 
-    if (user.value.id) {
-      // Qui collego direttamente le ref del composable
+    const componentFlag = (await isComponent(user.value.id)).is_component;
+    isGroupComponent.value = componentFlag;
+
+    if (componentFlag && user.value.id) {
       const { loading, error, component, projects, ownedProjects, teachedCourses, publications, fetchComponentData, updateComponent } =
         useComponent(() => user.value.id)
       
-      // salvo i riferimenti reattivi
       loadingComponent = loading
       errorComponent = error
-
       componentData = { loading, error, component, projects, ownedProjects, teachedCourses, publications, fetchComponentData, updateComponent }
 
       await fetchComponentData()
-
-      isGroupComponent.value = !!component.value
-      console.log("Component loaded:", component.value) // 👀 debug
     }
+
   } catch (err) {
     console.error(err)
     isGroupComponent.value = false

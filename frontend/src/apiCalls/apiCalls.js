@@ -112,8 +112,8 @@ export function updateUser(data) {
 export function deleteUser(id) {
     return apiRequest(`/api/users/${id}/`, 'DELETE');
 }
-export function isComponent() {
-    return apiRequest('/api/is-component/', 'GET');
+export function isComponent(id) {
+    return apiRequest(`/api/is-component/${id}/`, 'GET');
 }
 
 

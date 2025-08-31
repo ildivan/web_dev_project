@@ -1,8 +1,8 @@
 import { ref } from 'vue'
-import axiosInstance, { axiosEventBus } from '../axios'
+import axiosInstance from '../axios'
 
 export function useUser() {
-  const loading = ref(true)
+  const loading = ref(true)   // stato generale
   const error = ref(null)
   const user = ref(null)
 
@@ -22,15 +22,13 @@ export function useUser() {
 
   // Aggiorna dati utente loggato
   const updateUserData = async (data) => {
-    loading.value = true
+    loading.value = true        // usa loading esistente, NON loadingUpdate
     error.value = null
     try {
-      // PATCH /me/ con axiosInstance
       const res = await axiosInstance.patch('/api/auth/users/me/', data)
-      // Aggiorna reactive user con la risposta
       user.value = res.data
     } catch (err) {
-      error.value = err.response?.data || err.message || 'Could not update user data.'
+      error.value = err.response?.data?.detail || err.message || 'Could not update user data.'
     } finally {
       loading.value = false
     }

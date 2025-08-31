@@ -37,17 +37,21 @@ export function useComponent(getId) {
   }
 
   const updateComponent = async (data) => {
-    loading.value = true
-    error.value = null
-    try {
-      component.value = await updateGroupComponent(id.value, data)
-      await fetchComponentData() // Refresh data after update
-    } catch (err) {
-      error.value = err.message || 'Could not update user data.'
-    } finally {
-      loading.value = false
-    }
+  loading.value = true
+  error.value = null
+  try {
+    // Aggiorna sul server
+    await updateGroupComponent(id.value, data)
+
+    // Poi ricarica i dati aggiornati dal server
+    await fetchComponentData()
+  } catch (err) {
+    error.value = err.message || 'Could not update component data.'
+  } finally {
+    loading.value = false
   }
+}
+
 
   fetchComponentData()
 
