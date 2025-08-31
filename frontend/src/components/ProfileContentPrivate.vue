@@ -28,7 +28,7 @@ const props = defineProps({
   <main class="flex-grow container max-w-8xl mx-auto  mt-10 ">
     
     <section v-if="ownedProjects && ownedProjects.length" class="mb-8">
-      <h3 class="text-xl font-bold text-violet-700 mb-4">Owned Projects</h3>
+      <h3 class="text-xl font-bold text-violet-700 mb-4">Progetti di cui si è responsabili</h3>
       <div class="flex flex-wrap gap-4">
         <ProjectCard
           v-for="project in ownedProjects"
@@ -40,7 +40,7 @@ const props = defineProps({
     </section>
 
     <section v-if="projects && projects.length" class="mb-8">
-      <h3 class="text-xl font-bold text-violet-700 mb-4">Projects</h3>
+      <h3 class="text-xl font-bold text-violet-700 mb-4">Progetti</h3>
       <div class="flex flex-wrap gap-4">
         <ProjectCard
           v-for="project in projects"
@@ -52,7 +52,7 @@ const props = defineProps({
     </section>
 
     <section v-if="teachedCourses && teachedCourses.length" class="mb-8">
-      <h3 class="text-xl font-bold text-violet-700 mb-4">Taught Courses</h3>
+      <h3 class="text-xl font-bold text-violet-700 mb-4">Corsi insegnati</h3>
       <div class="flex flex-wrap gap-4">
         <CourseCard
           v-for="course in teachedCourses"
@@ -64,7 +64,7 @@ const props = defineProps({
     </section>
 
     <section v-if="publications && publications.length" class="mb-8">
-      <h3 class="text-xl font-bold text-violet-700 mb-4">Publications</h3>
+      <h3 class="text-xl font-bold text-violet-700 mb-4">Pubblicazioni</h3>
       <div class="flex flex-wrap gap-4">
         <PublicationCard
           v-for="pub in publications"

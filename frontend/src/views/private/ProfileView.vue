@@ -34,26 +34,12 @@ let errorComponent = ref(null)
 // Funzioni editing
 const startEditing = () => (editing.value = true)
 const cancelEditing = () => (editing.value = false)
-// const saveChanges = async (toSave) => {
-//   try {
-//     if (isGroupComponent.value && componentData) {
-//       await componentData.updateComponent(toSave)
-//     } else {
-//       await updateUserData(toSave)
-//     }
-//     editing.value = false
-//   } catch (err) {
-//     console.error('Error saving changes:', err)
-//   }
-// }
 
 const saveChanges = async (toSave) => {
-  console.log("🟣 saveChanges chiamato con:", toSave);
   try {
-    // Aggiorna sempre tramite useUser()
+
     await updateUserData(toSave);
 
-    // Fine editing
     editing.value = false;
   } catch (err) {
     console.error('Error saving changes:', err);
