@@ -57,8 +57,8 @@ const onCancel = () => {
         <input
           v-model="localUser.username"
           type="text"
-          class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-indigo-500"
-          required
+          class="w-full border rounded px-3 py-2"
+          readonly
         />
       </div>
 
