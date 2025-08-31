@@ -34,7 +34,6 @@ const props = defineProps({
           v-for="project in ownedProjects"
           :key="project.id"
           :project="project"
-          :clickable="false"
         />
       </div>
     </section>
@@ -46,7 +45,6 @@ const props = defineProps({
           v-for="project in projects"
           :key="project.id"
           :project="project"
-          :clickable="false"
         />
       </div>
     </section>
@@ -58,7 +56,6 @@ const props = defineProps({
           v-for="course in teachedCourses"
           :key="course.id"
           :course="course"
-          :clickable="false"
         />
       </div>
     </section>
@@ -71,7 +68,6 @@ const props = defineProps({
           :key="pub.id"
           :publication="pub"
           :projects="props.allProjects"
-          :clickable="false"
         />
       </div>
     </section>
