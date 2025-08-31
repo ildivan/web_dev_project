@@ -14,6 +14,7 @@ import PublicationList from '../../components/entity_edit/PublicationList.vue'
 import usePrivateMenu from '../../composables/usePrivateMenu.js'
 import { createPublication } from '../../apiCalls/apiCalls.js'
 import { getPermissions } from '../../apiCalls/apiCalls.js'
+import { deletePublication } from '../../apiCalls/apiCalls.js'
 
 const selectedPublicationId = ref(null)
 const creatingNewInstance = ref(false)
@@ -58,8 +59,10 @@ const publicationSave = (toSave) => {
 
 const publicationCreate = (toCreate) => {
   try {
-    createPublication(toCreate)
-    creatingNewInstance.value = false
+    createPublication(toCreate).then(() => {
+      creatingNewInstance.value = false
+      fetchPublicationsPaginated(1, 10, true)
+    })
   } catch (error) {
     console.error('Error creating publication data:', error)
   }
@@ -75,7 +78,19 @@ const onPublicationPaginate = (page, pageSize) => {
   fetchPublicationsPaginated(page, pageSize, true)
 }
 
-const onCreate = () => {
+const onPublicationDelete = (id) => {
+  deletePublication(id).then(() => {
+    fetchPublicationsPaginated(1, 10, true)
+    if (selectedPublicationId.value === id) {
+      selectedPublicationId.value = null
+      creatingNewInstance.value = false
+    }
+  }).catch(error => {
+    console.error('Error deleting publication:', error)
+  })
+}
+
+const onPublicationCreate = () => {
   creatingNewInstance.value = true
   selectedPublicationId.value = null
 }
@@ -102,8 +117,9 @@ const {menu: privateMenu} = usePrivateMenu()
                   :projects="allProjects"
                   :allowCreate="permissions.some(permission => permission == 'api.add_publication')"
                   @edit="onPublicationEdit"
+                  @delete="onPublicationDelete"
                   @paginate="onPublicationPaginate"
-                  @create="onCreate"
+                  @create="onPublicationCreate"
                 />
                 <PublicationForm 
                   v-if="creatingNewInstance"

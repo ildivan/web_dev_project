@@ -19,6 +19,10 @@ function onEdit(id) {
 function onPaginate(page, per_page) {
   emit('paginate', page, per_page)
 }
+
+function onDelete(id) {
+  emit('delete', id)
+}
 </script>
 
 <template>
@@ -41,6 +45,9 @@ function onPaginate(page, per_page) {
       v-for="publication in props.publications.filter(publication => publication.can_change || publication.can_delete)"
       :key="publication.id"
       :id="publication.id"
+      :showEdit="publication.can_change"
+      :showDelete="publication.can_delete"
+      @delete="onDelete"
       @edit="onEdit"
     >
       <PublicationCard :publication="publication" :projects="props.projects" :clickable="false"/>
