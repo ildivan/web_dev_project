@@ -7,6 +7,32 @@ const refreshToken = ref(localStorage.getItem('refreshToken') || null)
 const permissions = ref(localStorage.getItem('userPermissions') || null)
 const authError = ref(null)
 
+// 🔹 funzione helper per tradurre l'errore in stringa
+function parseError(err, fallbackMessage = 'Si è verificato un errore.') {
+  if (!err.response) {
+    return 'Errore di rete, riprova più tardi.'
+  }
+
+  const data = err.response.data
+
+  if (typeof data === 'string') {
+    return data
+  }
+
+  if (data.detail) {
+    return data.detail
+  }
+
+  // Se è un oggetto con campi (es. { email: ["..."], password: ["..."] })
+  const firstKey = Object.keys(data)[0]
+  if (firstKey) {
+    const val = data[firstKey]
+    return Array.isArray(val) ? val[0] : val
+  }
+
+  return fallbackMessage
+}
+
 export function useAuth() {
   const router = useRouter()
 
@@ -25,7 +51,7 @@ export function useAuth() {
       authError.value = null
       router.push('/profile')
     } catch (err) {
-      authError.value = 'Invalid credentials'
+      authError.value = parseError(err, 'Credenziali non valide')
     } finally {
       try {
         const permissionsRes = await axiosInstance.get('api/auth/permissions/')
@@ -38,13 +64,13 @@ export function useAuth() {
   }
 
   const logout = async () => {
-      localStorage.removeItem('authToken')
-      localStorage.removeItem('refreshToken')
-      localStorage.removeItem('userPermissions')
-      permissions.value = null
-      authToken.value = null
-      refreshToken.value = null
-      router.push('/login')
+    localStorage.removeItem('authToken')
+    localStorage.removeItem('refreshToken')
+    localStorage.removeItem('userPermissions')
+    permissions.value = null
+    authToken.value = null
+    refreshToken.value = null
+    router.push('/login')
   }
 
   // Listen for logout event from axios
@@ -69,7 +95,7 @@ export function useAuth() {
       })
       await login(username, password)
     } catch (err) {
-      authError.value = err.response?.data || 'Registration failed'
+      authError.value = parseError(err, 'Registrazione fallita')
       console.error(err)
     }
   }
