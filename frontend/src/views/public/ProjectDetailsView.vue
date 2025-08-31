@@ -5,6 +5,7 @@ import Navbar from '../../components/Navbar.vue'
 import ProjectContent from '../../components/ProjectContent.vue'
 import { useProject } from '../../composables/useProject.js'
 import { usePublicMenu } from '../../composables/usePublicMenu.js'
+import Footer from '../../components/Footer.vue'
 
 const { menu } = usePublicMenu()
 const route = useRoute()
@@ -51,5 +52,6 @@ watch(
         <p class="text-center text-gray-500">Project not found.</p>
       </div>
     </main>
+    <Footer />
   </div>
 </template>

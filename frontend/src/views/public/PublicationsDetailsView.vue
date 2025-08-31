@@ -5,6 +5,7 @@ import Navbar from '../../components/Navbar.vue'
 import PublicationContent from '../../components/PublicationContent.vue'
 import { usePublication } from '../../composables/usePublication.js'
 import { usePublicMenu } from '../../composables/usePublicMenu.js'
+import Footer from '../../components/Footer.vue'
 
 const { menu } = usePublicMenu()
 const route = useRoute()
@@ -46,5 +47,7 @@ watch(
         <p class="text-center text-gray-500">Publication not found.</p>
       </div>
     </main>
+
+    <Footer />
   </div>
 </template>

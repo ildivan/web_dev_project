@@ -6,6 +6,7 @@ import ProfileContent from '../../components/ProfileContent.vue'
 import { useComponent } from '../../composables/useComponent.js'
 import { usePublicMenu } from '../../composables/usePublicMenu.js'
 import useProjects from '../../composables/useProjects.js'
+import Footer from '../../components/Footer.vue'
 
 const { menu } = usePublicMenu()
 const route = useRoute()
@@ -56,5 +57,6 @@ watch(
         <p class="text-center text-gray-500">Component not found.</p>
       </div>
     </main>
+    <Footer />
   </div>
 </template>
