@@ -52,9 +52,6 @@ export function useComponent(getId) {
   }
 }
 
-
-  fetchComponentData()
-
   return {
     loading,
     error,

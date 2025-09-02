@@ -51,7 +51,6 @@ onMounted(async () => {
   try {
     await fetchUserData()
     await fetchAllProjects()
-
     const componentFlag = (await isComponent(user.value.id)).is_component;
     isGroupComponent.value = componentFlag;
 
@@ -65,7 +64,6 @@ onMounted(async () => {
 
       await fetchComponentData()
     }
-
   } catch (err) {
     console.error(err)
     isGroupComponent.value = false

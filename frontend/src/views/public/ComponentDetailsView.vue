@@ -25,6 +25,7 @@ const {projects: allProjects, fetchAllProjects} = useProjects()
 
 onMounted(() => {
   fetchAllProjects()
+  fetchComponentData(id)
 })
 
 // Refetch if route param changes

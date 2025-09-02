@@ -64,6 +64,8 @@ const {
   fetchComponentData: componentToEditFetch
 } = useComponent(fetchComponentId)
 
+await componentToEditFetch()
+
 
 const componentSave = (toSave) => {
   try {
