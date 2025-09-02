@@ -21,20 +21,15 @@ function fetchCourseId() {
     return selectedCourseId.value
 }
 
-const component = ref(false)
-
 const { components: allComponents, fetchAllComponents } = useComponents()
 const { courses: paginatedCourses, count: totalCourses, fetchCoursesPaginated } = useCourses()
 
 onMounted(async () =>{
-  component.value = (await isComponent()).is_component
-  if (component.value) {
-    fetchCoursesPaginated(1, 10, true)
-    fetchAllComponents()
-    getPermissions().then(fetchedPermissions => {
-      permissions.value = fetchedPermissions.permissions
-    })
-  }
+  fetchCoursesPaginated(1, 10, true)
+  fetchAllComponents()
+  getPermissions().then(fetchedPermissions => {
+    permissions.value = fetchedPermissions.permissions
+  })
 })
 
 const {
@@ -105,14 +100,7 @@ const { menu: privateMenu} = usePrivateMenu()
       <div class="flex flex-col md:flex-row gap-4 md:gap-8">
         <ViewDropDownSelector :menuOptions="privateMenu"/>
 
-        <section v-if="!component" class="flex-1 bg-white rounded-xl shadow p-6 min-h-[300px] flex items-center justify-center">
-          <div class="text-center"> 
-              <h3 class="text-red-500 text-lg mb-3">Accesso Negato</h3>
-              <p class="text-red-500 text-lg">Questa sezione è riservata ai componenti del gruppo di ricerca</p>
-          </div>
-        </section>
-
-        <section v-else class="flex-1 bg-white rounded-xl shadow p-6 min-h-[300px]">
+        <section class="flex-1 bg-white rounded-xl shadow p-6 min-h-[300px]">
             <div class="flex flex-col gap-6 md:flex-row md:items-start md:gap-8 md:flex-nowrap">
                 <CourseList 
                   :courses="paginatedCourses"

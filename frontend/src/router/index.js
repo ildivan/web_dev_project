@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
+import { isComponent } from '../apiCalls/apiCalls.js'
 
 const routes = [
   {
@@ -65,6 +66,7 @@ const routes = [
     component: () => import( '../views/private/ProjectAdministrationView.vue'),
     meta: {
       authenticationRequired: true,
+      componentRequired: true,
     }
   },
   {
@@ -73,6 +75,7 @@ const routes = [
     component: () => import('../views/private/ComponentAdministrationView.vue'),
     meta: {
       authenticationRequired: true,
+      isComponentRequired: true,
     }
   },
   {
@@ -81,6 +84,7 @@ const routes = [
     component: () => import('../views/private/PublicationAdministrationView.vue'),
     meta: {
       authenticationRequired: true,
+      isComponentRequired: true,
     }
   },
   {
@@ -89,7 +93,13 @@ const routes = [
     component: () => import('../views/private/CourseAdministrationView.vue'),
     meta: {
       authenticationRequired: true,
+      isComponentRequired: true,
     }
+  },
+  {
+    path: '/unauthorized',
+    name: 'Unauthorized',
+    component: () => import('../views/public/UnauthorizedView.vue'),
   }
 ];
 
@@ -98,17 +108,15 @@ const router = createRouter({
   routes,
 });
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   const isAuthenticated = !!localStorage.getItem('authToken');
   if (to.meta.authenticationRequired && !isAuthenticated) {
     next('/login');
   } else {
-    if(to.meta.permissionRequired) {
-      const userPermissions = JSON.parse(localStorage.getItem('userPermissions') || '[]');
-      for (const permission of to.meta.permissionsRequired || []) {
-        if (!userPermissions.includes(permission)) {
-          next({ name: from.name || 'Home' });
-        }
+    if(to.meta.isComponentRequired) {
+      if (!(await isComponent()).is_component) {
+        next('/unauthorized');
+        return;
       }
     }
     next();
