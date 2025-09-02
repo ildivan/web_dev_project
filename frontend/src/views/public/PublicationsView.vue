@@ -24,7 +24,6 @@ const searchQuery = ref('')
 
 const {projects ,fetchAllProjects} = useProjects()
 
-console.log('Projects in PublicationsView:', projects)
 
 async function loadPublications() {
   const data = await getPublications(currentPage.value, pageSize)

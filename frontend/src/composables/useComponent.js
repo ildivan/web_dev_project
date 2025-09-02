@@ -1,6 +1,7 @@
 import { ref } from 'vue'
 import { getGroupComponent , getProject, getPublication, getCourse, updateGroupComponent} from '../apiCalls/apiCalls'
 
+//si aspetta una funzione getId che ritorna l'id del componente da caricare
 export function useComponent(getId) {
   const loading = ref(true)
   const error = ref(null)

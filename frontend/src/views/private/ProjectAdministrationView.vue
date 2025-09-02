@@ -13,29 +13,32 @@ import useResearchAreas from '../../composables/useResearchAreas.js'
 import ViewDropDownSelector from '../../components/ViewDropDownSelector.vue'
 import usePrivateMenu from '../../composables/usePrivateMenu.js'
 import { createProject, deleteProject } from '../../apiCalls/apiCalls.js'
-import { getPermissions } from '../../apiCalls/apiCalls.js'
+import { getPermissions, isComponent} from '../../apiCalls/apiCalls.js'
 
 const selectedProjectId = ref(null)
 const creatingNewInstance = ref(false)
 const permissions = ref([])
 
+const component = ref(false)
+
 function fetchProjectId() {
     return selectedProjectId.value
 }
-
-const { menu } = usePublicMenu()
 
 const { components: allComponents, fetchAllComponents } = useComponents()
 const { projects: paginatedProjects, count: totalProjects, fetchProjectsPaginated } = useProjects()
 const { researchAreas: allResearchAreas, fetchAllResearchAreas } = useResearchAreas()
 
-onMounted(() => {
-  fetchProjectsPaginated(1, 10, true)
-  fetchAllComponents()
-  fetchAllResearchAreas()
-  getPermissions().then(fetchedPermissions => {
-    permissions.value = fetchedPermissions.permissions
-  })
+onMounted(async () =>{
+  component.value = (await isComponent()).is_component
+  if (component.value) {
+    fetchProjectsPaginated(1, 10, true)
+    fetchAllComponents()
+    fetchAllResearchAreas()
+    getPermissions().then(fetchedPermissions => {
+      permissions.value = fetchedPermissions.permissions
+    })
+  }
 })
 
 const {
@@ -98,21 +101,28 @@ const onProjectCreate = () => {
   creatingNewInstance.value = true
   selectedProjectId.value = null
 }
-
+const { menu: publicMenu } = usePublicMenu()
 const {menu: privateMenu} = usePrivateMenu()
 </script>
 
 <template>
   <div class="min-h-screen flex flex-col bg-gray-50 text-gray-800 pt-16">
     <Navbar
-        :menuItems="menu"
+        :menuItems="publicMenu"
     />
 
     <main class="flex-grow container max-w-6xl mx-auto p-2 sm:p-4 md:p-6 mt-4">
       <div class="flex flex-col md:flex-row gap-4 md:gap-8">
         <ViewDropDownSelector :menuOptions="privateMenu"/>
 
-        <section class="flex-1 bg-white rounded-xl shadow p-6 min-h-[300px]">
+        <section v-if="!component" class="flex-1 bg-white rounded-xl shadow p-6 min-h-[300px] flex items-center justify-center">
+          <div class="text-center"> 
+              <h3 class="text-red-500 text-lg mb-3">Accesso Negato</h3>
+              <p class="text-red-500 text-lg">Questa sezione è riservata ai componenti del gruppo di ricerca</p>
+          </div>
+        </section>
+
+        <section v-else class="flex-1 bg-white rounded-xl shadow p-6 min-h-[300px]">
             <div class="flex flex-col gap-6 md:flex-row md:items-start md:gap-8 md:flex-nowrap">
                 <ProjectList 
                   :projects="paginatedProjects"

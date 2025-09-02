@@ -240,7 +240,8 @@ class PermissionsView(APIView):
 class IsComponentView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def get(self, request, pk=None):
-        user_id = pk or request.user.id
+    def get(self, request):
+        # Usa direttamente l'utente loggato
+        user_id = request.user.id
         is_comp = ResearchGroupComponent.objects.filter(user__id=user_id).exists()
         return Response({'is_component': is_comp})

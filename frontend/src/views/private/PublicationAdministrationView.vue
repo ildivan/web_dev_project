@@ -12,31 +12,32 @@ import { usePublication } from '../../composables/usePublication.js'
 import PublicationForm from '../../components/entity_edit/PublicationForm.vue'
 import PublicationList from '../../components/entity_edit/PublicationList.vue'
 import usePrivateMenu from '../../composables/usePrivateMenu.js'
-import { createPublication } from '../../apiCalls/apiCalls.js'
-import { getPermissions } from '../../apiCalls/apiCalls.js'
-import { deletePublication } from '../../apiCalls/apiCalls.js'
+import { createPublication, getPermissions, deletePublication, isComponent } from '../../apiCalls/apiCalls.js'
 
 const selectedPublicationId = ref(null)
 const creatingNewInstance = ref(false)
 const permissions = ref([])
 
+const component = ref(false)
+
 function fetchPublicationId() {
     return selectedPublicationId.value
 }
-
-const { menu } = usePublicMenu()
 
 const { components: allComponents, fetchAllComponents } = useComponents()
 const { projects: allProjects, fetchAllProjects } = useProjects()
 const { publications: paginatedPublications, count: totalPublications, fetchPublicationsPaginated } = usePublications()
 
-onMounted(() => {
-  fetchPublicationsPaginated(1, 10, true)
-  fetchAllComponents()
-  fetchAllProjects()
-  getPermissions().then(fetchedPermissions => {
-    permissions.value = fetchedPermissions.permissions
-  })
+onMounted(async () => {
+  component.value = (await isComponent()).is_component
+  if (component.value) {
+    fetchPublicationsPaginated(1, 10, true)
+    fetchAllComponents()
+    fetchAllProjects()
+    getPermissions().then(fetchedPermissions => {
+      permissions.value = fetchedPermissions.permissions
+    })
+  }
 })
 
 const {
@@ -95,20 +96,28 @@ const onPublicationCreate = () => {
   selectedPublicationId.value = null
 }
 
+const { menu: publicMenu } = usePublicMenu()
 const {menu: privateMenu} = usePrivateMenu()
 </script>
 
 <template>
   <div class="min-h-screen flex flex-col bg-gray-50 text-gray-800 pt-16">
     <Navbar
-        :menuItems="menu"
+        :menuItems="publicMenu"
     />
 
     <main class="flex-grow container max-w-6xl mx-auto p-2 sm:p-4 md:p-6 mt-4">
       <div class="flex flex-col md:flex-row gap-4 md:gap-8">
         <ViewDropDownSelector :menuOptions="privateMenu"/>
 
-        <section class="flex-1 bg-white rounded-xl shadow p-6 min-h-[300px]">
+        <section v-if="!component" class="flex-1 bg-white rounded-xl shadow p-6 min-h-[300px] flex items-center justify-center">
+          <div class="text-center"> 
+              <h3 class="text-red-500 text-lg mb-3">Accesso Negato</h3>
+              <p class="text-red-500 text-lg">Questa sezione è riservata ai componenti del gruppo di ricerca</p>
+          </div>
+        </section>
+
+        <section v-else class="flex-1 bg-white rounded-xl shadow p-6 min-h-[300px]">
             <div class="flex flex-col gap-6 md:flex-row md:items-start md:gap-8 md:flex-nowrap">
                 <PublicationList 
                   :publications="paginatedPublications"

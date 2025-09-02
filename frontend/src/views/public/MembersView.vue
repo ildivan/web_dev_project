@@ -34,7 +34,6 @@ function loadMore() {
 
 onMounted(() => {
   loadComponents()
-  console.log('Components loaded:', components.value)
 })
 
 </script>

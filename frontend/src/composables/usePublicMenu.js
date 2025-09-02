@@ -29,7 +29,10 @@ export function usePublicMenu() {
 
   const menu = computed(() => {
     // If on profile page, use profile menu
-    if (route.path === '/profile') return MENUS.profile
+    if (route.path === '/profile' || route.path ==='/admin/components'
+      || route.path ==='/admin/projects' || route.path ==='/admin/publications'
+      || route.path ==='/admin/courses'
+    ) return MENUS.profile
     // Otherwise, use home menu for all main pages
     return MENUS[menuKeyByPath[route.path]] || MENUS.home
   })

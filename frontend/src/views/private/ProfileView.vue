@@ -13,7 +13,7 @@ import { useComponent } from '../../composables/useComponent.js'
 import { isComponent } from '../../apiCalls/apiCalls.js'
 
 // Menu
-const { menu } = usePublicMenu()
+const { menu: publicMenu } = usePublicMenu()
 const { menu: privateMenu } = usePrivateMenu()
 
 // Editing state
@@ -51,7 +51,7 @@ onMounted(async () => {
   try {
     await fetchUserData()
     await fetchAllProjects()
-    const componentFlag = (await isComponent(user.value.id)).is_component;
+    const componentFlag = (await isComponent()).is_component;
     isGroupComponent.value = componentFlag;
 
     if (componentFlag && user.value.id) {
@@ -75,7 +75,7 @@ onMounted(async () => {
 
 <template>
   <div class="min-h-screen flex flex-col bg-gray-50 text-gray-800 pt-16">
-    <Navbar :menuItems="menu" />
+    <Navbar :menuItems="publicMenu" />
 
     <main class="flex-grow container max-w-6xl mx-auto p-4 mt-4">
       <div class="flex flex-col md:flex-row gap-4 md:gap-8">

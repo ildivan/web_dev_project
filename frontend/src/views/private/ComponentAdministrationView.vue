@@ -13,8 +13,7 @@ import useCourses from '../../composables/useCourses.js'
 import usePublications from '../../composables/usePublications.js'
 import ViewDropDownSelector from '../../components/ViewDropDownSelector.vue'
 import usePrivateMenu from '../../composables/usePrivateMenu.js'
-import { createGroupComponent, deleteGroupComponent, getPermissions } from '../../apiCalls/apiCalls.js'
-import { getUsers } from '../../apiCalls/apiCalls.js'
+import { createGroupComponent, deleteGroupComponent, getPermissions, getUsers, isComponent } from '../../apiCalls/apiCalls.js'
 import ComponentCreationForm from '../../components/entity_edit/ComponentCreationForm.vue'
 
 const selectedComponentId = ref(null)
@@ -25,6 +24,7 @@ function fetchComponentId() {
     return selectedComponentId.value
 }
 
+const component = ref(false)
 const { menu } = usePublicMenu()
 
 const usersNotComponents = ref([])
@@ -53,15 +53,18 @@ const {
   fetchComponentData: componentToEditFetch
 } = useComponent(fetchComponentId)
 
-onMounted(() => {
-  fetchComponentsPaginated(1, 10, true)
-  fetchAllProjects()
-  fetchAllPublications()
-  fetchAllCourses()
-  refreshUsersNotComponents()
-  getPermissions().then(fetchedPermissions => {
-    permissions.value = fetchedPermissions.permissions
-  })
+onMounted(async () => {
+  component.value = (await isComponent()).is_component
+  if (!component.value) {
+    fetchComponentsPaginated(1, 10, true)
+    fetchAllProjects()
+    fetchAllPublications()
+    fetchAllCourses()
+    refreshUsersNotComponents()
+    getPermissions().then(fetchedPermissions => {
+      permissions.value = fetchedPermissions.permissions
+    })
+  }
 })
 
 componentToEditFetch()
@@ -133,7 +136,14 @@ const {menu: privateMenu} = usePrivateMenu()
       <div class="flex flex-col md:flex-row gap-4 md:gap-8">
         <ViewDropDownSelector :menuOptions="privateMenu"/>
 
-        <div class="flex-1 bg-white rounded-xl shadow p-6 min-h-[300px]">
+        <section v-if="!component" class="flex-1 bg-white rounded-xl shadow p-6 min-h-[300px] flex items-center justify-center">
+          <div class="text-center"> 
+              <h3 class="text-red-500 text-lg mb-3">Accesso Negato</h3>
+              <p class="text-red-500 text-lg">Questa sezione è riservata ai componenti del gruppo di ricerca</p>
+          </div>
+        </section>
+
+        <div v-else class="flex-1 bg-white rounded-xl shadow p-6 min-h-[300px]">
           <div class="flex flex-col gap-6 md:flex-row md:items-start md:gap-8 md:flex-nowrap">
             <ComponentList 
             :components="paginatedComponents"

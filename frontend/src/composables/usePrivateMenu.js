@@ -21,13 +21,14 @@ export default function usePrivateMenu() {
 
     async function fetchUserPermissions() {
         try {
-            const res = await getPermissions()
-            permissions.value = res.data
+           const res = await getPermissions()
+            permissions.value = res.permissions || []
         } catch (err) {
             console.error('Error fetching user permissions:', err)
-            throw err
+            permissions.value = []
         }
     }
+
 
     onMounted(() => {
         fetchUserPermissions()
@@ -35,19 +36,19 @@ export default function usePrivateMenu() {
 
     const menu = computed(() => {
             const base = [ { label: 'Profilo', relURL: '/profile' } ]
-            if (!userError.value || permissions.value.some(permission => permission.includes('groupcomponents'))) {
+            if (Array.isArray(permissions.value) && !userError.value && permissions.value.some(permission => permission.includes('researchgroupcomponent'))) {
                 base.push({ label: 'Amministrazione Componenti del Gruppo', relURL: '/admin/components' })
                 
             }
-            if (!userError.value || permissions.value.some(permission => permission.includes('researchprojects'))) {
+            if (Array.isArray(permissions.value) && !userError.value && permissions.value.some(permission => permission.includes('researchproject'))) {
                 base.push({ label: 'Amministrazione Progetti', relURL: '/admin/projects' })
                 
             }
-            if (!userError.value || permissions.value.some(permission => permission.includes('publications'))) {
+            if (Array.isArray(permissions.value) && !userError.value && permissions.value.some(permission => permission.includes('publication'))) {
                 base.push({ label: 'Amministrazione Pubblicazioni', relURL: '/admin/publications' })
                 
             }
-            if (!userError.value || permissions.value.some(permission => permission.includes('courses'))) {
+            if (Array.isArray(permissions.value) && !userError.value && permissions.value.some(permission => permission.includes('course'))) {
                 base.push({ label: 'Amministrazione Corsi', relURL: '/admin/courses' })
                 
             }

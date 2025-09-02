@@ -11,9 +11,7 @@ import CourseForm from '../../components/entity_edit/CourseForm.vue'
 import CourseList from '../../components/entity_edit/CourseList.vue'
 import usePrivateMenu from '../../composables/usePrivateMenu.js'
 import useCourses from '../../composables/useCourses.js'
-import { createCourse } from '../../apiCalls/apiCalls.js'
-import { getPermissions } from '../../apiCalls/apiCalls.js'
-import { deleteCourse } from '../../apiCalls/apiCalls.js'
+import { createCourse, getPermissions,deleteCourse, isComponent } from '../../apiCalls/apiCalls.js'
 
 const selectedCourseId = ref(null)
 const creatingNewInstance = ref(false)
@@ -23,17 +21,20 @@ function fetchCourseId() {
     return selectedCourseId.value
 }
 
-const { menu } = usePublicMenu()
+const component = ref(false)
 
 const { components: allComponents, fetchAllComponents } = useComponents()
 const { courses: paginatedCourses, count: totalCourses, fetchCoursesPaginated } = useCourses()
 
-onMounted(() => {
-  fetchCoursesPaginated(1, 10, true)
-  fetchAllComponents()
-  getPermissions().then(fetchedPermissions => {
-    permissions.value = fetchedPermissions.permissions
-  })
+onMounted(async () =>{
+  component.value = (await isComponent()).is_component
+  if (component.value) {
+    fetchCoursesPaginated(1, 10, true)
+    fetchAllComponents()
+    getPermissions().then(fetchedPermissions => {
+      permissions.value = fetchedPermissions.permissions
+    })
+  }
 })
 
 const {
@@ -90,21 +91,28 @@ const onCreateCourse = () => {
   creatingNewInstance.value = true
   selectedCourseId.value = null
 }
-
-const {menu: privateMenu} = usePrivateMenu()
+const { menu: publicMenu } = usePublicMenu()
+const { menu: privateMenu} = usePrivateMenu()
 </script>
 
 <template>
   <div class="min-h-screen flex flex-col bg-gray-50 text-gray-800 pt-16">
     <Navbar
-        :menuItems="menu"
+        :menuItems="publicMenu"
     />
 
     <main class="flex-grow container max-w-6xl mx-auto p-2 sm:p-4 md:p-6 mt-4">
       <div class="flex flex-col md:flex-row gap-4 md:gap-8">
         <ViewDropDownSelector :menuOptions="privateMenu"/>
 
-        <section class="flex-1 bg-white rounded-xl shadow p-6 min-h-[300px]">
+        <section v-if="!component" class="flex-1 bg-white rounded-xl shadow p-6 min-h-[300px] flex items-center justify-center">
+          <div class="text-center"> 
+              <h3 class="text-red-500 text-lg mb-3">Accesso Negato</h3>
+              <p class="text-red-500 text-lg">Questa sezione è riservata ai componenti del gruppo di ricerca</p>
+          </div>
+        </section>
+
+        <section v-else class="flex-1 bg-white rounded-xl shadow p-6 min-h-[300px]">
             <div class="flex flex-col gap-6 md:flex-row md:items-start md:gap-8 md:flex-nowrap">
                 <CourseList 
                   :courses="paginatedCourses"
