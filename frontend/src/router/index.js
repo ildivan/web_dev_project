@@ -66,7 +66,7 @@ const routes = [
     component: () => import( '../views/private/ProjectAdministrationView.vue'),
     meta: {
       authenticationRequired: true,
-      componentRequired: true,
+      isComponentRequired: true,
     }
   },
   {
