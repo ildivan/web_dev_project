@@ -42,17 +42,6 @@ const refreshUsersNotComponents = async () => {
   usersNotComponents.value = users_not_components;
 }
 
-onMounted(() => {
-  fetchComponentsPaginated(1, 10, true)
-  fetchAllProjects()
-  fetchAllPublications()
-  fetchAllCourses()
-  refreshUsersNotComponents()
-  getPermissions().then(fetchedPermissions => {
-    permissions.value = fetchedPermissions.permissions
-  })
-})
-
 const {
   loading: componentToEditLoading,
   error: componentToEditError,
@@ -64,8 +53,18 @@ const {
   fetchComponentData: componentToEditFetch
 } = useComponent(fetchComponentId)
 
-await componentToEditFetch()
+onMounted(() => {
+  fetchComponentsPaginated(1, 10, true)
+  fetchAllProjects()
+  fetchAllPublications()
+  fetchAllCourses()
+  refreshUsersNotComponents()
+  getPermissions().then(fetchedPermissions => {
+    permissions.value = fetchedPermissions.permissions
+  })
+})
 
+componentToEditFetch()
 
 const componentSave = (toSave) => {
   try {
