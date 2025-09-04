@@ -12,13 +12,15 @@ import { usePublication } from '../../composables/usePublication.js'
 import PublicationForm from '../../components/entity_edit/PublicationForm.vue'
 import PublicationList from '../../components/entity_edit/PublicationList.vue'
 import usePrivateMenu from '../../composables/usePrivateMenu.js'
-import { createPublication, getPermissions, deletePublication, isComponent } from '../../apiCalls/apiCalls.js'
+import { createPublication, getPermissions, deletePublication } from '../../apiCalls/apiCalls.js'
+import ConfirmModal from '../../components/ConfirmDeleteModal.vue'
 
 const selectedPublicationId = ref(null)
 const creatingNewInstance = ref(false)
 const permissions = ref([])
 
-const component = ref(false)
+const showDeleteModal = ref(false)
+const publicationToDelete = ref(null)
 
 function fetchPublicationId() {
     return selectedPublicationId.value
@@ -47,9 +49,15 @@ const {
   fetchPublicationData: publicationToEditFetch
 } = usePublication(fetchPublicationId)
 
-const publicationSave = (toSave) => {
+const publicationSave = async (toSave) => {
   try {
-    publicationToEditUpdate(toSave)
+    await publicationToEditUpdate(toSave)
+    await fetchPublicationsPaginated(1, 10, true)
+    if (selectedPublicationId.value) {
+      await publicationToEditFetch()
+    }
+    selectedPublicationId.value = null
+    creatingNewInstance.value = false
   } catch (error) {
     console.error('Error saving publication data:', error)
   }
@@ -76,16 +84,26 @@ const onPublicationPaginate = (page, pageSize) => {
   fetchPublicationsPaginated(page, pageSize, true)
 }
 
-const onPublicationDelete = (id) => {
-  deletePublication(id).then(() => {
-    fetchPublicationsPaginated(1, 10, true)
-    if (selectedPublicationId.value === id) {
+// Nuova logica: conferma prima di eliminare
+const confirmPublicationDelete = (publication) => {
+  publicationToDelete.value = publication
+  showDeleteModal.value = true
+}
+
+const performPublicationDelete = async () => {
+  if (!publicationToDelete.value) return
+  try {
+    await deletePublication(publicationToDelete.value)
+    await fetchPublicationsPaginated(1, 10, true)
+    if (selectedPublicationId.value === publicationToDelete.value) {
       selectedPublicationId.value = null
       creatingNewInstance.value = false
     }
-  }).catch(error => {
+    showDeleteModal.value = false
+    publicationToDelete.value = null
+  } catch (error) {
     console.error('Error deleting publication:', error)
-  })
+  }
 }
 
 const onPublicationCreate = () => {
@@ -94,52 +112,63 @@ const onPublicationCreate = () => {
 }
 
 const { menu: publicMenu } = usePublicMenu()
-const {menu: privateMenu} = usePrivateMenu()
+const { menu: privateMenu } = usePrivateMenu()
 </script>
+
 
 <template>
   <div class="min-h-screen flex flex-col bg-gray-50 text-gray-800 pt-16">
-    <Navbar
-        :menuItems="publicMenu"
-    />
+    <Navbar :menuItems="publicMenu" />
 
     <main class="flex-grow container max-w-6xl mx-auto p-2 sm:p-4 md:p-6 mt-4">
       <div class="flex flex-col md:flex-row gap-4 md:gap-8">
         <ViewDropDownSelector :menuOptions="privateMenu"/>
 
         <section class="flex-1 bg-white rounded-xl shadow p-6 min-h-[300px]">
-            <div class="flex flex-col gap-6 md:flex-row md:items-start md:gap-8 md:flex-nowrap">
-                <PublicationList 
-                  :publications="paginatedPublications"
-                  :maxHeight="'28rem'"
-                  :totalItems="totalPublications"
-                  :projects="allProjects"
-                  :allowCreate="permissions.some(permission => permission == 'api.add_publication')"
-                  @edit="onPublicationEdit"
-                  @delete="onPublicationDelete"
-                  @paginate="onPublicationPaginate"
-                  @create="onPublicationCreate"
-                />
-                <PublicationForm 
-                  v-if="creatingNewInstance"
-                  :saving="publicationToEditLoading"
-                  :componentOptions="allComponents"
-                  :projectOptions="allProjects"
-                  formTitle="Creazione Pubblicazione"
-                  @save="publicationCreate"
-                />
-                <PublicationForm 
-                  v-if="!creatingNewInstance && !publicationToEditLoading && !publicationToEditError && publicationToEdit"
-                  :publication="publicationToEdit"
-                  :components="publicationToEditComponents"
-                  :project="publicationToEditProject"
-                  :saving="publicationToEditLoading"
-                  :componentOptions="allComponents"
-                  :projectOptions="allProjects"
-                  formTitle="Modifica Pubblicazione"
-                  @save="publicationSave"
-                />
-            </div>
+          <!-- Modale di conferma -->
+          <ConfirmModal
+            :show="showDeleteModal"
+            title="Conferma Eliminazione"
+            message="Sei sicuro di voler eliminare questa pubblicazione?"
+            confirmText="Elimina"
+            cancelText="Annulla"
+            warningText="Questa operazione non può essere annullata."
+            @confirm="performPublicationDelete"
+            @cancel="showDeleteModal = false"
+          />
+
+          <div class="flex flex-col gap-6 md:flex-row md:items-start md:gap-8 md:flex-nowrap">
+            <PublicationList 
+              :publications="paginatedPublications"
+              :maxHeight="'28rem'"
+              :totalItems="totalPublications"
+              :projects="allProjects"
+              :allowCreate="permissions.some(p => p === 'api.add_publication')"
+              @edit="onPublicationEdit"
+              @delete="confirmPublicationDelete"
+              @paginate="onPublicationPaginate"
+              @create="onPublicationCreate"
+            />
+            <PublicationForm 
+              v-if="creatingNewInstance"
+              :saving="publicationToEditLoading"
+              :componentOptions="allComponents"
+              :projectOptions="allProjects"
+              formTitle="Creazione Pubblicazione"
+              @save="publicationCreate"
+            />
+            <PublicationForm 
+              v-if="!creatingNewInstance && !publicationToEditLoading && !publicationToEditError && publicationToEdit && selectedPublicationId"
+              :publication="publicationToEdit"
+              :components="publicationToEditComponents"
+              :project="publicationToEditProject"
+              :saving="publicationToEditLoading"
+              :componentOptions="allComponents"
+              :projectOptions="allProjects"
+              formTitle="Modifica Pubblicazione"
+              @save="publicationSave"
+            />
+          </div>
         </section>
       </div>
     </main>

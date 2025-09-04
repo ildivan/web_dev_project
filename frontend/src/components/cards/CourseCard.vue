@@ -1,5 +1,8 @@
 <script setup>
 import { computed } from 'vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 const props = defineProps({
   course: { type: Object, required: true },
@@ -48,7 +51,9 @@ const containerClasses = computed(() => {
 })
 
 function onClick() {
-  //da implementare se si vuole inserire una pagina per il dettaglio dei corsi
+    if (!props.clickable) return
+    const id = props.course?.id
+    if (id != null) router.push(`/courses/${id}`)
 }
 
 </script>

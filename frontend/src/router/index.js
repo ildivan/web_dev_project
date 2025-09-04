@@ -28,6 +28,11 @@ const routes = [
     component: () => import('../views/public/PublicationsView.vue'),
   },
   {
+    path: '/courses',
+    name: 'Courses',
+    component: () => import('../views/public/CoursesView.vue'),
+  },
+  {
     path: '/contacts',
     name: 'Contacts',
     component: () => import('../views/public/ContactsView.vue'),
@@ -59,6 +64,11 @@ const routes = [
     path: '/projects/:id',
     name: 'ProjectDetail',
     component: () => import( '../views/public/ProjectDetailsView.vue'),
+  },
+  {
+    path: '/courses/:id',
+    name: 'CourseDetail',
+    component: () => import( '../views/public/CourseDetailsView.vue'),
   },
   {
     path: '/admin/projects',

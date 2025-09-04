@@ -10,6 +10,7 @@ export function usePublicMenu() {
       { name: 'Membri', to: '/members' },
       { name: 'Progetti', to: '/projects' },
       { name: 'Pubblicazioni', to: '/pubblications' },
+      { name: 'Corsi', to: '/courses' },
       { name: 'Profilo', to: '/profile' }
     ],
     profile: [
@@ -21,10 +22,11 @@ export function usePublicMenu() {
   // Map route paths to menu keys
   const menuKeyByPath = {
     '/': 'home',
-    '/members': 'home',
-    '/projects': 'home',
-    '/pubblications': 'home',
-    '/profile': 'profile',
+    '/members': 'members',
+    '/projects': 'projects',
+    '/pubblications': 'pubblications',
+    '/courses': 'courses',
+    '/profile': 'profile'
   }
 
   const menu = computed(() => {

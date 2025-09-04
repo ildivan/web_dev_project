@@ -45,6 +45,10 @@ function arraysHaveSameElements(arr1, arr2) {
 }
 
 function onSave() {
+   if (startDate.value && endDate.value && new Date(startDate.value) > new Date(endDate.value)) {
+    alert('La data di inizio non può essere successiva alla data di fine.')
+    return
+  }
   const toSave = {}
   if (title.value !== props.project.title) toSave.title = title.value
   if (description.value !== props.project.description) toSave.description = description.value

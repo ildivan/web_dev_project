@@ -53,8 +53,6 @@ export function useCourse(getId) {
         }
     }
 
-    fetchCourseData()
-
     return {
         loading,
         error,

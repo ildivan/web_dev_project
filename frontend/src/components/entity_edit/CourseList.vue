@@ -49,7 +49,7 @@ function onDelete(id) {
       @delete="onDelete"
       @edit="onEdit"
     >
-      <CourseCard :course="course" />
+      <CourseCard :course="course" :clickable="false"/>
     </EntityListItem>
   </EntityList>
 </template>

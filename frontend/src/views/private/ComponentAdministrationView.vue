@@ -15,10 +15,15 @@ import ViewDropDownSelector from '../../components/ViewDropDownSelector.vue'
 import usePrivateMenu from '../../composables/usePrivateMenu.js'
 import { createGroupComponent, deleteGroupComponent, getPermissions, getUsers, isComponent } from '../../apiCalls/apiCalls.js'
 import ComponentCreationForm from '../../components/entity_edit/ComponentCreationForm.vue'
+import ConfirmModal from '../../components/ConfirmDeleteModal.vue'
 
 const selectedComponentId = ref(null)
 const creatingNewInstance = ref(false)
 const permissions = ref([])
+
+const showDeleteModal = ref(false)
+const componentToDelete = ref(null)
+
 
 function fetchComponentId() {
     return selectedComponentId.value
@@ -65,10 +70,15 @@ onMounted(async () => {
 
 componentToEditFetch()
 
-const componentSave = (toSave) => {
+const componentSave = async (toSave) => {
   try {
-    componentToEditUpdate(toSave)
-    fetchComponentsPaginated(1, 10, true)
+    await componentToEditUpdate(toSave)
+    await fetchComponentsPaginated(1, 10, true)
+    if (selectedComponentId.value) {
+      await componentToEditFetch()
+    }
+    selectedComponentId.value = null
+    creatingNewInstance.value = false
   } catch (error) {
     console.error('Error saving component data:', error)
   }
@@ -98,20 +108,31 @@ const onComponentPaginate = (page, pageSize) => {
   fetchComponentsPaginated(page, pageSize, true)
 }
 
-const onComponentDelete = (id) => {
-  deleteGroupComponent(id).then(() => {
+const confirmComponentDelete = (component) => {
+  componentToDelete.value = component
+  showDeleteModal.value = true
+}
+
+const performComponentDelete = async () => {
+  if (!componentToDelete.value) return
+  try {
+    await deleteGroupComponent(componentToDelete.value)
     refreshUsersNotComponents()
-    // Refresh the component list after deletion
     fetchComponentsPaginated(1, 10, true)
-    // If the deleted component was being edited, clear the form
-    if (selectedComponentId.value === id) {
+
+    if (selectedComponentId.value === componentToDelete.value) {
       selectedComponentId.value = null
       creatingNewInstance.value = false
     }
-  }).catch(error => {
+
+    showDeleteModal.value = false
+    componentToDelete.value = null
+  } catch (error) {
     console.error('Error deleting component:', error)
-  })
+  }
 }
+
+
 
 const onComponentCreate = () => {
   creatingNewInstance.value = true
@@ -133,14 +154,24 @@ const {menu: privateMenu} = usePrivateMenu()
         <ViewDropDownSelector :menuOptions="privateMenu"/>
 
         <div class="flex-1 bg-white rounded-xl shadow p-6 min-h-[300px]">
-          <div class="flex flex-col gap-6 md:flex-row md:items-start md:gap-8 md:flex-nowrap">
+          <ConfirmModal
+            :show="showDeleteModal"
+            title="Conferma Eliminazione"
+            :message="`Sei sicuro di voler eliminare il componente?`"
+            confirmText="Elimina"
+            cancelText="Annulla"
+            warningText="Questa operazione non può essere annullata"
+            @confirm="performComponentDelete"
+            @cancel="showDeleteModal = false"
+          />
+
             <ComponentList 
             :components="paginatedComponents"
             :maxHeight="'28rem'"
             :totalItems="totalComponents"
             :allowCreate="permissions.some(permission => permission == 'api.add_researchgroupcomponent')"
             @edit="onComponentEdit"
-            @delete="onComponentDelete"
+            @delete="confirmComponentDelete"
             @paginate="onComponentPaginate"
             @create="onComponentCreate"
             />
@@ -167,8 +198,7 @@ const {menu: privateMenu} = usePrivateMenu()
             @save="componentSave"
             />
           </div>
-        </div>
-      </div>
+        </div> 
     </main>
 
     <Footer/>
