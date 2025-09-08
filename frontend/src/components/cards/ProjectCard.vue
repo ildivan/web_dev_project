@@ -61,10 +61,6 @@ const statusClass = computed(() => {
       <span v-if="props.project.end_date"> - A: {{ props.project.end_date }}</span>
     </p>
 
-    <!-- Research area -->
-    <p class="text-xs text-gray-500 mt-1 break-words whitespace-normal">
-      Area: {{ props.project.research_area?.name || 'N/A' }}
-    </p>
   </div>
 </template>
 
