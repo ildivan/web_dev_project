@@ -15,7 +15,6 @@ defineProps({
         {{ course.name }}
       </h2>
       <p class="text-gray-600 mb-2">{{ course.description }}</p>
-      <p class="text-gray-500 text-sm">Anno accademico: {{ course.academic_year }}</p>
     </section>
 
     <!-- Sezione docenti -->
