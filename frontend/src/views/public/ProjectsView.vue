@@ -75,102 +75,69 @@ const toggleFilterPanel = () => {
 
 <template>
   <div class="min-h-screen flex flex-col bg-gray-50 text-gray-800">
-    <Navbar
-        :menuItems="menu"
-    />
+    <Navbar :menuItems="menu" />
 
     <main class="flex-grow container max-w-8xl mx-auto p-6 mt-10">
-        <section id="overview" class="container mx-auto py-12 px-4 text-center">
-            <h2 class="text-3xl font-bold mb-4">{{ welcomeMessage }}</h2>
-        </section>
+      <section id="overview" class="container mx-auto py-12 px-4 text-center">
+        <h2 class="text-3xl font-bold mb-4">{{ welcomeMessage }}</h2>
+      </section>
 
-        <section id="progetti" class="bg-white py-6 px-4 rounded-lg shadow relative">
-            <div class="container mx-auto">
-            <div class="flex items-center justify-between mb-4">
-               <Button
-                  message="Filtra"
-                  @click="toggleFilterPanel"
-                  class="mr-4"
-                  style=" font-size: 0.875rem;"
+      <section id="progetti" class="bg-white py-6 px-4 rounded-lg shadow relative">
+        <div class="container mx-auto">
+          <!-- Filters always on top -->
+          <div class="flex flex-col md:flex-row items-center md:items-end gap-4 mb-4">
+            <div class="flex flex-row gap-4">
+              <label class="flex items-center space-x-2">
+                <input 
+                  type="checkbox" 
+                  value="active"
+                  v-model="selectedFilters"
+                  class="w-3 h-3 bg-white rounded-sm border border-gray-300 !appearance-none checked:bg-indigo-500 transition-colors duration-200"
+                  style="box-shadow: inset 0 1px 2px rgba(0,0,0,0.10);"
                 />
-                <input
-                  v-model="searchQuery"
-                  type="text"
-                  placeholder="Cerca progetti..."
-                  class="border border-gray-300 rounded-lg px-4 py-2 flex-1 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  style=" font-size: 0.875rem;"
-                  />
-            </div>  
-
-                <!-- flex div for projects and filters -->
-                <div class="flex transition-all duration-300">
-
-                    <!-- filter panel -->
-                    <transition name="slide-side">
-                        <div 
-                        v-if="filterPanelOpen" 
-                        class="w-64 bg-gray-100 shadow-lg rounded-lg p-4 relative flex-shrink-0 mr-4"
-                        >
-
-                            <button 
-                                @click="filterPanelOpen = false"
-                                class="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
-                            >
-                                ✕
-                            </button>
-
-                            <div class="space-y-2">
-                                <label class="flex items-center space-x-2">
-                                <input 
-                                    type="checkbox" 
-                                    value="active"
-                                    v-model="selectedFilters"
-                                    class="w-3 h-3 bg-white rounded-sm border border-gray-300 !appearance-none checked:bg-indigo-500 transition-colors duration-200"
-                                    style="box-shadow: inset 0 1px 2px rgba(0,0,0,0.10);"
-
-                                />
-                                <span 
-                                class="px-2 py-1 rounded-md hover:bg-gray-300 transition-colors duration-300"
-                                >
-                                    Attivi
-                                </span>
-                                </label>
-                                <label class="flex items-center space-x-2">
-                                <input 
-                                    type="checkbox" 
-                                    value="finished"
-                                    v-model="selectedFilters"
-                                    class="w-3 h-3 bg-white rounded-sm border border-gray-300 !appearance-none checked:bg-indigo-500 transition-colors duration-200"
-                                    style="box-shadow: inset 0 1px 2px rgba(0,0,0,0.10);"
-                                />
-                                <span 
-                                class="px-2 py-1 rounded-md hover:bg-gray-300 transition-colors duration-300"
-                                >
-                                    Conclusi
-                                </span>
-                                </label>
-                            </div>
-                        </div>
-                    </transition>
-
-                    <div class="w-full grid md:grid-cols-1 gap-6">
-                        <ProjectCard
-                        v-for="project in filteredProjects"
-                        :key="project.id"
-                        :project="project"
-                        />
-                    </div>
-                </div>
-
-                <div class="mt-8 text-center">
-                    <Button
-                        v-if="hasMore"
-                        message="Carica altri progetti"
-                        @click="loadMore"
-                    />
-                </div>
+                <span class="px-2 py-1 rounded-md hover:bg-gray-300 transition-colors duration-300">
+                  Attivi
+                </span>
+              </label>
+              <label class="flex items-center space-x-2">
+                <input 
+                  type="checkbox" 
+                  value="finished"
+                  v-model="selectedFilters"
+                  class="w-3 h-3 bg-white rounded-sm border border-gray-300 !appearance-none checked:bg-indigo-500 transition-colors duration-200"
+                  style="box-shadow: inset 0 1px 2px rgba(0,0,0,0.10);"
+                />
+                <span class="px-2 py-1 rounded-md hover:bg-gray-300 transition-colors duration-300">
+                  Conclusi
+                </span>
+              </label>
             </div>
-        </section>
+            <input
+              v-model="searchQuery"
+              type="text"
+              placeholder="Cerca progetti..."
+              class="border border-gray-300 rounded-lg px-4 py-2 flex-1 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              style="font-size: 0.875rem; min-width: 200px;"
+            />
+          </div>
+
+          <div class="w-full grid md:grid-cols-1 gap-6">
+            <ProjectCard
+              v-for="project in filteredProjects"
+              :key="project.id"
+              :project="project"
+            />
+          </div>
+
+          <div class="mt-8 text-center">
+            <Button
+              v-if="hasMore"
+              message="Carica altri progetti"
+              @click="loadMore"
+            />
+          </div>
+        </div>
+      </section>
     </main>
 
     <Footer/>

@@ -43,7 +43,7 @@ const statusClass = computed(() => {
       {{ props.project.title }}
     </h3>
 
-    <p class="text-sm text-gray-600 mt-1 break-words whitespace-normal">
+    <p class="text-sm text-gray-600 mt-1 break-words whitespace-normal line-clamp-3">
       {{ props.project.description }}
     </p>
 
@@ -67,3 +67,13 @@ const statusClass = computed(() => {
     </p>
   </div>
 </template>
+
+<style scoped>
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+</style>
