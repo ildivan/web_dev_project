@@ -47,7 +47,7 @@ function onClick() {
       {{ props.publication.title }}
     </h3>
 
-    <p class="text-sm text-gray-600 whitespace-normal break-words mt-2">
+    <p class="text-sm text-gray-600 whitespace-normal break-words mt-2 line-clamp-3">
       {{ props.publication.description }}
     </p>
 
@@ -60,3 +60,14 @@ function onClick() {
     </p>
   </div>
 </template>
+
+<style scoped>
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+</style>
