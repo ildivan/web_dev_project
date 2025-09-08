@@ -49,7 +49,7 @@ onMounted(() => {
                     <Title :title="title"  class="mb-6" />
 
                     <div class="bg-white rounded-2xl shadow-lg p-8">
-                        <h2 class="text-center text-2xl font-bold mb-6 text-gray-600">Our Team</h2>
+                        <h2 class="text-center text-2xl font-bold mb-6 text-gray-600">I nostri corsi</h2>
 
                        <div class="space-y-6">
                            <CourseCard

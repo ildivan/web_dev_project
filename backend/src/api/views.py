@@ -4,7 +4,7 @@ from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 from .pagination import DefaultPagination
 
-from guardian.shortcuts import assign_perm, remove_perm, get_objects_for_user
+from guardian.shortcuts import assign_perm, remove_perm, get_objects_for_user, get_users_with_perms, get_perms
 from django.contrib.auth.models import User
 from django.db import transaction
 
@@ -88,12 +88,11 @@ class ResearchGroupComponentViewSet(BaseModelViewSet):
         'projects', 'owned_projects', 'teached_courses', 'publications', 'user__groups'
     ).select_related('user').order_by('user_id')
 
-    # use list serializer (PK relationships) for paginated GET
     serializer_class = api_serializers.ResearchGroupComponentListSerializer
     detail_serializer_class = api_serializers.ResearchGroupComponentDetailSerializer
     short_serializer_class = api_serializers.ResearchGroupComponentShortSerializer
     edit_serializer_class = api_serializers.ResearchGroupComponentEditSerializer
-    
+
     def perform_create(self, serializer):
         # Salva il progetto assegnando owner come l'utente richiedente
         with transaction.atomic():
@@ -119,6 +118,40 @@ class ResearchGroupComponentViewSet(BaseModelViewSet):
             for course in old_courses - new_courses:
                 remove_perm('api.change_course', component.user, course)
                 remove_perm('api.delete_course', component.user, course)
+
+    def perform_destroy(self, instance):
+        """
+        Remove all object-level permissions for the user associated with this component.
+        """
+        from guardian.shortcuts import get_perms, remove_perm
+        user = instance.user
+
+        # Remove permissions for related courses
+        for course in instance.teached_courses.all():
+            for perm in get_perms(user, course):
+                remove_perm(perm, user, course)
+
+        # Remove permissions for related projects
+        for project in instance.projects.all():
+            for perm in get_perms(user, project):
+                remove_perm(perm, user, project)
+
+        # Remove permissions for owned projects
+        for project in instance.owned_projects.all():
+            for perm in get_perms(user, project):
+                remove_perm(perm, user, project)
+
+        # Remove permissions for related publications
+        for publication in instance.publications.all():
+            for perm in get_perms(user, publication):
+                remove_perm(perm, user, publication)
+
+        # Remove permissions for the component itself
+        for perm in get_perms(user, instance):
+            remove_perm(perm, user, instance)
+
+        # Now delete the instance
+        super().perform_destroy(instance)
 
 class AllUsersViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = User.objects.prefetch_related('groups').order_by('id')
@@ -158,6 +191,21 @@ class ResearchProjectViewSet(BaseModelViewSet):
                 assign_perm('api.change_researchproject', new_owner.user, project)
                 assign_perm('api.delete_researchproject', new_owner.user, project)
 
+                for publication in project.publications.all():
+                    remove_perm('api.change_publication', old_owner.user, publication)
+                    remove_perm('api.delete_publication', old_owner.user, publication)
+                    assign_perm('api.change_publication', new_owner.user, publication)
+                    assign_perm('api.delete_publication', new_owner.user, publication)
+
+    def perform_destroy(self, instance):
+        """
+        Remove all object-level permissions for all users on this project.
+        """
+        users = get_users_with_perms(instance)
+        for user in users:
+            for perm in get_perms(user, instance):
+                remove_perm(perm, user, instance)
+        super().perform_destroy(instance)
 
 class PublicationViewSet(BaseModelViewSet):
     queryset = Publication.objects.select_related(
@@ -190,6 +238,16 @@ class PublicationViewSet(BaseModelViewSet):
                 assign_perm('api.change_publication', new_owner.user, publication)
                 assign_perm('api.delete_publication', new_owner.user, publication)
 
+    def perform_destroy(self, instance):
+        """
+        Remove all object-level permissions for all users on this publication.
+        """
+        users = get_users_with_perms(instance)
+        for user in users:
+            for perm in get_perms(user, instance):
+                remove_perm(perm, user, instance)
+        super().perform_destroy(instance)
+
 class CourseViewSet(BaseModelViewSet):
     queryset = Course.objects.prefetch_related('teachers').order_by('id')
     serializer_class = api_serializers.CourseListSerializer
@@ -201,8 +259,8 @@ class CourseViewSet(BaseModelViewSet):
             course = serializer.save()
             # Assegna permessi di cambio/cancellazione a ciascun membro 
             for teacher in course.teachers.all():
-                    assign_perm('api.change_course', teacher.user, course)
-                    assign_perm('api.delete_course', teacher.user, course)
+                assign_perm('api.change_course', teacher.user, course)
+                assign_perm('api.delete_course', teacher.user, course)
 
     def perform_update(self, serializer):
         course = serializer.instance  # istanza prima dell'update
@@ -227,6 +285,16 @@ class CourseViewSet(BaseModelViewSet):
                 remove_perm('api.change_course', teacher.user, course)
                 remove_perm('api.delete_course', teacher.user, course)
 
+    def perform_destroy(self, instance):
+        """
+        Remove all object-level permissions for all teachers on this course.
+        """
+        teachers = instance.teachers.all()
+        for teacher in teachers:
+            remove_perm('api.change_course', teacher.user, instance)
+            remove_perm('api.delete_course', teacher.user, instance)
+        super().perform_destroy(instance)
+
 # ----------------- API VIEWS -----------------
 
 class PermissionsView(APIView):
@@ -234,8 +302,33 @@ class PermissionsView(APIView):
         user = request.user
         if not user.is_authenticated:
             return Response({'detail': 'Authentication failed.'}, status=401)
+
+        # Global permissions
         permissions = user.get_all_permissions()
-        return Response({'permissions': list(permissions)})
+
+        # Object-level permissions
+        from .models import ResearchArea, ResearchGroupComponent, ResearchProject, Publication, Course
+        from guardian.shortcuts import get_objects_for_user
+
+        object_perms = {}
+        models_and_perms = {
+            'researcharea': (ResearchArea, ['change_researcharea', 'delete_researcharea']),
+            'researchgroupcomponent': (ResearchGroupComponent, ['change_researchgroupcomponent', 'delete_researchgroupcomponent']),
+            'researchproject': (ResearchProject, ['change_researchproject', 'delete_researchproject']),
+            'publication': (Publication, ['change_publication', 'delete_publication']),
+            'course': (Course, ['change_course', 'delete_course']),
+        }
+
+        for key, (model, perms) in models_and_perms.items():
+            object_perms[key] = {}
+            for perm in perms:
+                objs = get_objects_for_user(user, f'api.{perm}', klass=model)
+                object_perms[key][perm] = [obj.pk for obj in objs]
+
+        return Response({
+            'permissions': list(permissions),
+            'object_permissions': object_perms
+        })
 
 class IsComponentView(APIView):
     permission_classes = [IsAuthenticated]
